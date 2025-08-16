@@ -45,7 +45,8 @@ interface expandedRows {
         RippleModule,
         IconFieldModule
     ],
-    template: ` <div class="card">
+    template: ` 
+    <div class="card">
             <div class="font-semibold text-xl mb-4">Filtering</div>
             <p-table
                 #dt1

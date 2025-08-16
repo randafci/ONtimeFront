@@ -1,0 +1,10 @@
+.layout-menu {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.menu-separator {
+    border-top: 1px solid var(--surface-border);
+    margin: 1rem 0;
+}
