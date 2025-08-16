@@ -1,15 +1,14 @@
+import { LayoutService } from '@/layout/service/layout.service';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, computed, inject, PLATFORM_ID, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { $t, updatePreset, updateSurfacePalette } from '@primeuix/themes';
+import { updatePreset, updateSurfacePalette, $t } from '@primeuix/themes';
+import { PrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 import Lara from '@primeuix/themes/lara';
 import Nora from '@primeuix/themes/nora';
-import { PrimeNG } from 'primeng/config';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { LayoutService } from '../service/layout.service';
-
 const presets = {
     Aura,
     Lara,
@@ -37,65 +36,12 @@ declare type SurfacesType = {
 };
 
 @Component({
-    selector: 'app-configurator',
-    standalone: true,
-    imports: [CommonModule, FormsModule, SelectButtonModule],
-    template: `
-        <div class="flex flex-col gap-4">
-            <div>
-                <span class="text-sm text-muted-color font-semibold">Primary</span>
-                <div class="pt-2 flex gap-2 flex-wrap justify-start">
-                    @for (primaryColor of primaryColors(); track primaryColor.name) {
-                        <button
-                            type="button"
-                            [title]="primaryColor.name"
-                            (click)="updateColors($event, 'primary', primaryColor)"
-                            [ngClass]="{
-                                    'outline outline-primary': primaryColor.name === selectedPrimaryColor()
-                                }"
-                            class="cursor-pointer w-5 h-5 rounded-full flex shrink-0 items-center justify-center outline-offset-1 shadow"
-                            [style]="{
-                                    'background-color': primaryColor?.name === 'noir' ? 'var(--text-color)' : primaryColor?.palette?.['500']
-                                }"
-                        >
-                        </button>
-                    }
-                </div>
-            </div>
-            <div>
-                <span class="text-sm text-muted-color font-semibold">Surface</span>
-                <div class="pt-2 flex gap-2 flex-wrap justify-start">
-                    @for (surface of surfaces; track surface.name) {
-                        <button
-                            type="button"
-                            [title]="surface.name"
-                            (click)="updateColors($event, 'surface', surface)"
-                            class="cursor-pointer w-5 h-5 rounded-full flex shrink-0 items-center justify-center p-0 outline-offset-1"
-                            [ngClass]="{
-                                    'outline outline-primary': selectedSurfaceColor() ? selectedSurfaceColor() === surface.name : layoutService.layoutConfig().darkTheme ? surface.name === 'zinc' : surface.name === 'slate'
-                                }"
-                            [style]="{
-                                    'background-color': surface?.palette?.['500']
-                                }"
-                        ></button>
-                    }
-                </div>
-            </div>
-            <div class="flex flex-col gap-2">
-                <span class="text-sm text-muted-color font-semibold">Presets</span>
-                <p-selectbutton [options]="presets" [ngModel]="selectedPreset()" (ngModelChange)="onPresetChange($event)" [allowEmpty]="false" size="small" />
-            </div>
-            <div *ngIf="showMenuModeButton()" class="flex flex-col gap-2">
-                <span class="text-sm text-muted-color font-semibold">Menu Mode</span>
-                <p-selectbutton [ngModel]="menuMode()" (ngModelChange)="onMenuModeChange($event)" [options]="menuModeOptions" [allowEmpty]="false" size="small" />
-            </div>
-        </div>
-    `,
-    host: {
-        class: 'hidden absolute top-13 right-0 w-72 p-4 bg-surface-0 dark:bg-surface-900 border border-surface rounded-border origin-top shadow-[0px_3px_5px_rgba(0,0,0,0.02),0px_0px_2px_rgba(0,0,0,0.05),0px_1px_4px_rgba(0,0,0,0.08)]'
-    }
+  selector: 'app-configurator',
+  imports: [CommonModule, FormsModule, SelectButtonModule],
+  templateUrl: './configurator.html',
+  styleUrl: './configurator.scss'
 })
-export class AppConfigurator {
+export class Configurator {
     router = inject(Router);
 
     config: PrimeNG = inject(PrimeNG);

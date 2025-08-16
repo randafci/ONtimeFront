@@ -1,0 +1,29 @@
+.layout-menuitem-root-text {
+    color: var(--text-color);
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    text-transform: uppercase;
+}
+
+.layout-menuitem-icon {
+    margin-right: 0.5rem;
+}
+
+.layout-menuitem-text {
+    flex: 1;
+}
+
+.layout-submenu-toggler {
+    transition: transform 0.3s;
+}
+
+.active-route {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.active-route .layout-menuitem-icon,
+.active-route .layout-menuitem-text,
+.active-route .layout-submenu-toggler {
+    color: white;
+}
