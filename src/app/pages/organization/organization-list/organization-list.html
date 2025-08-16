@@ -1,0 +1,100 @@
+<div class="card">
+  <h1 class="font-semibold text-xl mb-4">Admin Users</h1>
+  
+  <div class="flex justify-between items-center mb-4">
+    <button 
+      pButton 
+      label="Clear" 
+      class="p-button-outlined" 
+      icon="pi pi-filter-slash" 
+      >
+    </button>
+    
+    <span class="p-input-icon-left">
+      <i class="pi pi-search"></i>
+      <input 
+        pInputText 
+        type="text" 
+      
+        placeholder="Search..." />
+    </span>
+  </div>
+
+  <p-table
+    #dt
+    [value]="admins"
+    dataKey="id"
+    [rows]="10"
+    [loading]="loading"
+    [paginator]="true"
+    [globalFilterFields]="['fullName', 'email', 'phoneNumber']"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+    styleClass="p-datatable-gridlines"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    [showCurrentPageReport]="true">
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="min-width: 12rem">
+          <div class="flex justify-between items-center">
+            Full Name
+            <p-columnFilter type="text" field="fullName" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 12rem">
+          <div class="flex justify-between items-center">
+            Email
+            <p-columnFilter type="text" field="email" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 10rem">
+          <div class="flex justify-between items-center">
+            Phone
+            <p-columnFilter type="text" field="phoneNumber" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 8rem">
+          <div class="flex justify-between items-center">
+            Status
+            <p-columnFilter field="status" matchMode="equals" display="menu" [showMatchModes]="false">
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+         
+              </ng-template>
+            </p-columnFilter>
+          </div>
+        </th>
+        <th style="width: 5rem"></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-admin>
+      <tr>
+        <td>{{ admin.fullName }}</td>
+        <td>{{ admin.email }}</td>
+        <td>{{ admin.phoneNumber }}</td>
+        <td>
+          <p-tag 
+            [value]="admin.status || 'active'" 
+           >
+          </p-tag>
+        </td>
+        <td class="text-center">
+          <button pButton icon="pi pi-ellipsis-v" class="p-button-text"></button>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5">No admin users found</td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="loadingbody">
+      <tr>
+        <td colspan="5">Loading admin users...</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

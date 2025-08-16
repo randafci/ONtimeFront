@@ -4,15 +4,20 @@ import { Dashboard } from './app/pages/dashboard/dashboard';
 import { Documentation } from './app/pages/documentation/documentation';
 import { Landing } from './app/pages/landing/landing';
 import { Notfound } from './app/pages/notfound/notfound';
+import { MenuComponent } from '@/main/menu/menu';
+import { Layout } from '@/main/layout/layout';
 
 export const appRoutes: Routes = [
     {
         path: '',
-        component: AppLayout,
+        component: Layout,//AppLayout,
         children: [
             { path: '', component: Dashboard },
             { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
+            { path: 'organization', loadChildren: () => import('./app/pages/organization/oraganization.routes') },
+
             { path: 'documentation', component: Documentation },
+            { path: 'test', component: Layout },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
         ]
     },
