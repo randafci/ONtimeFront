@@ -1,11 +1,16 @@
-import { Routes } from "@angular/router";
-import { AddOrEditOrganization } from "./add-or-edit-organization/add-or-edit-organization";
-import { OrganizationList } from "./organization-list/organization-list";
+// organization.routes.ts
+import { Routes } from '@angular/router';
+import { OrganizationListComponent } from './organization-list/organization-list';
+import { AddOrEditOrganization } from './add-or-edit-organization/add-or-edit-organization';
 
-export default [
-    { path: 'addeditOrganization',  component: AddOrEditOrganization },
-    { path: 'Organizationlits',  component: OrganizationList },
-
-    
-    { path: '**', redirectTo: '/notfound' }
-] as Routes;
+export const ORGANIZATION_ROUTES: Routes = [
+    { 
+        path: '',
+        children: [
+            { path: 'list', component: OrganizationListComponent },
+            { path: 'add', component: AddOrEditOrganization },
+            { path: 'edit/:id', component: AddOrEditOrganization },
+            { path: '', redirectTo: 'list', pathMatch: 'full' }
+        ]
+    }
+];

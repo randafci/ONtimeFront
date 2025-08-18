@@ -21,8 +21,8 @@ export class MenuComponent {
                 items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }]
             },
              {
-                label: 'Home 2',
-                items: [{ label: 'Organization', icon: 'pi pi-fw pi-home', routerLink: ['/organization/Organizationlits'] }]
+                label: 'Organization',
+                items: [{ label: 'Organization', icon: 'pi pi-fw pi-home', routerLink: ['/organizations/list'] }]
             },
             {
                 label: 'UI Components',
