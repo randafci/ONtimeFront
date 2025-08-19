@@ -1,4 +1,3 @@
-// organization-list.component.ts
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Table } from 'primeng/table';
 import { CommonModule } from '@angular/common';
@@ -15,14 +14,14 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { Organization } from '@/interfaces/organization.interface';
-import { LookupService } from '../OrganizationService';
+import { Company } from '@/interfaces/company.interface';
+import { CompanyService } from '../CompanyService';
 import { ApiResponse } from '@/interfaces/apiResponse.interface';
 import { Router, RouterModule } from "@angular/router";
 import { DatePipe } from '@angular/common';
 
 @Component({
-  selector: 'app-organization-list',
+  selector: 'app-company-list',
   standalone: true,
   imports: [
     CommonModule,
@@ -42,15 +41,20 @@ import { DatePipe } from '@angular/common';
     DatePipe
   ],
   providers: [MessageService],
-  templateUrl: './organization-list.html',
-  styleUrl: './organization-list.scss'
+  templateUrl: './company-list.html',
+  styleUrl: './company-list.scss'
 })
-export class OrganizationListComponent implements OnInit {
-  organizations: Organization[] = [];
+export class CompanyListComponent implements OnInit {
+  companies: Company[] = [];
   loading: boolean = true;
   statuses: any[] = [
     { label: 'Active', value: 'active' },
     { label: 'Inactive', value: 'inactive' }
+  ];
+
+  integrationOptions: any[] = [
+    { label: 'Yes', value: true },
+    { label: 'No', value: false }
   ];
 
   activityValues: number[] = [0, 100];
@@ -59,44 +63,44 @@ export class OrganizationListComponent implements OnInit {
   @ViewChild('filter') filter!: ElementRef;
 
   constructor(
-    private lookupService: LookupService,
+    private companyService: CompanyService,
     private messageService: MessageService,
     private router: Router
   ) {}
 
   ngOnInit() {
-    this.loadOrganizations();
+    this.loadCompanies();
   }
 
-  loadOrganizations() {
+  loadCompanies() {
     this.loading = true;
-    this.lookupService.getAllOrganizations().subscribe({
-      next: (response: ApiResponse<Organization[]>) => {
+    this.companyService.getAllCompanies().subscribe({
+      next: (response: ApiResponse<Company[]>) => {
         if (response.succeeded) {
-          this.organizations = response.data;
+          this.companies = response.data;
         } else {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: response.message || 'Failed to load organizations'
+            detail: response.message || 'Failed to load companies'
           });
         }
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading organizations:', error);
+        console.error('Error loading companies:', error);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to load organizations'
+          detail: 'Failed to load companies'
         });
         this.loading = false;
       }
     });
   }
 
-  getStatus(organization: Organization): string {
-    return organization.isDeleted ? 'inactive' : 'active';
+  getStatus(company: Company): string {
+    return company.isDeleted ? 'inactive' : 'active';
   }
 
   getSeverity(status: string) {
@@ -112,21 +116,25 @@ export class OrganizationListComponent implements OnInit {
     }
   }
 
+  getIntegrationSeverity(fromIntegration: boolean) {
+    return fromIntegration ? 'warning' : 'info';
+  }
+
   navigateToAdd() {
-    this.router.navigate(['/organizations/add']);
+    this.router.navigate(['/companies/add']);
   }
 
   navigateToEdit(id: number) {
-    this.router.navigate(['/organizations/edit', id]);
+    this.router.navigate(['/companies/edit', id]);
   }
 
-  deleteOrganization(organization: Organization) {
+  deleteCompany(company: Company) {
     // Implement delete logic here
-    console.log('Deleting organization:', organization);
+    console.log('Deleting company:', company);
     this.messageService.add({
       severity: 'warn',
       summary: 'Delete',
-      detail: `Are you sure you want to delete ${organization.name}?`,
+      detail: `Are you sure you want to delete ${company.name}?`,
       life: 3000
     });
   }

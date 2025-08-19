@@ -1,0 +1,190 @@
+<div class="card p-fluid max-w-[800px] mx-auto">
+  <h2>{{ isEditMode ? 'Edit' : 'Add' }} Department</h2>
+  
+  <form [formGroup]="departmentForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+    <!-- Vertical Grid Layout -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Code Field -->
+      <div class="field">
+        <label for="code">Code</label>
+        <input 
+          id="code" 
+          type="text" 
+          pInputText 
+          class="w-full"
+          formControlName="code" 
+          [ngClass]="{
+            'ng-invalid ng-dirty': 
+              (departmentForm.controls['code'].invalid && 
+              (departmentForm.controls['code'].dirty || departmentForm.controls['code'].touched || submitted))
+          }"
+        />
+        <small 
+          *ngIf="departmentForm.controls['code'].invalid && 
+                (departmentForm.controls['code'].dirty || departmentForm.controls['code'].touched || submitted)" 
+          class="p-error"
+        >
+          Code is required
+        </small>
+      </div>
+
+      <!-- Index Field -->
+      <div class="field">
+        <label for="index">Index</label>
+        <p-inputnumber class="w-full"
+          id="index" 
+          formControlName="index" 
+          [ngClass]="{
+            'ng-invalid ng-dirty': 
+              (departmentForm.controls['index'].invalid && 
+              (departmentForm.controls['index'].dirty || departmentForm.controls['index'].touched || submitted))
+          }"
+        ></p-inputnumber>
+        <small 
+          *ngIf="departmentForm.controls['index'].invalid && 
+                (departmentForm.controls['index'].dirty || departmentForm.controls['index'].touched || submitted)" 
+          class="p-error"
+        >
+          Index is required
+        </small>
+      </div>
+
+      <!-- Name Field -->
+      <div class="field">
+        <label for="name">Name</label>
+        <input class="w-full"
+          id="name" 
+          type="text" 
+          pInputText 
+          formControlName="name" 
+          [ngClass]="{
+            'ng-invalid ng-dirty': 
+              (departmentForm.controls['name'].invalid && 
+              (departmentForm.controls['name'].dirty || departmentForm.controls['name'].touched || submitted))
+          }"
+        />
+        <small 
+          *ngIf="departmentForm.controls['name'].invalid && 
+                (departmentForm.controls['name'].dirty || departmentForm.controls['name'].touched || submitted)" 
+          class="p-error"
+        >
+          Name is required
+        </small>
+      </div>
+
+      <!-- NameSE Field -->
+      <div class="field">
+        <label for="nameSE">Name (SE)</label>
+        <input class="w-full"
+          id="nameSE" 
+          type="text" 
+          pInputText 
+          formControlName="nameSE" 
+          [ngClass]="{
+            'ng-invalid ng-dirty': 
+              (departmentForm.controls['nameSE'].invalid && 
+              (departmentForm.controls['nameSE'].dirty || departmentForm.controls['nameSE'].touched || submitted))
+          }"
+        />
+        <small 
+          *ngIf="departmentForm.controls['nameSE'].invalid && 
+                (departmentForm.controls['nameSE'].dirty || departmentForm.controls['nameSE'].touched || submitted)" 
+          class="p-error"
+        >
+          Name (SE) is required
+        </small>
+      </div>
+
+      <!-- Organization Field -->
+      <div class="field">
+        <label for="organizationId">Organization</label>
+        <p-select class="w-full"
+          id="organizationId" 
+          formControlName="organizationId" 
+          [options]="organizations" 
+          optionLabel="name" 
+          optionValue="id"
+          placeholder="Select Organization"
+          [ngClass]="{
+            'ng-invalid ng-dirty': 
+              (departmentForm.controls['organizationId'].invalid && 
+              (departmentForm.controls['organizationId'].dirty || departmentForm.controls['organizationId'].touched || submitted))
+          }"
+        ></p-select>
+        <small 
+          *ngIf="departmentForm.controls['organizationId'].invalid && 
+                (departmentForm.controls['organizationId'].dirty || departmentForm.controls['organizationId'].touched || submitted)" 
+          class="p-error"
+        >
+          Organization is required
+        </small>
+      </div>
+
+      <!-- Company Field -->
+      <div class="field">
+        <label for="companyId">Company</label>
+        <p-select class="w-full"
+          id="companyId" 
+          formControlName="companyId" 
+          [options]="companies" 
+          optionLabel="name" 
+          optionValue="id"
+          placeholder="Select Company (Optional)"
+        ></p-select>
+      </div>
+
+      <!-- Parent Department Field -->
+      <div class="field">
+        <label for="parentId">Parent Department</label>
+        <p-select class="w-full"
+          id="parentId" 
+          formControlName="parentId" 
+          [options]="departments" 
+          optionLabel="name" 
+          optionValue="id"
+          placeholder="Select Parent Department (Optional)"
+        ></p-select>
+      </div>
+
+      <!-- Department Type Field -->
+      <div class="field">
+        <label for="departmentType">Department Type</label>
+        <p-inputnumber class="w-full"
+          id="departmentType" 
+          formControlName="departmentType" 
+          placeholder="Enter Department Type"
+        ></p-inputnumber>
+      </div>
+
+      <!-- From Integration Field -->
+      <div class="field">
+        <label for="fromIntegration">From Integration</label>
+        <p-checkbox class="w-full"
+          id="fromIntegration" 
+          formControlName="fromIntegration" 
+          [binary]="true"
+        ></p-checkbox>
+      </div>
+    </div>
+
+    <!-- Submit Button Row -->
+    <div class="flex justify-content-start gap-2 mt-4">
+      <button 
+        pButton 
+        type="button" 
+        label="Cancel" 
+        class="p-button-secondary" 
+        (click)="onCancel()"
+        [disabled]="loading"
+      ></button>
+      <button 
+        pButton 
+        type="submit" 
+        label="{{ isEditMode ? 'Update' : 'Save' }}" 
+        [disabled]="departmentForm.invalid || loading"
+      ></button>
+    </div>
+  </form>
+</div>
+
+<p-toast></p-toast>
