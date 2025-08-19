@@ -15,7 +15,7 @@ export const appRoutes: Routes = [
     {
         path: '',
         component: Layout, //AppLayout,
-        //canActivate: [AuthGuard], // Protect entire layout
+        canActivate: [AuthGuard], // Protect entire layout
         children: [
             { path: '', component: Dashboard },
             { 
