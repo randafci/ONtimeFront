@@ -1,1 +1,74 @@
-<p>add-or-edit-organization works!</p>
+<div class="card p-fluid">
+  <h2>{{ isEditMode ? 'Edit' : 'Add' }} Organization</h2>
+  
+  <form [formGroup]="organizationForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+    <!-- Vertical Grid Layout -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Name Field -->
+      <div class="field">
+        <label for="name">Name</label>
+        <input 
+          id="name" 
+          type="text" 
+          pInputText 
+          formControlName="name" 
+          [ngClass]="{
+            'ng-invalid ng-dirty': 
+              (organizationForm.controls['name'].invalid && 
+              (organizationForm.controls['name'].dirty || organizationForm.controls['name'].touched || submitted))
+          }"
+        />
+        <small 
+          *ngIf="organizationForm.controls['name'].invalid && 
+                (organizationForm.controls['name'].dirty || organizationForm.controls['name'].touched || submitted)" 
+          class="p-error"
+        >
+          Name is required
+        </small>
+      </div>
+
+      <!-- NameSE Field -->
+      <div class="field">
+        <label for="nameSE">Name (SE)</label>
+        <input 
+          id="nameSE" 
+          type="text" 
+          pInputText 
+          formControlName="nameSE" 
+          [ngClass]="{
+            'ng-invalid ng-dirty': 
+              (organizationForm.controls['nameSE'].invalid && 
+              (organizationForm.controls['nameSE'].dirty || organizationForm.controls['nameSE'].touched || submitted))
+          }"
+        />
+        <small 
+          *ngIf="organizationForm.controls['nameSE'].invalid && 
+                (organizationForm.controls['nameSE'].dirty || organizationForm.controls['nameSE'].touched || submitted)" 
+          class="p-error"
+        >
+          Name (SE) is required
+        </small>
+      </div>
+    </div>
+
+    <!-- Submit Button Row -->
+    <div class="flex justify-content-end gap-2 mt-4">
+      <button 
+        pButton 
+        type="button" 
+        label="Cancel" 
+        class="p-button-secondary" 
+        (click)="onCancel()"
+        [disabled]="loading"
+      ></button>
+      <button 
+        pButton 
+        type="submit" 
+        label="{{ isEditMode ? 'Update' : 'Save' }}" 
+        [disabled]="organizationForm.invalid || loading"
+      ></button>
+    </div>
+  </form>
+</div>
+
+<p-toast></p-toast>
