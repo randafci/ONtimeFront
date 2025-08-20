@@ -4,13 +4,13 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
-import { CheckboxModule } from 'primeng/checkbox';
 import { ToastModule } from 'primeng/toast';
 import { CompanyService } from '../CompanyService';
+import { CompanyTypeService } from '../CompanyTypeService';
 import { LookupService } from '../../organization/OrganizationService';
 import { Company, CreateCompany, EditCompany } from '@/interfaces/company.interface';
+import { CompanyType } from '@/interfaces/company-type.interface';
 import { Organization } from '@/interfaces/organization.interface';
 import { ApiResponse } from '@/interfaces/apiResponse.interface';
 import { CommonModule } from '@angular/common';
@@ -24,9 +24,7 @@ import { CommonModule } from '@angular/common';
     RouterModule,
     ButtonModule,
     InputTextModule,
-    InputNumberModule,
     SelectModule,
-    CheckboxModule,
     ToastModule,
   ],
   templateUrl: './add-or-edit-company.html',
@@ -41,12 +39,15 @@ export class AddOrEditCompany implements OnInit {
   submitted = false;
   organizations: Organization[] = [];
   companies: Company[] = [];
+  companyTypes: CompanyType[] = [];
+  mainCompanies: Company[] = [];
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private companyService: CompanyService,
+    private companyTypeService: CompanyTypeService,
     private organizationService: LookupService,
     private messageService: MessageService
   ) {
@@ -54,22 +55,27 @@ export class AddOrEditCompany implements OnInit {
       code: ['', Validators.required],
       name: ['', Validators.required],
       nameSE: ['', Validators.required],
-      index: [0, Validators.required],
       parentId: [null],
-      fromIntegration: [false],
-      organizationId: [null, Validators.required]
+      organizationId: [null, Validators.required],
+      companyTypeId: [null, Validators.required]
     });
   }
 
   ngOnInit(): void {
     this.loadOrganizations();
     this.loadCompanies();
+    this.loadCompanyTypes();
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode = true;
         this.companyId = +params['id'];
         this.loadCompany(this.companyId);
       }
+    });
+
+    // Watch for company type changes
+    this.companyForm.get('companyTypeId')?.valueChanges.subscribe(companyTypeId => {
+      this.onCompanyTypeChange(companyTypeId);
     });
   }
 
@@ -91,12 +97,42 @@ export class AddOrEditCompany implements OnInit {
       next: (response: ApiResponse<Company[]>) => {
         if (response.succeeded) {
           this.companies = response.data;
+          this.updateMainCompanies();
         }
       },
       error: (error) => {
         console.error('Error loading companies:', error);
       }
     });
+  }
+
+  loadCompanyTypes(): void {
+    this.companyTypeService.getAllCompanyTypes().subscribe({
+      next: (response: ApiResponse<CompanyType[]>) => {
+        if (response.succeeded) {
+          this.companyTypes = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading company types:', error);
+      }
+    });
+  }
+
+  updateMainCompanies(): void {
+    // Filter companies to show only Main Companies (companyTypeId = 1)
+    this.mainCompanies = this.companies.filter(company => company.companyTypeId === 1);
+  }
+
+  onCompanyTypeChange(companyTypeId: number): void {
+    if (companyTypeId === 1) { // Main Company
+      // Hide parent company selection
+      this.companyForm.get('parentId')?.setValue(null);
+      this.companyForm.get('parentId')?.disable();
+    } else if (companyTypeId === 2) { // Sub Company
+      // Show parent company selection with only main companies
+      this.companyForm.get('parentId')?.enable();
+    }
   }
 
   loadCompany(id: number): void {
@@ -108,11 +144,11 @@ export class AddOrEditCompany implements OnInit {
             code: response.data.code,
             name: response.data.name,
             nameSE: response.data.nameSE,
-            index: response.data.index,
             parentId: response.data.parentId,
-            fromIntegration: response.data.fromIntegration,
-            organizationId: response.data.organizationId
+            organizationId: response.data.organizationId,
+            companyTypeId: response.data.companyTypeId
           });
+          this.onCompanyTypeChange(response.data.companyTypeId || 0);
         }
         this.loading = false;
       },
@@ -142,10 +178,9 @@ export class AddOrEditCompany implements OnInit {
         code: formData.code,
         name: formData.name,
         nameSE: formData.nameSE,
-        index: formData.index,
         parentId: formData.parentId,
-        fromIntegration: formData.fromIntegration,
-        organizationId: formData.organizationId
+        organizationId: formData.organizationId,
+        companyTypeId: formData.companyTypeId
       };
       this.updateCompany(editData);
     } else {
@@ -153,10 +188,9 @@ export class AddOrEditCompany implements OnInit {
         code: formData.code,
         name: formData.name,
         nameSE: formData.nameSE,
-        index: formData.index,
         parentId: formData.parentId,
-        fromIntegration: formData.fromIntegration,
-        organizationId: formData.organizationId
+        organizationId: formData.organizationId,
+        companyTypeId: formData.companyTypeId
       };
       this.createCompany(createData);
     }

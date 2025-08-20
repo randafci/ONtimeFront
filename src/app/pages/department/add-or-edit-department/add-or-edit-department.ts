@@ -4,14 +4,14 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
-import { CheckboxModule } from 'primeng/checkbox';
 import { ToastModule } from 'primeng/toast';
 import { DepartmentService } from '../DepartmentService';
+import { DepartmentTypeService } from '../DepartmentTypeService';
 import { CompanyService } from '../../company/CompanyService';
 import { LookupService } from '../../organization/OrganizationService';
 import { Department, CreateDepartment, EditDepartment } from '@/interfaces/department.interface';
+import { DepartmentType } from '@/interfaces/department-type.interface';
 import { Company } from '@/interfaces/company.interface';
 import { Organization } from '@/interfaces/organization.interface';
 import { ApiResponse } from '@/interfaces/apiResponse.interface';
@@ -26,9 +26,7 @@ import { CommonModule } from '@angular/common';
     RouterModule,
     ButtonModule,
     InputTextModule,
-    InputNumberModule,
     SelectModule,
-    CheckboxModule,
     ToastModule,
   ],
   templateUrl: './add-or-edit-department.html',
@@ -44,12 +42,15 @@ export class AddOrEditDepartment implements OnInit {
   companies: Company[] = [];
   organizations: Organization[] = [];
   departments: Department[] = [];
+  departmentTypes: DepartmentType[] = [];
+  mainDepartments: Department[] = [];
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private departmentService: DepartmentService,
+    private departmentTypeService: DepartmentTypeService,
     private companyService: CompanyService,
     private organizationService: LookupService,
     private messageService: MessageService
@@ -58,12 +59,10 @@ export class AddOrEditDepartment implements OnInit {
       code: ['', Validators.required],
       name: ['', Validators.required],
       nameSE: ['', Validators.required],
-      index: [0, Validators.required],
       parentId: [null],
-      departmentType: [null],
-      fromIntegration: [false],
       organizationId: [null, Validators.required],
-      companyId: [null]
+      companyId: [null],
+      departmentTypeId: [null, Validators.required]
     });
   }
 
@@ -71,12 +70,18 @@ export class AddOrEditDepartment implements OnInit {
     this.loadOrganizations();
     this.loadCompanies();
     this.loadDepartments();
+    this.loadDepartmentTypes();
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode = true;
         this.departmentId = +params['id'];
         this.loadDepartment(this.departmentId);
       }
+    });
+
+    // Watch for department type changes
+    this.departmentForm.get('departmentTypeId')?.valueChanges.subscribe(departmentTypeId => {
+      this.onDepartmentTypeChange(departmentTypeId);
     });
   }
 
@@ -111,12 +116,42 @@ export class AddOrEditDepartment implements OnInit {
       next: (response: ApiResponse<Department[]>) => {
         if (response.succeeded) {
           this.departments = response.data;
+          this.updateMainDepartments();
         }
       },
       error: (error) => {
         console.error('Error loading departments:', error);
       }
     });
+  }
+
+  loadDepartmentTypes(): void {
+    this.departmentTypeService.getAllDepartmentTypes().subscribe({
+      next: (response: ApiResponse<DepartmentType[]>) => {
+        if (response.succeeded) {
+          this.departmentTypes = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading department types:', error);
+      }
+    });
+  }
+
+  updateMainDepartments(): void {
+    // Filter departments to show only Main Departments (departmentTypeId = 1)
+    this.mainDepartments = this.departments.filter(department => department.departmentTypeId === 1);
+  }
+
+  onDepartmentTypeChange(departmentTypeId: number): void {
+    if (departmentTypeId === 1) { // Main Department
+      // Hide parent department selection
+      this.departmentForm.get('parentId')?.setValue(null);
+      this.departmentForm.get('parentId')?.disable();
+    } else if (departmentTypeId === 2) { // Sub Department
+      // Show parent department selection with only main departments
+      this.departmentForm.get('parentId')?.enable();
+    }
   }
 
   loadDepartment(id: number): void {
@@ -128,13 +163,12 @@ export class AddOrEditDepartment implements OnInit {
             code: response.data.code,
             name: response.data.name,
             nameSE: response.data.nameSE,
-            index: response.data.index,
             parentId: response.data.parentId,
-            departmentType: response.data.departmentType,
-            fromIntegration: response.data.fromIntegration,
             organizationId: response.data.organizationId,
-            companyId: response.data.companyId
+            companyId: response.data.companyId,
+            departmentTypeId: response.data.departmentTypeId
           });
+          this.onDepartmentTypeChange(response.data.departmentTypeId || 0);
         }
         this.loading = false;
       },
@@ -164,12 +198,10 @@ export class AddOrEditDepartment implements OnInit {
         code: formData.code,
         name: formData.name,
         nameSE: formData.nameSE,
-        index: formData.index,
         parentId: formData.parentId,
-        departmentType: formData.departmentType,
-        fromIntegration: formData.fromIntegration,
         organizationId: formData.organizationId,
-        companyId: formData.companyId
+        companyId: formData.companyId,
+        departmentTypeId: formData.departmentTypeId
       };
       this.updateDepartment(editData);
     } else {
@@ -177,12 +209,10 @@ export class AddOrEditDepartment implements OnInit {
         code: formData.code,
         name: formData.name,
         nameSE: formData.nameSE,
-        index: formData.index,
         parentId: formData.parentId,
-        departmentType: formData.departmentType,
-        fromIntegration: formData.fromIntegration,
         organizationId: formData.organizationId,
-        companyId: formData.companyId
+        companyId: formData.companyId,
+        departmentTypeId: formData.departmentTypeId
       };
       this.createDepartment(createData);
     }

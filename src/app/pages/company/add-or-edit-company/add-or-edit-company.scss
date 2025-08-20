@@ -53,8 +53,14 @@
   font-weight: bold;
 }
 
-.ng-invalid {
-  border-color: #f44336;
+.required-star {
+  color: #f44336;
+  font-weight: bold;
+}
+
+.field-error {
+  border-color: #f44336 !important;
+  box-shadow: 0 0 0 1px #f44336 !important;
 }
 
 .p-error {

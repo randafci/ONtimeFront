@@ -67,19 +67,19 @@
                         <p-columnFilter type="text" field="nameSE" display="menu" placeholder="Search by name (SE)"></p-columnFilter>
                     </div>
                 </th>
-                <th style="min-width: 8rem">
+                <!--<th style="min-width: 8rem">
                     <div class="flex justify-between items-center">
                         Index
                         <p-columnFilter type="numeric" field="index" display="menu"></p-columnFilter>
                     </div>
-                </th>
+                </th>-->
                 <th style="min-width: 12rem">
                     <div class="flex justify-between items-center">
                         Parent Company
                         <p-columnFilter type="text" field="parentName" display="menu" placeholder="Search by parent"></p-columnFilter>
                     </div>
                 </th>
-                <th style="min-width: 8rem">
+                <!--<th style="min-width: 8rem">
                     <div class="flex justify-between items-center">
                         Integration
                         <p-columnFilter field="fromIntegration" matchMode="equals" display="menu">
@@ -101,7 +101,7 @@
                             </ng-template>
                         </p-columnFilter>
                     </div>
-                </th>
+                </th>-->
                 <th style="min-width: 10rem">
                     <div class="flex justify-between items-center">
                         Status
@@ -140,14 +140,14 @@
                 <td>{{ company.code }}</td>
                 <td>{{ company.name }}</td>
                 <td>{{ company.nameSE }}</td>
-                <td>{{ company.index }}</td>
+                <!--<td>{{ company.index }}</td>-->
                 <td>{{ company.parentName || '-' }}</td>
-                <td>
+               <!--<td>
                     <p-tag 
                         [value]="company.fromIntegration ? 'Yes' : 'No'" 
                         [severity]="getIntegrationSeverity(company.fromIntegration)"
                     ></p-tag>
-                </td>
+                </td>-->
                 <td>
                     <p-tag 
                         [value]="getStatus(company)" 

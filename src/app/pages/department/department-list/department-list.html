@@ -67,12 +67,12 @@
                         <p-columnFilter type="text" field="nameSE" display="menu" placeholder="Search by name (SE)"></p-columnFilter>
                     </div>
                 </th>
-                <th style="min-width: 8rem">
+                <!--<th style="min-width: 8rem">
                     <div class="flex justify-between items-center">
                         Index
                         <p-columnFilter type="numeric" field="index" display="menu"></p-columnFilter>
                     </div>
-                </th>
+                </th>-->
                 <th style="min-width: 12rem">
                     <div class="flex justify-between items-center">
                         Parent Department
@@ -91,7 +91,7 @@
                         <p-columnFilter type="text" field="companyName" display="menu" placeholder="Search by company"></p-columnFilter>
                     </div>
                 </th>
-                <th style="min-width: 8rem">
+                <!--<th style="min-width: 8rem">
                     <div class="flex justify-between items-center">
                         Integration
                         <p-columnFilter field="fromIntegration" matchMode="equals" display="menu">
@@ -113,7 +113,7 @@
                             </ng-template>
                         </p-columnFilter>
                     </div>
-                </th>
+                </th>-->
                 <th style="min-width: 10rem">
                     <div class="flex justify-between items-center">
                         Status
@@ -152,16 +152,16 @@
                 <td>{{ department.code }}</td>
                 <td>{{ department.name }}</td>
                 <td>{{ department.nameSE }}</td>
-                <td>{{ department.index }}</td>
+                <!--<td>{{ department.index }}</td>-->
                 <td>{{ department.parent?.name || '-' }}</td>
                 <td>{{ department.departmentType || '-' }}</td>
                 <td>{{ department.company?.name || '-' }}</td>
-                <td>
+                <!--<td>
                     <p-tag 
                         [value]="department.fromIntegration ? 'Yes' : 'No'" 
                         [severity]="getIntegrationSeverity(department.fromIntegration)"
                     ></p-tag>
-                </td>
+                </td>-->
                 <td>
                     <p-tag 
                         [value]="getStatus(department)" 
