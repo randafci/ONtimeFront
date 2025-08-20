@@ -3,10 +3,7 @@ export interface Department {
   code: string;
   name: string;
   nameSE: string;
-  index: number;
   parentId: number | null;
-  departmentType: number | null;
-  fromIntegration: boolean;
   organizationId: number;
   companyId: number | null;
   isDeleted: boolean;
@@ -14,21 +11,21 @@ export interface Department {
   modificationDate: string | null;
   modifiedBy: string;
   createdBy: string;
+  departmentTypeId?: number | null;
   parentName?: string;
   companyName?: string;
   organizationName?: string;
+  departmentTypeName?: string;
 }
 
 export interface CreateDepartment {
   code: string;
   name: string;
   nameSE: string;
-  index: number;
   parentId: number | null;
-  departmentType: number | null;
-  fromIntegration: boolean;
   organizationId: number;
   companyId: number | null;
+  departmentTypeId?: number | null;
 }
 
 export interface EditDepartment {
@@ -36,10 +33,8 @@ export interface EditDepartment {
   code: string;
   name: string;
   nameSE: string;
-  index: number;
   parentId: number | null;
-  departmentType: number | null;
-  fromIntegration: boolean;
   organizationId: number;
   companyId: number | null;
+  departmentTypeId?: number | null;
 }

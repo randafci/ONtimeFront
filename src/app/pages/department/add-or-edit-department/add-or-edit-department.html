@@ -6,7 +6,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Code Field -->
       <div class="field">
-        <label for="code">Code</label>
+        <label for="code">Code <span class="required-star">*</span></label>
         <input 
           id="code" 
           type="text" 
@@ -14,7 +14,7 @@
           class="w-full"
           formControlName="code" 
           [ngClass]="{
-            'ng-invalid ng-dirty': 
+            'field-error': 
               (departmentForm.controls['code'].invalid && 
               (departmentForm.controls['code'].dirty || departmentForm.controls['code'].touched || submitted))
           }"
@@ -28,37 +28,18 @@
         </small>
       </div>
 
-      <!-- Index Field -->
-      <div class="field">
-        <label for="index">Index</label>
-        <p-inputnumber class="w-full"
-          id="index" 
-          formControlName="index" 
-          [ngClass]="{
-            'ng-invalid ng-dirty': 
-              (departmentForm.controls['index'].invalid && 
-              (departmentForm.controls['index'].dirty || departmentForm.controls['index'].touched || submitted))
-          }"
-        ></p-inputnumber>
-        <small 
-          *ngIf="departmentForm.controls['index'].invalid && 
-                (departmentForm.controls['index'].dirty || departmentForm.controls['index'].touched || submitted)" 
-          class="p-error"
-        >
-          Index is required
-        </small>
-      </div>
+
 
       <!-- Name Field -->
       <div class="field">
-        <label for="name">Name</label>
+        <label for="name">Name <span class="required-star">*</span></label>
         <input class="w-full"
           id="name" 
           type="text" 
           pInputText 
           formControlName="name" 
           [ngClass]="{
-            'ng-invalid ng-dirty': 
+            'field-error': 
               (departmentForm.controls['name'].invalid && 
               (departmentForm.controls['name'].dirty || departmentForm.controls['name'].touched || submitted))
           }"
@@ -74,14 +55,14 @@
 
       <!-- NameSE Field -->
       <div class="field">
-        <label for="nameSE">Name (SE)</label>
+        <label for="nameSE">Name (SE) <span class="required-star">*</span></label>
         <input class="w-full"
           id="nameSE" 
           type="text" 
           pInputText 
           formControlName="nameSE" 
           [ngClass]="{
-            'ng-invalid ng-dirty': 
+            'field-error': 
               (departmentForm.controls['nameSE'].invalid && 
               (departmentForm.controls['nameSE'].dirty || departmentForm.controls['nameSE'].touched || submitted))
           }"
@@ -97,7 +78,7 @@
 
       <!-- Organization Field -->
       <div class="field">
-        <label for="organizationId">Organization</label>
+        <label for="organizationId">Organization <span class="required-star">*</span></label>
         <p-select class="w-full"
           id="organizationId" 
           formControlName="organizationId" 
@@ -106,7 +87,7 @@
           optionValue="id"
           placeholder="Select Organization"
           [ngClass]="{
-            'ng-invalid ng-dirty': 
+            'field-error': 
               (departmentForm.controls['organizationId'].invalid && 
               (departmentForm.controls['organizationId'].dirty || departmentForm.controls['organizationId'].touched || submitted))
           }"
@@ -117,6 +98,31 @@
           class="p-error"
         >
           Organization is required
+        </small>
+      </div>
+
+      <!-- Department Type Field -->
+      <div class="field">
+        <label for="departmentTypeId">Department Type <span class="required-star">*</span></label>
+        <p-select class="w-full"
+          id="departmentTypeId" 
+          formControlName="departmentTypeId" 
+          [options]="departmentTypes" 
+          optionLabel="name" 
+          optionValue="id"
+          placeholder="Select Department Type"
+          [ngClass]="{
+            'field-error': 
+              (departmentForm.controls['departmentTypeId'].invalid && 
+              (departmentForm.controls['departmentTypeId'].dirty || departmentForm.controls['departmentTypeId'].touched || submitted))
+          }"
+        ></p-select>
+        <small 
+          *ngIf="departmentForm.controls['departmentTypeId'].invalid && 
+                (departmentForm.controls['departmentTypeId'].dirty || departmentForm.controls['departmentTypeId'].touched || submitted)" 
+          class="p-error"
+        >
+          Department Type is required
         </small>
       </div>
 
@@ -133,38 +139,20 @@
         ></p-select>
       </div>
 
-      <!-- Parent Department Field -->
-      <div class="field">
+      <!-- Parent Department Field - Only shown for Sub Departments -->
+      <div class="field" *ngIf="departmentForm.get('departmentTypeId')?.value === 2">
         <label for="parentId">Parent Department</label>
         <p-select class="w-full"
           id="parentId" 
           formControlName="parentId" 
-          [options]="departments" 
+          [options]="mainDepartments" 
           optionLabel="name" 
           optionValue="id"
-          placeholder="Select Parent Department (Optional)"
+          placeholder="Select Parent Department"
         ></p-select>
       </div>
 
-      <!-- Department Type Field -->
-      <div class="field">
-        <label for="departmentType">Department Type</label>
-        <p-inputnumber class="w-full"
-          id="departmentType" 
-          formControlName="departmentType" 
-          placeholder="Enter Department Type"
-        ></p-inputnumber>
-      </div>
 
-      <!-- From Integration Field -->
-      <div class="field">
-        <label for="fromIntegration">From Integration</label>
-        <p-checkbox class="w-full"
-          id="fromIntegration" 
-          formControlName="fromIntegration" 
-          [binary]="true"
-        ></p-checkbox>
-      </div>
     </div>
 
     <!-- Submit Button Row -->
