@@ -16,6 +16,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { RippleModule } from 'primeng/ripple';
 import { SelectModule } from 'primeng/select';
 import { ToggleButtonModule } from 'primeng/togglebutton';
+import { TranslatePipe } from '@/core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-organization-list',
@@ -34,6 +35,7 @@ import { ToggleButtonModule } from 'primeng/togglebutton';
         ButtonModule,
         RatingModule,
         RippleModule,
+        TranslatePipe,
         IconFieldModule],
   templateUrl: './organization-list.html',
   styleUrl: './organization-list.scss'

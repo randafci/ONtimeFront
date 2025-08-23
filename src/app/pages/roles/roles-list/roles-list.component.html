@@ -1,0 +1,97 @@
+<div class="card">
+    <!-- Page Header -->
+    <div class="flex justify-content-between align-items-center mb-4">
+        <h1 class="font-semibold text-xl m-0">{{ 'rolesList.title' | translate }}</h1>
+        <button
+            pButton
+            [label]="'rolesList.createButton' | translate"
+            icon="pi pi-plus"
+            routerLink="/roles/add">
+        </button>
+    </div>
+
+    <!-- PrimeNG Table -->
+    <p-table
+        #table
+        [value]="rolesList"
+        [columns]="cols"
+        dataKey="id"
+        [rows]="10"
+        [loading]="loading"
+        [paginator]="true"
+        [rowHover]="true"
+        styleClass="p-datatable-gridlines"
+        responsiveLayout="scroll"
+        [globalFilterFields]="['name']"
+        [rowsPerPageOptions]="[10, 25, 50]">
+
+        <ng-template pTemplate="caption">
+            <div class="flex justify-content-between align-items-center">
+                <div>
+                    <button pButton pRipple type="button" icon="pi pi-ellipsis-v" class="p-button-text"></button>
+                    <button
+                        pButton
+                        pRipple
+                        (click)="clear(table)"
+                        icon="pi pi-filter-slash"
+                        class="p-button-danger ml-2"
+                        [label]="'rolesList.clearButton' | translate">
+                    </button>
+                </div>
+                <div class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input
+                        #filter
+                        pInputText
+                        type="text"
+                        (input)="table.filterGlobal($event.target.value, 'contains')"
+                        [placeholder]="'rolesList.searchPlaceholder' | translate" />
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header" let-columns>
+            <tr>
+                <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+                    {{ col.headerKey | translate }}
+                    <p-sortIcon *ngIf="col.field !== 'actions'" [field]="col.field"></p-sortIcon>
+                </th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-role let-columns="columns">
+            <tr>
+                <!-- Name Column -->
+                <td>{{ role.name }}</td>
+
+                <!-- Default Role Column -->
+                <td>{{ (role.isDefaultRole ? 'rolesList.common.yes' : 'rolesList.common.no') | translate }}</td>
+
+                <!-- HR Role Column -->
+                <td>{{ (role.isHRRole ? 'rolesList.common.yes' : 'rolesList.common.no') | translate }}</td>
+
+                <!-- Actions Column -->
+                <td>
+                    <div class="flex gap-2">
+                        <button (click)="deleteRole(role)" pButton pRipple type="button" class="p-button-rounded p-button-danger" [pTooltip]="'rolesList.actions.delete' | translate" tooltipPosition="top" [label]="'rolesList.actions.delete' | translate"></button>
+                        <button (click)="makeAsDefault(role)" pButton pRipple type="button" class="p-button-rounded" [pTooltip]="(role.isDefaultRole ? 'rolesList.actions.unmarkAsDefault' : 'rolesList.actions.markAsDefault') | translate" tooltipPosition="top" [label]="(role.isDefaultRole ? 'rolesList.actions.unmarkAsDefault' : 'rolesList.actions.markAsDefault') | translate"></button>
+                        <button pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.edit' | translate" tooltipPosition="top" [label]="'rolesList.actions.edit' | translate"></button>
+                        <button pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.permissions' | translate" tooltipPosition="top" [label]="'rolesList.actions.permissions' | translate"></button>
+                        <button pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.systemUsers' | translate" tooltipPosition="top" [label]="'rolesList.actions.systemUsers' | translate"></button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td [attr.colspan]="cols.length">{{ 'rolesList.messages.noResults' | translate }}</td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="loadingbody">
+            <tr>
+                <td [attr.colspan]="cols.length">{{ 'rolesList.messages.loading' | translate }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
