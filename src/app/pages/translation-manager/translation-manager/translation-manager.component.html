@@ -1,0 +1,40 @@
+<div class="card card-container">
+    <div class="card-header">
+        <h3>{{ title }}</h3>
+    </div>
+
+    <div class="card-body">
+        <!-- Show a loading message while fetching initial data -->
+        <div *ngIf="isLoading" class="loading-indicator">
+            Loading translations...
+        </div>
+
+        <!-- Only show the editor when data has arrived -->
+        <json-editor
+            *ngIf="!isLoading"
+            [data]="initialData"
+            [options]="editorOptions"
+            (change)="onDataChange($event)">
+        </json-editor>
+    </div>
+
+    <div class="card-footer">
+        <!-- Success and Error Messages -->
+        <div *ngIf="updateStatus === 'success'" class="status-message success">
+            Translations updated successfully!
+        </div>
+        <div *ngIf="updateStatus === 'error'" class="status-message error">
+            Failed to update translations. Please try again.
+        </div>
+
+        <button
+            class="btn btn-primary"
+            type="button"
+            (click)="onSubmit()"
+            [disabled]="isSaving || isLoading">
+            <!-- Change button text while saving -->
+            <span *ngIf="!isSaving">Update Translations</span>
+            <span *ngIf="isSaving">Saving...</span>
+        </button>
+    </div>
+</div>

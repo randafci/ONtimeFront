@@ -1,13 +1,13 @@
 <div class="card">
-  <h1 class="font-semibold text-xl mb-4">Admin Users</h1>
+  <!-- Use the pipe for the title -->
+  <h1 class="font-semibold text-xl mb-4">{{ 'organizationList.title' | translate }}</h1>
   
   <div class="flex justify-between items-center mb-4">
     <button 
       pButton 
-      label="Clear" 
+      [label]="'organizationList.clearButton' | translate" 
       class="p-button-outlined" 
-      icon="pi pi-filter-slash" 
-      >
+      icon="pi pi-filter-slash">
     </button>
     
     <span class="p-input-icon-left">
@@ -15,8 +15,7 @@
       <input 
         pInputText 
         type="text" 
-      
-        placeholder="Search..." />
+        [placeholder]="'organizationList.searchPlaceholder' | translate" />
     </span>
   </div>
 
@@ -31,36 +30,34 @@
     [rowHover]="true"
     responsiveLayout="scroll"
     styleClass="p-datatable-gridlines"
-    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    [currentPageReportTemplate]="'organizationList.paginatorReport' | translate"
     [showCurrentPageReport]="true">
     
     <ng-template pTemplate="header">
       <tr>
         <th style="min-width: 12rem">
           <div class="flex justify-between items-center">
-            Full Name
+            {{ 'organizationList.headers.fullName' | translate }}
             <p-columnFilter type="text" field="fullName" display="menu"></p-columnFilter>
           </div>
         </th>
         <th style="min-width: 12rem">
           <div class="flex justify-between items-center">
-            Email
+            {{ 'organizationList.headers.email' | translate }}
             <p-columnFilter type="text" field="email" display="menu"></p-columnFilter>
           </div>
         </th>
         <th style="min-width: 10rem">
           <div class="flex justify-between items-center">
-            Phone
+            {{ 'organizationList.headers.phone' | translate }}
             <p-columnFilter type="text" field="phoneNumber" display="menu"></p-columnFilter>
           </div>
         </th>
         <th style="min-width: 8rem">
           <div class="flex justify-between items-center">
-            Status
+            {{ 'organizationList.headers.status' | translate }}
             <p-columnFilter field="status" matchMode="equals" display="menu" [showMatchModes]="false">
-              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-         
-              </ng-template>
+              <!-- Filter content would go here -->
             </p-columnFilter>
           </div>
         </th>
@@ -74,9 +71,9 @@
         <td>{{ admin.email }}</td>
         <td>{{ admin.phoneNumber }}</td>
         <td>
+          <!-- You can even translate dynamic values -->
           <p-tag 
-            [value]="admin.status || 'active'" 
-           >
+            [value]="(admin.status === 'active' ? 'organizationList.statusValues.active' : 'organizationList.statusValues.inactive') | translate">
           </p-tag>
         </td>
         <td class="text-center">
@@ -87,13 +84,13 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="5">No admin users found</td>
+        <td colspan="5">{{ 'organizationList.emptyMessage' | translate }}</td>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="loadingbody">
       <tr>
-        <td colspan="5">Loading admin users...</td>
+        <td colspan="5">{{ 'organizationList.loadingMessage' | translate }}</td>
       </tr>
     </ng-template>
   </p-table>

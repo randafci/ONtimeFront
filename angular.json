@@ -32,9 +32,12 @@
                             }
                         ],
                         "styles": [
-                            "src/assets/styles.scss"
+                            "src/assets/styles.scss",
+                            "node_modules/jsoneditor/dist/jsoneditor.min.css"
                         ],
-                        "scripts": []
+                        "scripts": [
+                            "node_modules/jsoneditor/dist/jsoneditor.min.js"
+                        ]
                     },
                     "configurations": {
                         "production": {
