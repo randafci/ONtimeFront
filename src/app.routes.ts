@@ -6,6 +6,10 @@ import { Landing } from './app/pages/landing/landing';
 import { Notfound } from './app/pages/notfound/notfound';
 import { MenuComponent } from '@/main/menu/menu';
 import { Layout } from '@/main/layout/layout';
+import { Login } from '@/auth/login/login';
+import { AuthGuard } from '@/auth/gurads/auth.guard';
+import { LoginGuard } from '@/auth/gurads/login.guard';
+
 
 import { RolesListComponent } from '@/pages/roles/roles-list/roles-list.component';
 import { AddRoleComponent } from '@/pages/roles/add-role/add-role.component';
@@ -14,14 +18,21 @@ import { TranslationManagerComponent } from '@/pages/translation-manager/transla
 export const appRoutes: Routes = [
     {
         path: '',
-        component: Layout,//AppLayout,
+        component: Layout, //AppLayout,
+        canActivate: [AuthGuard], // Protect entire layout
         children: [
             { path: '', component: Dashboard },
-            { path: 'uikit', loadChildren: () => import('./app/pages/uikit/uikit.routes') },
-            { path: 'organization', loadChildren: () => import('./app/pages/organization/oraganization.routes') },
+            { 
+                path: 'uikit', 
+                loadChildren: () => import('./app/pages/uikit/uikit.routes') 
+            },
+            { 
+                path: 'organizations', 
+                loadChildren: () => import('./app/pages/organization/oraganization.routes')
+                    .then(m => m.ORGANIZATION_ROUTES)
+            },
             { path: 'roles', component: RolesListComponent },
             { path: 'roles/add', component: AddRoleComponent },
-
             { path: 'documentation', component: Documentation },
             { path: 'test', component: Layout },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
@@ -34,6 +45,15 @@ export const appRoutes: Routes = [
     component: TranslationManagerComponent
   },
     { path: 'notfound', component: Notfound },
-    { path: 'auth', loadChildren: () => import('./app/pages/auth/auth.routes') },
+    { 
+        path: 'login', 
+        component: Login,
+        canActivate: [LoginGuard] // Prevent logged-in users from accessing login
+    },
+    { 
+        path: 'auth', 
+        loadChildren: () => import('./app/pages/auth/auth.routes'),
+        canActivate: [LoginGuard] // Protect auth routes
+    },
     { path: '**', redirectTo: '/notfound' }
 ];
