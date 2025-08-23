@@ -1,11 +1,10 @@
-<!-- organization-list.html -->
 <div class="card">
     <div class="flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Organizations</h2>  <!-- Added mb-0 to remove margin-bottom -->
-        <div class="flex-grow-1"></div>  <!-- This empty div will push the button to the right -->
+        <h2 class="mb-0">Departments</h2>
+        <div class="flex-grow-1"></div>
         <button 
             pButton 
-            label="Add Organization" 
+            label="Add Department" 
             icon="pi pi-plus" 
             class="p-button-sm"
             (click)="navigateToAdd()"
@@ -14,14 +13,14 @@
     
     <p-table
         #dt
-        [value]="organizations"
+        [value]="departments"
         dataKey="id"
         [rows]="10"
         [loading]="loading"
         [rowHover]="true"
         [showGridlines]="true"
         [paginator]="true"
-        [globalFilterFields]="['name', 'nameSE']"
+        [globalFilterFields]="['code', 'name', 'nameSE', 'companyName']"
         responsiveLayout="scroll"
     >
         <ng-template #caption>
@@ -42,7 +41,7 @@
                         type="text" 
                         #filter
                         (input)="onGlobalFilter(dt, $event)" 
-                        placeholder="Search organizations" 
+                        placeholder="Search departments" 
                     />
                 </p-iconfield>
             </div>
@@ -50,6 +49,12 @@
         
         <ng-template #header>
             <tr>
+                <th style="min-width: 8rem">
+                    <div class="flex justify-between items-center">
+                        Code
+                        <p-columnFilter type="text" field="code" display="menu" placeholder="Search by code"></p-columnFilter>
+                    </div>
+                </th>
                 <th style="min-width: 12rem">
                     <div class="flex justify-between items-center">
                         Name
@@ -62,6 +67,53 @@
                         <p-columnFilter type="text" field="nameSE" display="menu" placeholder="Search by name (SE)"></p-columnFilter>
                     </div>
                 </th>
+                <!--<th style="min-width: 8rem">
+                    <div class="flex justify-between items-center">
+                        Index
+                        <p-columnFilter type="numeric" field="index" display="menu"></p-columnFilter>
+                    </div>
+                </th>-->
+                <th style="min-width: 12rem">
+                    <div class="flex justify-between items-center">
+                        Parent Department
+                        <p-columnFilter type="text" field="parentName" display="menu" placeholder="Search by parent"></p-columnFilter>
+                    </div>
+                </th>
+                <th style="min-width: 8rem">
+                    <div class="flex justify-between items-center">
+                        Department Type
+                        <p-columnFilter type="numeric" field="departmentType" display="menu"></p-columnFilter>
+                    </div>
+                </th>
+                <th style="min-width: 12rem">
+                    <div class="flex justify-between items-center">
+                        Company
+                        <p-columnFilter type="text" field="companyName" display="menu" placeholder="Search by company"></p-columnFilter>
+                    </div>
+                </th>
+                <!--<th style="min-width: 8rem">
+                    <div class="flex justify-between items-center">
+                        Integration
+                        <p-columnFilter field="fromIntegration" matchMode="equals" display="menu">
+                            <ng-template #filter let-value let-filter="filterCallback">
+                                <p-select 
+                                    [ngModel]="value" 
+                                    [options]="integrationOptions" 
+                                    (onChange)="filter($event.value)" 
+                                    placeholder="Any" 
+                                    [style]="{ 'min-width': '8rem' }"
+                                >
+                                    <ng-template let-option pTemplate="item">
+                                        <p-tag 
+                                            [value]="option.label" 
+                                            [severity]="getIntegrationSeverity(option.value)"
+                                        ></p-tag>
+                                    </ng-template>
+                                </p-select>
+                            </ng-template>
+                        </p-columnFilter>
+                    </div>
+                </th>-->
                 <th style="min-width: 10rem">
                     <div class="flex justify-between items-center">
                         Status
@@ -91,37 +143,46 @@
                         <p-columnFilter type="date" field="creationDate" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
                     </div>
                 </th>
-              
                 <th style="min-width: 8rem">Actions</th>
             </tr>
         </ng-template>
         
-        <ng-template #body let-organization>
+        <ng-template #body let-department>
             <tr>
-                <td>{{ organization.name }}</td>
-                <td>{{ organization.nameSE }}</td>
+                <td>{{ department.code }}</td>
+                <td>{{ department.name }}</td>
+                <td>{{ department.nameSE }}</td>
+                <!--<td>{{ department.index }}</td>-->
+                <td>{{ department.parent?.name || '-' }}</td>
+                <td>{{ department.departmentType || '-' }}</td>
+                <td>{{ department.company?.name || '-' }}</td>
+                <!--<td>
+                    <p-tag 
+                        [value]="department.fromIntegration ? 'Yes' : 'No'" 
+                        [severity]="getIntegrationSeverity(department.fromIntegration)"
+                    ></p-tag>
+                </td>-->
                 <td>
                     <p-tag 
-                        [value]="getStatus(organization)" 
-                        [severity]="getSeverity(getStatus(organization))"
+                        [value]="getStatus(department)" 
+                        [severity]="getSeverity(getStatus(department))"
                     ></p-tag>
                 </td>
                 <td>
-                    {{ organization.creationDate | date: 'MM/dd/yyyy' }}
+                    {{ department.creationDate | date: 'MM/dd/yyyy' }}
                 </td>
-               
                 <td>
                     <button 
                         pButton 
                         icon="pi pi-pencil" 
                         class="p-button-rounded p-button-text p-button-sm"
-                        (click)="navigateToEdit(organization.id)"
+                        (click)="navigateToEdit(department.id)"
                     ></button>
                     <button 
                         pButton 
                         icon="pi pi-trash" 
                         class="p-button-rounded p-button-text p-button-danger p-button-sm"
-                        (click)="deleteOrganization(organization)"
+                        (click)="deleteDepartment(department)"
                     ></button>
                 </td>
             </tr>
@@ -129,13 +190,13 @@
         
         <ng-template #emptymessage>
             <tr>
-                <td colspan="6">No organizations found.</td>
+                <td colspan="12">No departments found.</td>
             </tr>
         </ng-template>
         
         <ng-template #loadingbody>
             <tr>
-                <td colspan="6">Loading organizations data. Please wait.</td>
+                <td colspan="12">Loading departments data. Please wait.</td>
             </tr>
         </ng-template>
     </p-table>
