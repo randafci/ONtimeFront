@@ -323,5 +323,36 @@ getAuthUserInfo(): Observable<any> {
     if (any) return requiredList.some(r => this.permissions.includes(r));
     return requiredList.every(r => this.permissions.includes(r));
   }
+
+// Enhanced getHeaders method with better debugging
+getHeaders(): HttpHeaders {
+  try {
+    const userData = this.getUserDataFromLocalStorage();
+    const token = userData?.token;
+    
+    console.log('Token being used:', token ? 'Present' : 'Missing');
+    
+    if (token) {
+      // Verify token format
+      if (!token.startsWith('eyJ')) {
+        console.error('Token format appears invalid');
+      }
+      
+      return new HttpHeaders({
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      });
+    }
+  } catch (error) {
+    console.error('Error getting auth headers:', error);
+  }
+  
+  return new HttpHeaders({
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  });
+}
+
   
 }
