@@ -12,7 +12,7 @@ import { LoginGuard } from '@/auth/gurads/login.guard';
 
 
 import { RolesListComponent } from '@/pages/roles/roles-list/roles-list.component';
-import { AddRoleComponent } from '@/pages/roles/add-role/add-role.component';
+import { AddEditRoleComponent } from '@/pages/roles/add-role/add-edit-role.component';
 import { TranslationManagerComponent } from '@/pages/translation-manager/translation-manager/translation-manager.component';
 
 export const appRoutes: Routes = [
@@ -32,7 +32,7 @@ export const appRoutes: Routes = [
                     .then(m => m.ORGANIZATION_ROUTES)
             },
             { path: 'roles', component: RolesListComponent },
-            { path: 'roles/add', component: AddRoleComponent },
+            { path: 'roles/add', component: AddEditRoleComponent },
             { path: 'documentation', component: Documentation },
             { path: 'test', component: Layout },
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
