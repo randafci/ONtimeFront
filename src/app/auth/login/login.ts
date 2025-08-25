@@ -9,12 +9,14 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
 import { AuthService } from '../auth.service';
-import { environment } from '@/environments/environment';
+import { environment } from 'environments/environment';
 import { User } from '../user.model';
+import { ReactiveFormsModule } from '@angular/forms';   
+import { AppConfigService } from '@/pages/service/app-config.service';
 
 @Component({
   selector: 'app-login',
-  imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator],
+  imports: [ButtonModule, CheckboxModule, InputTextModule, PasswordModule, FormsModule, RouterModule, RippleModule, AppFloatingConfigurator,ReactiveFormsModule],
   templateUrl: './login.html',
   styleUrl: './login.scss',
   providers: [MessageService]
@@ -38,82 +40,83 @@ export class Login {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private messageService: MessageService
+    private messageService: MessageService,
+   private appConfig: AppConfigService
+
   ) { 
       this.userForm = new FormGroup({
       username: new FormControl(null, [Validators.required]),
       password: new FormControl(null, [Validators.required]),
+      rememberMe: new FormControl(false)
+      
+
     });
+
   }
 
-  onSubmit() {
-    if (!this.email || !this.password) {
-      this.errorMessage = 'Please enter both email and password';
-      return;
-    }
+ onSubmit() {
+  if (this.userForm.invalid) {
+    this.errorMessage = 'Please enter both email and password';
+    return;
+  }
 
-    this.loading = true;
-    this.errorMessage = null;
+  this.loading = true;
+  this.errorMessage = null;
 
-      this.authService.accountLogin(this.userForm.value).subscribe({
-      next: (response: any) => {
-        if (response.code === "88888") {
-          this.isAuthFailed = true;
-          this.doAction();
-          return;
-        }
-        if (response.code === "99999") {
-          this.isAuthFailed = true;
-          this.doAction();
-          return;
-        }
-        if (!response.token) {
-          this.isAuthFailed = true;
-          this.doAction();
-          return;
-        }
+  this.authService.accountLogin(this.userForm.value).subscribe({
+    next: (response: any) => {
+      const token = response?.data?.accessToken;
+      const refreshToken = response?.data?.refreshToken;
+      const expiresAt = response?.data?.expiresAt;
 
-        var tokenInfo = this.authService.decodeToken(response.token);
-        this.authService
-          .getAuthUserInfo({ userId: tokenInfo.UserId })
-          .subscribe({
-            next: (info: any) => {
-              const user = new User(
-                info?.name ?? "",
-                response?.token ?? "",
-                response?.expireIn,
-                response?.refreshToken,
-                info?.referenceId ?? 0,
-                info?.userReferenceType ?? 0,
-                info?.language ?? environment.defaultLanguage,
-                info?.permissions
-              );
-              localStorage.setItem("token", response?.token);
-              localStorage.setItem("authData", JSON.stringify(user));
-              localStorage.setItem("lan", environment.defaultLanguage);
-              localStorage.setItem("isHost", response.isHost);
-              localStorage.setItem("isSuperAdmin", response.isSuperAdmin);
-
-              this.authService.loadPermissions();
-              this.doAction();
-              if (info?.permissions?.includes("SYSTEM_PERMISSION_CODE.Dashboard_PAGE")) {
-                this.router.navigate(["/dashboard"]);
-              } else {
-                this.router.navigate([""]); // Replace with your desired route
-              }
-            },
-            error: (error: any) => {
-              this.doAction();
-              this.isAuthFailed = true;
-            },
-          });
-      },
-      error: (err) => {
-        this.doAction();
+      if (!token) {
         this.isAuthFailed = true;
-      },
-    });
-  }
+        this.doAction();
+        return;
+      }
+      localStorage.setItem('token', token);
+
+      const tokenInfo = this.authService.decodeToken(token);
+
+      this.authService.getAuthUserInfo().subscribe({
+        next: (info: any) => {
+          const user = new User(
+            info?.name ?? "",
+            token,
+            expiresAt,
+            refreshToken,
+            info?.referenceId ?? 0,
+            info?.userReferenceType ?? 0,
+            info?.language ?? environment.defaultLanguage,
+            info?.permissions
+          );
+
+          localStorage.setItem("token", token);
+          localStorage.setItem("authData", JSON.stringify(user));
+          localStorage.setItem("lan", environment.defaultLanguage);
+
+          this.authService.loadPermissions();
+          this.doAction();
+
+          if (info?.permissions?.includes("SYSTEM_PERMISSION_CODE.Dashboard_PAGE")) {
+            this.router.navigate(["/dashboard"]);
+          } else {
+            this.router.navigate([""]);
+          }
+        },
+        error: () => {
+          this.doAction();
+          this.isAuthFailed = true;
+        }
+      });
+    },
+    error: () => {
+      this.doAction();
+      this.isAuthFailed = true;
+    }
+  });
+}
+
     doAction() {
     this.loading = false;
     this.disableSubmit = false;

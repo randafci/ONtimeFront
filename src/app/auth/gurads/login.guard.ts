@@ -14,7 +14,7 @@ export class LoginGuard implements CanActivate {
     canActivate(): boolean | UrlTree {
         if (this.authService.isLoggedIn()) {
             // If already logged in, redirect to home
-            return this.router.createUrlTree(['/']);
+          //  return this.router.createUrlTree(['/']);
         }
         return true;
     }

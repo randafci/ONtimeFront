@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CreateCompany, EditCompany, Company } from '@/interfaces/company.interface';
 import { ApiResponse } from '@/interfaces/apiResponse.interface';
+import { AuthService } from '@/auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,10 +11,14 @@ import { ApiResponse } from '@/interfaces/apiResponse.interface';
 export class CompanyService {
   private apiUrl = 'https://localhost:7148/api';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient ,
+    private authService :AuthService
+  ) { }
 
   getAllCompanies(): Observable<ApiResponse<Company[]>> {
-    return this.http.get<ApiResponse<Company[]>>(`${this.apiUrl}/Lookup/Company`);
+      const headers = this.authService.getHeaders();
+
+    return this.http.get<ApiResponse<Company[]>>(`${this.apiUrl}/Lookup/Company` , { headers });
   }
 
   createCompany(data: CreateCompany): Observable<ApiResponse<Company>> {
