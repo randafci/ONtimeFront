@@ -1,10 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '@/environments/environment';
 
-// Use the same interface from your list component
-export interface IRole {
-  id: number;
+// Import the new models
+import { APIOperationResponse, PaginatedList, PagedListRequest } from '@/core/models/api-response.model';
+
+// Use the DTO structure from the backend
+export interface RoleDto {
+  id: string;
   name: string;
   isDefaultRole: boolean;
   isHRRole: boolean;
@@ -14,40 +18,27 @@ export interface IRole {
   providedIn: 'root'
 })
 export class RoleService {
-  // Move the mock data here to be the single source of truth
-  private roles: IRole[] = [
-    { id: 1, name: 'Integration', isDefaultRole: true, isHRRole: false },
-    { id: 2, name: 'Administrator', isDefaultRole: true, isHRRole: false },
-    { id: 3, name: 'Test', isDefaultRole: true, isHRRole: false },
-    { id: 4, name: 'Support', isDefaultRole: false, isHRRole: true }
-  ];
+  private readonly apiUrl = `${environment.apiUrl}/api/Roles`; // e.g., http://localhost:5001/api/Roles
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
-  getRoles(): Observable<IRole[]> {
-    // Return a copy to prevent direct mutation
-    return of([...this.roles]).pipe(delay(1000));
+  getRolesWithPagination(request: PagedListRequest): Observable<APIOperationResponse<PaginatedList<RoleDto>>> {
+    return this.http.post<APIOperationResponse<PaginatedList<RoleDto>>>(`${this.apiUrl}/GetRolesWithPagination`, request);
   }
 
-  /**
-   * Simulates adding a new role to the database.
-   * @param roleData The data from the form { name: string, isHRRole: boolean }
-   */
-  addRole(roleData: { name: string, isHRRole: boolean }): Observable<{ success: boolean }> {
-    console.log('SERVICE: Adding role...', roleData);
+  getRoleById(id: string): Observable<APIOperationResponse<RoleDto>> {
+    return this.http.get<APIOperationResponse<RoleDto>>(`${this.apiUrl}/${id}`);
+  }
 
-    // Find the highest current ID and add 1
-    const newId = Math.max(...this.roles.map(r => r.id)) + 1;
+  addRole(roleData: { name: string, isHRRole: boolean }): Observable<APIOperationResponse<RoleDto>> {
+    return this.http.post<APIOperationResponse<RoleDto>>(this.apiUrl, roleData);
+  }
 
-    const newRole: IRole = {
-      id: newId,
-      name: roleData.name,
-      isHRRole: roleData.isHRRole,
-      isDefaultRole: false // New roles are not default
-    };
+  updateRole(id: string, roleData: Partial<RoleDto>): Observable<APIOperationResponse<RoleDto>> {
+    return this.http.put<APIOperationResponse<RoleDto>>(`${this.apiUrl}/${id}`, roleData);
+  }
 
-    this.roles.push(newRole);
-
-    return of({ success: true }).pipe(delay(1500)); // Simulate network latency
+  deleteRole(id: string): Observable<APIOperationResponse<string>> {
+    return this.http.delete<APIOperationResponse<string>>(`${this.apiUrl}/${id}`);
   }
 }

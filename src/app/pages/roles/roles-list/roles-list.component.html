@@ -1,3 +1,5 @@
+<p-toast></p-toast>
+<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
 <div class="card">
     <!-- Page Header -->
     <div class="flex justify-content-between align-items-center mb-4">
@@ -16,13 +18,14 @@
         [value]="rolesList"
         [columns]="cols"
         dataKey="id"
-        [rows]="10"
+        [rows]="rows"
+        [totalRecords]="totalRecords"
         [loading]="loading"
         [paginator]="true"
         [rowHover]="true"
         styleClass="p-datatable-gridlines"
-        responsiveLayout="scroll"
-        [globalFilterFields]="['name']"
+        [lazy]="true"
+        (onLazyLoad)="loadRoles($event)"
         [rowsPerPageOptions]="[10, 25, 50]">
 
         <ng-template pTemplate="caption">
@@ -41,10 +44,10 @@
                 <div class="p-input-icon-left">
                     <i class="pi pi-search"></i>
                     <input
-                        #filter
                         pInputText
                         type="text"
-                        (input)="table.filterGlobal($event.target.value, 'contains')"
+                        [(ngModel)]="searchValue"
+                        (input)="onSearch(table)"
                         [placeholder]="'rolesList.searchPlaceholder' | translate" />
                 </div>
             </div>
@@ -75,7 +78,7 @@
                     <div class="flex gap-2">
                         <button (click)="deleteRole(role)" pButton pRipple type="button" class="p-button-rounded p-button-danger" [pTooltip]="'rolesList.actions.delete' | translate" tooltipPosition="top" [label]="'rolesList.actions.delete' | translate"></button>
                         <button (click)="makeAsDefault(role)" pButton pRipple type="button" class="p-button-rounded" [pTooltip]="(role.isDefaultRole ? 'rolesList.actions.unmarkAsDefault' : 'rolesList.actions.markAsDefault') | translate" tooltipPosition="top" [label]="(role.isDefaultRole ? 'rolesList.actions.unmarkAsDefault' : 'rolesList.actions.markAsDefault') | translate"></button>
-                        <button pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.edit' | translate" tooltipPosition="top" [label]="'rolesList.actions.edit' | translate"></button>
+                        <button (click)="editRole(role)" pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.edit' | translate" tooltipPosition="top" [label]="'rolesList.actions.edit' | translate"></button>
                         <button pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.permissions' | translate" tooltipPosition="top" [label]="'rolesList.actions.permissions' | translate"></button>
                         <button pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.systemUsers' | translate" tooltipPosition="top" [label]="'rolesList.actions.systemUsers' | translate"></button>
                     </div>

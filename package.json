@@ -21,11 +21,8 @@
         "@angular/router": "^20",
         "@primeuix/themes": "^1.2.1",
         "@tailwindcss/postcss": "^4.1.11",
-<<<<<<< HEAD
         "ang-jsoneditor": "^4.0.2",
-=======
         "axios": "^1.11.0",
->>>>>>> 70545f7a485a779038ae9ac02d692223951edfce
         "chart.js": "4.4.2",
         "jwt-decode": "^4.0.0",
         "primeclt": "^0.1.5",
