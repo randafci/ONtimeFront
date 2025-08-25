@@ -25,6 +25,14 @@ export class MenuComponent {
                 items: [{ label: 'Organization', icon: 'pi pi-fw pi-home', routerLink: ['/organizations/list'] }]
             },
             {
+                label: 'Company',
+                items: [{ label: 'Company', icon: 'pi pi-fw pi-building', routerLink: ['/companies/list'] }]
+            },
+            {
+                label: 'Department',
+                items: [{ label: 'Department', icon: 'pi pi-fw pi-sitemap', routerLink: ['/departments/list'] }]
+            },
+            {
                 label: 'UI Components',
                 items: [
                     { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', routerLink: ['/uikit/formlayout'] },
