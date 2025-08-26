@@ -14,12 +14,16 @@ export class ViewGuard implements CanActivateChild {
         private redirectServices: RedirectServices
     ) {}
 
-    async canActivateChild( childRoute: ActivatedRouteSnapshot) : Promise<boolean | UrlTree> {
-        const authorizations: Authorizations[] = childRoute.data["authorizations"] ?? [];
-        if (this.authService.isAuthorizred(authorizations, childRoute.data["anyAuthorization"])) {
-            return true;
-        }
-        this.redirectServices.redirectToUnAuthorized();
-        return false;
-    }
+   async canActivateChild(childRoute: ActivatedRouteSnapshot): Promise<boolean | UrlTree> {
+  const authorizations: string[] = childRoute.data["authorizations"] ?? [];
+  const anyAuth: boolean = childRoute.data["anyAuthorization"] ?? false;
+
+  if (this.authService.isAuthorized(authorizations, anyAuth)) {
+    return true;
+  }
+
+  this.redirectServices.redirectToUnAuthorized();
+  return false;
+}
+
 }
