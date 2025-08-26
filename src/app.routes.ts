@@ -33,6 +33,7 @@ export const appRoutes: Routes = [
             },
             { path: 'roles', component: RolesListComponent },
             { path: 'roles/add', component: AddEditRoleComponent },
+            { path: 'roles/edit/:id', component: AddEditRoleComponent },
             { 
                 path: 'companies', 
                 loadChildren: () => import('./app/pages/company/company.routes')
