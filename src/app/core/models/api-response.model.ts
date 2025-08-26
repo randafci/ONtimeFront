@@ -55,5 +55,6 @@ export interface PagedListRequest {
     logic?: string;
     filters?: any[];
   };
+
 }
 

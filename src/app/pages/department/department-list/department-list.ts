@@ -20,6 +20,8 @@ import { DepartmentService } from '../DepartmentService';
 import { ApiResponse } from '@/interfaces/apiResponse.interface';
 import { Router, RouterModule } from "@angular/router";
 import { DatePipe } from '@angular/common';
+import { TranslatePipe } from '@/core/pipes/translate.pipe';
+import { TranslationService } from '@/pages/translation-manager/translation-manager/translation.service';
 
 import { TranslatePipe } from '@/core/pipes/translate.pipe';
 import { TranslationService } from '@/pages/translation-manager/translation-manager/translation.service';
@@ -57,6 +59,7 @@ export class DepartmentListComponent implements OnInit {
   //   { label: 'Active', value: 'active' },
   //   { label: 'Inactive', value: 'inactive' }
   // ];
+
 
   statuses: any[] = []; // Will be populated from translations
   integrationOptions: any[] = [

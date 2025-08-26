@@ -47,45 +47,52 @@
             </div>
         </ng-template>
         
-        <!-- keep your translation-enabled headers -->
+
         <ng-template pTemplate="header">
             <tr>
+                <!-- Code Header -->
                 <th style="min-width: 8rem">
                     <div class="flex justify-between items-center">
                         {{ 'departmentList.headers.code' | translate }}
                         <p-columnFilter type="text" field="code" display="menu" [placeholder]="'departmentList.filters.searchByCode' | translate"></p-columnFilter>
                     </div>
                 </th>
+                <!-- Name Header -->
                 <th style="min-width: 12rem">
                     <div class="flex justify-between items-center">
                         {{ 'departmentList.headers.name' | translate }}
                         <p-columnFilter type="text" field="name" display="menu" [placeholder]="'departmentList.filters.searchByName' | translate"></p-columnFilter>
                     </div>
                 </th>
+                <!-- Name (SE) Header -->
                 <th style="min-width: 12rem">
                     <div class="flex justify-between items-center">
                         {{ 'departmentList.headers.nameSE' | translate }}
                         <p-columnFilter type="text" field="nameSE" display="menu" [placeholder]="'departmentList.filters.searchByNameSE' | translate"></p-columnFilter>
                     </div>
                 </th>
+
                 <th style="min-width: 12rem">
                     <div class="flex justify-between items-center">
                         {{ 'departmentList.headers.parentDepartment' | translate }}
                         <p-columnFilter type="text" field="parentName" display="menu" [placeholder]="'departmentList.filters.searchByParent' | translate"></p-columnFilter>
                     </div>
                 </th>
+                <!-- Department Type Header -->
                 <th style="min-width: 8rem">
                     <div class="flex justify-between items-center">
                         {{ 'departmentList.headers.departmentType' | translate }}
                         <p-columnFilter type="numeric" field="departmentType" display="menu"></p-columnFilter>
                     </div>
                 </th>
+                <!-- Company Header -->
                 <th style="min-width: 12rem">
                     <div class="flex justify-between items-center">
                         {{ 'departmentList.headers.company' | translate }}
                         <p-columnFilter type="text" field="companyName" display="menu" [placeholder]="'departmentList.filters.searchByCompany' | translate"></p-columnFilter>
                     </div>
                 </th>
+
                 <th style="min-width: 10rem">
                     <div class="flex justify-between items-center">
                         {{ 'departmentList.headers.status' | translate }}
@@ -109,12 +116,14 @@
                         </p-columnFilter>
                     </div>
                 </th>
+                <!-- Created Date Header -->
                 <th style="min-width: 10rem">
                     <div class="flex justify-between items-center">
                         {{ 'departmentList.headers.createdDate' | translate }}
                         <p-columnFilter type="date" field="creationDate" display="menu" [placeholder]="'departmentList.filters.datePlaceholder' | translate"></p-columnFilter>
                     </div>
                 </th>
+
                 <th style="min-width: 8rem">{{ 'departmentList.headers.actions' | translate }}</th>
             </tr>
         </ng-template>
@@ -137,6 +146,7 @@
                     {{ department.creationDate | date: 'MM/dd/yyyy' }}
                 </td>
                 <td>
+                    <!-- FIX: Removed the invalid '...' attribute from these buttons -->
                     <button 
                         pButton 
                         icon="pi pi-pencil" 
