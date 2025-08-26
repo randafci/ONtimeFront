@@ -49,6 +49,8 @@ export class AddOrEditDepartment implements OnInit {
   mainDepartments: Department[] = [];
   private translations: any = {}; // Store current translations
 
+  private translations: any = {}; // Store current translations
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -187,6 +189,7 @@ export class AddOrEditDepartment implements OnInit {
           severity: 'error',
           summary: this.translations.common?.error || 'Error',
           detail: this.translations.departmentForm?.toasts?.loadError || 'Failed to load department data'
+
         });
         this.loading = false;
       }
@@ -235,6 +238,7 @@ export class AddOrEditDepartment implements OnInit {
           severity: 'success',
           summary: this.translations.common?.success || 'Success',
           detail: this.translations.departmentForm?.toasts?.createSuccess || 'Department created successfully'
+
         });
         this.router.navigate(['/departments']);
       },
@@ -243,6 +247,7 @@ export class AddOrEditDepartment implements OnInit {
           severity: 'error',
           summary: this.translations.common?.error || 'Error',
           detail: this.translations.departmentForm?.toasts?.createError || 'Failed to create department'
+
         });
         this.loading = false;
       }
@@ -256,6 +261,7 @@ export class AddOrEditDepartment implements OnInit {
           severity: 'success',
           summary: this.translations.common?.success || 'Success',
           detail: this.translations.departmentForm?.toasts?.updateSuccess || 'Department updated successfully'
+
         });
         this.router.navigate(['/departments']);
       },
@@ -264,6 +270,7 @@ export class AddOrEditDepartment implements OnInit {
           severity: 'error',
           summary: this.translations.common?.error || 'Error',
           detail: this.translations.departmentForm?.toasts?.updateError || 'Failed to update department'
+
         });
         this.loading = false;
       }

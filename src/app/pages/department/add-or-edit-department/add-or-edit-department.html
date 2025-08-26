@@ -1,5 +1,5 @@
 <div class="card p-fluid max-w-[800px] mx-auto">
-  <!-- Title -->
+
   <h2>{{ (isEditMode ? 'departmentForm.title.edit' : 'departmentForm.title.add') | translate }}</h2>
   
   <form [formGroup]="departmentForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
@@ -7,6 +7,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Code Field -->
       <div class="field">
+
         <label for="code">{{ 'departmentForm.labels.code' | translate }} <span class="required-star">*</span></label>
         <input 
           id="code" 
@@ -20,6 +21,7 @@
               (departmentForm.controls['code'].dirty || departmentForm.controls['code'].touched || submitted))
           }"
         />
+        <!-- 3. Translated Validation Message -->
         <small 
           *ngIf="departmentForm.controls['code'].invalid && 
                 (departmentForm.controls['code'].dirty || departmentForm.controls['code'].touched || submitted)" 
@@ -154,6 +156,7 @@
 
     <!-- Buttons -->
     <div class="flex justify-content-start gap-2 mt-4">
+      <!-- 4. Translated Buttons -->
       <button 
         pButton 
         type="button" 
