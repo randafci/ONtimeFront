@@ -29,3 +29,30 @@ export interface AuthState {
   token: string | null;
   user: User | null;
 } 
+
+export interface APIOperationResponse<T> {
+  statusCode: number;
+  succeeded: boolean;
+  message?: string;
+  errors?: string[];
+  data: T;
+}
+
+export interface PaginatedList<T> {
+  items: T[];
+  pageIndex: number;
+  totalPages: number;
+  totalCount: number;
+}
+
+// Interface for the request body for pagination
+export interface PagedListRequest {
+  page: number;
+  pageSize: number;
+  filter: {
+    sortField: string;
+    sortDirection: number;
+    logic?: string;
+    filters?: any[];
+  };
+}

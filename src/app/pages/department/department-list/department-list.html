@@ -1,10 +1,10 @@
 <div class="card">
     <div class="flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Departments</h2>
+        <h2 class="mb-0">{{ 'departmentList.title' | translate }}</h2>
         <div class="flex-grow-1"></div>
         <button 
             pButton 
-            label="Add Department" 
+            [label]="'departmentList.addButton' | translate" 
             icon="pi pi-plus" 
             class="p-button-sm"
             (click)="navigateToAdd()"
@@ -23,11 +23,11 @@
         [globalFilterFields]="['code', 'name', 'nameSE', 'companyName']"
         responsiveLayout="scroll"
     >
-        <ng-template #caption>
+        <ng-template pTemplate="caption">
             <div class="flex justify-between items-center flex-column sm:flex-row">
                 <button 
                     pButton 
-                    label="Clear" 
+                    [label]="'departmentList.clearButton' | translate" 
                     class="p-button-outlined mb-2" 
                     icon="pi pi-filter-slash" 
                     (click)="clear(dt)"
@@ -41,89 +41,67 @@
                         type="text" 
                         #filter
                         (input)="onGlobalFilter(dt, $event)" 
-                        placeholder="Search departments" 
+                        [placeholder]="'departmentList.searchPlaceholder' | translate" 
                     />
                 </p-iconfield>
             </div>
         </ng-template>
         
-        <ng-template #header>
+        <ng-template pTemplate="header">
             <tr>
+                <!-- Code Header -->
                 <th style="min-width: 8rem">
                     <div class="flex justify-between items-center">
-                        Code
-                        <p-columnFilter type="text" field="code" display="menu" placeholder="Search by code"></p-columnFilter>
+                        {{ 'departmentList.headers.code' | translate }}
+                        <p-columnFilter type="text" field="code" display="menu" [placeholder]="'departmentList.filters.searchByCode' | translate"></p-columnFilter>
                     </div>
                 </th>
+                <!-- Name Header -->
                 <th style="min-width: 12rem">
                     <div class="flex justify-between items-center">
-                        Name
-                        <p-columnFilter type="text" field="name" display="menu" placeholder="Search by name"></p-columnFilter>
+                        {{ 'departmentList.headers.name' | translate }}
+                        <p-columnFilter type="text" field="name" display="menu" [placeholder]="'departmentList.filters.searchByName' | translate"></p-columnFilter>
                     </div>
                 </th>
+                <!-- Name (SE) Header -->
                 <th style="min-width: 12rem">
                     <div class="flex justify-between items-center">
-                        Name (SE)
-                        <p-columnFilter type="text" field="nameSE" display="menu" placeholder="Search by name (SE)"></p-columnFilter>
+                        {{ 'departmentList.headers.nameSE' | translate }}
+                        <p-columnFilter type="text" field="nameSE" display="menu" [placeholder]="'departmentList.filters.searchByNameSE' | translate"></p-columnFilter>
                     </div>
                 </th>
-                <!--<th style="min-width: 8rem">
-                    <div class="flex justify-between items-center">
-                        Index
-                        <p-columnFilter type="numeric" field="index" display="menu"></p-columnFilter>
-                    </div>
-                </th>-->
+                <!-- Parent Department Header -->
                 <th style="min-width: 12rem">
                     <div class="flex justify-between items-center">
-                        Parent Department
-                        <p-columnFilter type="text" field="parentName" display="menu" placeholder="Search by parent"></p-columnFilter>
+                        {{ 'departmentList.headers.parentDepartment' | translate }}
+                        <p-columnFilter type="text" field="parentName" display="menu" [placeholder]="'departmentList.filters.searchByParent' | translate"></p-columnFilter>
                     </div>
                 </th>
+                <!-- Department Type Header -->
                 <th style="min-width: 8rem">
                     <div class="flex justify-between items-center">
-                        Department Type
+                        {{ 'departmentList.headers.departmentType' | translate }}
                         <p-columnFilter type="numeric" field="departmentType" display="menu"></p-columnFilter>
                     </div>
                 </th>
+                <!-- Company Header -->
                 <th style="min-width: 12rem">
                     <div class="flex justify-between items-center">
-                        Company
-                        <p-columnFilter type="text" field="companyName" display="menu" placeholder="Search by company"></p-columnFilter>
+                        {{ 'departmentList.headers.company' | translate }}
+                        <p-columnFilter type="text" field="companyName" display="menu" [placeholder]="'departmentList.filters.searchByCompany' | translate"></p-columnFilter>
                     </div>
                 </th>
-                <!--<th style="min-width: 8rem">
-                    <div class="flex justify-between items-center">
-                        Integration
-                        <p-columnFilter field="fromIntegration" matchMode="equals" display="menu">
-                            <ng-template #filter let-value let-filter="filterCallback">
-                                <p-select 
-                                    [ngModel]="value" 
-                                    [options]="integrationOptions" 
-                                    (onChange)="filter($event.value)" 
-                                    placeholder="Any" 
-                                    [style]="{ 'min-width': '8rem' }"
-                                >
-                                    <ng-template let-option pTemplate="item">
-                                        <p-tag 
-                                            [value]="option.label" 
-                                            [severity]="getIntegrationSeverity(option.value)"
-                                        ></p-tag>
-                                    </ng-template>
-                                </p-select>
-                            </ng-template>
-                        </p-columnFilter>
-                    </div>
-                </th>-->
+                <!-- Status Header -->
                 <th style="min-width: 10rem">
                     <div class="flex justify-between items-center">
-                        Status
+                        {{ 'departmentList.headers.status' | translate }}
                         <p-columnFilter field="isDeleted" matchMode="equals" display="menu">
-                            <ng-template #filter let-value let-filter="filterCallback">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                                 <p-select 
                                     [ngModel]="value" 
                                     [options]="statuses" 
                                     (onChange)="filter($event.value)" 
-                                    placeholder="Any" 
+                                    [placeholder]="'departmentList.filters.any' | translate" 
                                     [style]="{ 'min-width': '12rem' }"
                                 >
                                     <ng-template let-option pTemplate="item">
@@ -137,34 +115,29 @@
                         </p-columnFilter>
                     </div>
                 </th>
+                <!-- Created Date Header -->
                 <th style="min-width: 10rem">
                     <div class="flex justify-between items-center">
-                        Created Date
-                        <p-columnFilter type="date" field="creationDate" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
+                        {{ 'departmentList.headers.createdDate' | translate }}
+                        <p-columnFilter type="date" field="creationDate" display="menu" [placeholder]="'departmentList.filters.datePlaceholder' | translate"></p-columnFilter>
                     </div>
                 </th>
-                <th style="min-width: 8rem">Actions</th>
+                <!-- Actions Header -->
+                <th style="min-width: 8rem">{{ 'departmentList.headers.actions' | translate }}</th>
             </tr>
         </ng-template>
         
-        <ng-template #body let-department>
+        <ng-template pTemplate="body" let-department>
             <tr>
                 <td>{{ department.code }}</td>
                 <td>{{ department.name }}</td>
                 <td>{{ department.nameSE }}</td>
-                <!--<td>{{ department.index }}</td>-->
                 <td>{{ department.parent?.name || '-' }}</td>
                 <td>{{ department.departmentType || '-' }}</td>
                 <td>{{ department.company?.name || '-' }}</td>
-                <!--<td>
-                    <p-tag 
-                        [value]="department.fromIntegration ? 'Yes' : 'No'" 
-                        [severity]="getIntegrationSeverity(department.fromIntegration)"
-                    ></p-tag>
-                </td>-->
                 <td>
                     <p-tag 
-                        [value]="getStatus(department)" 
+                        [value]="('departmentList.statusValues.' + getStatus(department)) | translate" 
                         [severity]="getSeverity(getStatus(department))"
                     ></p-tag>
                 </td>
@@ -172,6 +145,7 @@
                     {{ department.creationDate | date: 'MM/dd/yyyy' }}
                 </td>
                 <td>
+                    <!-- FIX: Removed the invalid '...' attribute from these buttons -->
                     <button 
                         pButton 
                         icon="pi pi-pencil" 
@@ -188,15 +162,15 @@
             </tr>
         </ng-template>
         
-        <ng-template #emptymessage>
+        <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="12">No departments found.</td>
+                <td colspan="12">{{ 'departmentList.messages.empty' | translate }}</td>
             </tr>
         </ng-template>
         
-        <ng-template #loadingbody>
+        <ng-template pTemplate="loadingbody">
             <tr>
-                <td colspan="12">Loading departments data. Please wait.</td>
+                <td colspan="12">{{ 'departmentList.messages.loading' | translate }}</td>
             </tr>
         </ng-template>
     </p-table>

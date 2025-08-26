@@ -1,12 +1,14 @@
 <div class="card p-fluid max-w-[800px] mx-auto">
-  <h2>{{ isEditMode ? 'Edit' : 'Add' }} Department</h2>
+  <!-- 1. Translated Title -->
+  <h2>{{ (isEditMode ? 'departmentForm.title.edit' : 'departmentForm.title.add') | translate }}</h2>
   
   <form [formGroup]="departmentForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
     <!-- Vertical Grid Layout -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Code Field -->
       <div class="field">
-        <label for="code">Code <span class="required-star">*</span></label>
+        <!-- 2. Translated Label -->
+        <label for="code">{{ 'departmentForm.labels.code' | translate }} <span class="required-star">*</span></label>
         <input 
           id="code" 
           type="text" 
@@ -19,20 +21,19 @@
               (departmentForm.controls['code'].dirty || departmentForm.controls['code'].touched || submitted))
           }"
         />
+        <!-- 3. Translated Validation Message -->
         <small 
           *ngIf="departmentForm.controls['code'].invalid && 
                 (departmentForm.controls['code'].dirty || departmentForm.controls['code'].touched || submitted)" 
           class="p-error"
         >
-          Code is required
+          {{ 'departmentForm.validation.required' | translate }}
         </small>
       </div>
 
-
-
       <!-- Name Field -->
       <div class="field">
-        <label for="name">Name <span class="required-star">*</span></label>
+        <label for="name">{{ 'departmentForm.labels.name' | translate }} <span class="required-star">*</span></label>
         <input class="w-full"
           id="name" 
           type="text" 
@@ -49,13 +50,13 @@
                 (departmentForm.controls['name'].dirty || departmentForm.controls['name'].touched || submitted)" 
           class="p-error"
         >
-          Name is required
+          {{ 'departmentForm.validation.required' | translate }}
         </small>
       </div>
 
       <!-- NameSE Field -->
       <div class="field">
-        <label for="nameSE">Name (SE) <span class="required-star">*</span></label>
+        <label for="nameSE">{{ 'departmentForm.labels.nameSE' | translate }} <span class="required-star">*</span></label>
         <input class="w-full"
           id="nameSE" 
           type="text" 
@@ -72,20 +73,20 @@
                 (departmentForm.controls['nameSE'].dirty || departmentForm.controls['nameSE'].touched || submitted)" 
           class="p-error"
         >
-          Name (SE) is required
+          {{ 'departmentForm.validation.required' | translate }}
         </small>
       </div>
 
       <!-- Organization Field -->
       <div class="field">
-        <label for="organizationId">Organization <span class="required-star">*</span></label>
+        <label for="organizationId">{{ 'departmentForm.labels.organization' | translate }} <span class="required-star">*</span></label>
         <p-select class="w-full"
           id="organizationId" 
           formControlName="organizationId" 
           [options]="organizations" 
           optionLabel="name" 
           optionValue="id"
-          placeholder="Select Organization"
+          [placeholder]="'departmentForm.placeholders.selectOrganization' | translate"
           [ngClass]="{
             'field-error': 
               (departmentForm.controls['organizationId'].invalid && 
@@ -97,20 +98,20 @@
                 (departmentForm.controls['organizationId'].dirty || departmentForm.controls['organizationId'].touched || submitted)" 
           class="p-error"
         >
-          Organization is required
+          {{ 'departmentForm.validation.required' | translate }}
         </small>
       </div>
 
       <!-- Department Type Field -->
       <div class="field">
-        <label for="departmentTypeId">Department Type <span class="required-star">*</span></label>
+        <label for="departmentTypeId">{{ 'departmentForm.labels.departmentType' | translate }} <span class="required-star">*</span></label>
         <p-select class="w-full"
           id="departmentTypeId" 
           formControlName="departmentTypeId" 
           [options]="departmentTypes" 
           optionLabel="name" 
           optionValue="id"
-          placeholder="Select Department Type"
+          [placeholder]="'departmentForm.placeholders.selectDepartmentType' | translate"
           [ngClass]="{
             'field-error': 
               (departmentForm.controls['departmentTypeId'].invalid && 
@@ -122,45 +123,44 @@
                 (departmentForm.controls['departmentTypeId'].dirty || departmentForm.controls['departmentTypeId'].touched || submitted)" 
           class="p-error"
         >
-          Department Type is required
+          {{ 'departmentForm.validation.required' | translate }}
         </small>
       </div>
 
       <!-- Company Field -->
       <div class="field">
-        <label for="companyId">Company</label>
+        <label for="companyId">{{ 'departmentForm.labels.company' | translate }}</label>
         <p-select class="w-full"
           id="companyId" 
           formControlName="companyId" 
           [options]="companies" 
           optionLabel="name" 
           optionValue="id"
-          placeholder="Select Company (Optional)"
+          [placeholder]="'departmentForm.placeholders.selectCompany' | translate"
         ></p-select>
       </div>
 
       <!-- Parent Department Field - Only shown for Sub Departments -->
       <div class="field" *ngIf="departmentForm.get('departmentTypeId')?.value === 2">
-        <label for="parentId">Parent Department</label>
+        <label for="parentId">{{ 'departmentForm.labels.parentDepartment' | translate }}</label>
         <p-select class="w-full"
           id="parentId" 
           formControlName="parentId" 
           [options]="mainDepartments" 
           optionLabel="name" 
           optionValue="id"
-          placeholder="Select Parent Department"
+          [placeholder]="'departmentForm.placeholders.selectParent' | translate"
         ></p-select>
       </div>
-
-
     </div>
 
     <!-- Submit Button Row -->
     <div class="flex justify-content-start gap-2 mt-4">
+      <!-- 4. Translated Buttons -->
       <button 
         pButton 
         type="button" 
-        label="Cancel" 
+        [label]="'departmentForm.buttons.cancel' | translate" 
         class="p-button-secondary" 
         (click)="onCancel()"
         [disabled]="loading"
@@ -168,7 +168,7 @@
       <button 
         pButton 
         type="submit" 
-        label="{{ isEditMode ? 'Update' : 'Save' }}" 
+        [label]="(isEditMode ? 'departmentForm.buttons.update' : 'departmentForm.buttons.save') | translate" 
         [disabled]="departmentForm.invalid || loading"
       ></button>
     </div>

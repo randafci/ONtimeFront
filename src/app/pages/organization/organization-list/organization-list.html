@@ -1,144 +1,98 @@
 <!-- organization-list.html -->
 <div class="card">
-    <div class="flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Organizations</h2>  <!-- Added mb-0 to remove margin-bottom -->
-        <div class="flex-grow-1"></div>  <!-- This empty div will push the button to the right -->
-        <button 
-            pButton 
-            label="Add Organization" 
-            icon="pi pi-plus" 
-            class="p-button-sm"
-            (click)="navigateToAdd()"
-        ></button>
-    </div>
+  <!-- Use the pipe for the title -->
+  <h1 class="font-semibold text-xl mb-4">{{ 'organizationList.title' | translate }}</h1>
+  
+  <div class="flex justify-between items-center mb-4">
+    <button 
+      pButton 
+      [label]="'organizationList.clearButton' | translate" 
+      class="p-button-outlined" 
+      icon="pi pi-filter-slash">
+    </button>
     
-    <p-table
-        #dt
-        [value]="organizations"
-        dataKey="id"
-        [rows]="10"
-        [loading]="loading"
-        [rowHover]="true"
-        [showGridlines]="true"
-        [paginator]="true"
-        [globalFilterFields]="['name', 'nameSE']"
-        responsiveLayout="scroll"
-    >
-        <ng-template #caption>
-            <div class="flex justify-between items-center flex-column sm:flex-row">
-                <button 
-                    pButton 
-                    label="Clear" 
-                    class="p-button-outlined mb-2" 
-                    icon="pi pi-filter-slash" 
-                    (click)="clear(dt)"
-                ></button>
-                <p-iconfield iconPosition="left" class="ml-auto">
-                    <p-inputicon>
-                        <i class="pi pi-search"></i>
-                    </p-inputicon>
-                    <input 
-                        pInputText 
-                        type="text" 
-                        #filter
-                        (input)="onGlobalFilter(dt, $event)" 
-                        placeholder="Search organizations" 
-                    />
-                </p-iconfield>
-            </div>
-        </ng-template>
-        
-        <ng-template #header>
-            <tr>
-                <th style="min-width: 12rem">
-                    <div class="flex justify-between items-center">
-                        Name
-                        <p-columnFilter type="text" field="name" display="menu" placeholder="Search by name"></p-columnFilter>
-                    </div>
-                </th>
-                <th style="min-width: 12rem">
-                    <div class="flex justify-between items-center">
-                        Name (SE)
-                        <p-columnFilter type="text" field="nameSE" display="menu" placeholder="Search by name (SE)"></p-columnFilter>
-                    </div>
-                </th>
-                <th style="min-width: 10rem">
-                    <div class="flex justify-between items-center">
-                        Status
-                        <p-columnFilter field="isDeleted" matchMode="equals" display="menu">
-                            <ng-template #filter let-value let-filter="filterCallback">
-                                <p-select 
-                                    [ngModel]="value" 
-                                    [options]="statuses" 
-                                    (onChange)="filter($event.value)" 
-                                    placeholder="Any" 
-                                    [style]="{ 'min-width': '12rem' }"
-                                >
-                                    <ng-template let-option pTemplate="item">
-                                        <p-tag 
-                                            [value]="option.label" 
-                                            [severity]="getSeverity(option.value)"
-                                        ></p-tag>
-                                    </ng-template>
-                                </p-select>
-                            </ng-template>
-                        </p-columnFilter>
-                    </div>
-                </th>
-                <th style="min-width: 10rem">
-                    <div class="flex justify-between items-center">
-                        Created Date
-                        <p-columnFilter type="date" field="creationDate" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
-                    </div>
-                </th>
-              
-                <th style="min-width: 8rem">Actions</th>
-            </tr>
-        </ng-template>
-        
-        <ng-template #body let-organization>
-            <tr>
-                <td>{{ organization.name }}</td>
-                <td>{{ organization.nameSE }}</td>
-                <td>
-                    <p-tag 
-                        [value]="getStatus(organization)" 
-                        [severity]="getSeverity(getStatus(organization))"
-                    ></p-tag>
-                </td>
-                <td>
-                    {{ organization.creationDate | date: 'MM/dd/yyyy' }}
-                </td>
-               
-                <td>
-                    <button 
-                        pButton 
-                        icon="pi pi-pencil" 
-                        class="p-button-rounded p-button-text p-button-sm"
-                        (click)="navigateToEdit(organization.id)"
-                    ></button>
-                    <button 
-                        pButton 
-                        icon="pi pi-trash" 
-                        class="p-button-rounded p-button-text p-button-danger p-button-sm"
-                        (click)="deleteOrganization(organization)"
-                    ></button>
-                </td>
-            </tr>
-        </ng-template>
-        
-        <ng-template #emptymessage>
-            <tr>
-                <td colspan="6">No organizations found.</td>
-            </tr>
-        </ng-template>
-        
-        <ng-template #loadingbody>
-            <tr>
-                <td colspan="6">Loading organizations data. Please wait.</td>
-            </tr>
-        </ng-template>
-    </p-table>
-</div>
+    <span class="p-input-icon-left">
+      <i class="pi pi-search"></i>
+      <input 
+        pInputText 
+        type="text" 
+        [placeholder]="'organizationList.searchPlaceholder' | translate" />
+    </span>
+  </div>
 
-<p-toast></p-toast>
+  <p-table
+    #dt
+    [value]="organizations"
+    dataKey="id"
+    [rows]="10"
+    [loading]="loading"
+    [paginator]="true"
+    [globalFilterFields]="['fullName', 'email', 'phoneNumber']"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+    styleClass="p-datatable-gridlines"
+    [currentPageReportTemplate]="'organizationList.paginatorReport' | translate"
+    [showCurrentPageReport]="true">
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="min-width: 12rem">
+          <div class="flex justify-between items-center">
+            {{ 'organizationList.headers.fullName' | translate }}
+            <p-columnFilter type="text" field="fullName" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 12rem">
+          <div class="flex justify-between items-center">
+            {{ 'organizationList.headers.email' | translate }}
+            <p-columnFilter type="text" field="email" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 10rem">
+          <div class="flex justify-between items-center">
+            {{ 'organizationList.headers.phone' | translate }}
+            <p-columnFilter type="text" field="phoneNumber" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 8rem">
+          <div class="flex justify-between items-center">
+            {{ 'organizationList.headers.status' | translate }}
+            <p-columnFilter field="status" matchMode="equals" display="menu" [showMatchModes]="false">
+              <!-- Filter content would go here -->
+            </p-columnFilter>
+          </div>
+        </th>
+        <th style="width: 5rem"></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-admin>
+      <tr>
+        <td>{{ admin.fullName }}</td>
+        <td>{{ admin.email }}</td>
+        <td>{{ admin.phoneNumber }}</td>
+        <td>
+          <!-- You can even translate dynamic values -->
+          <p-tag 
+            [value]="(admin.status === 'active' ? 'organizationList.statusValues.active' : 'organizationList.statusValues.inactive') | translate">
+          </p-tag>
+        </td>
+        <td class="text-center">
+          <button pButton icon="pi pi-ellipsis-v" class="p-button-text"></button>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5">{{ 'organizationList.emptyMessage' | translate }}</td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="loadingbody">
+      <tr>
+        <td colspan="5">{{ 'organizationList.loadingMessage' | translate }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
