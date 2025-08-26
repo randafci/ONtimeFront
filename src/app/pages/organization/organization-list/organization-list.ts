@@ -20,6 +20,7 @@ import { LookupService } from '../OrganizationService';
 import { ApiResponse } from '@/interfaces/apiResponse.interface';
 import { Router, RouterModule } from "@angular/router";
 import { DatePipe } from '@angular/common';
+import { TranslatePipe } from '@/core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-organization-list',
@@ -39,7 +40,8 @@ import { DatePipe } from '@angular/common';
     SelectModule,
     ToastModule,
     RouterModule,
-    DatePipe
+    DatePipe,
+    TranslatePipe
   ],
   providers: [MessageService],
   templateUrl: './organization-list.html',
