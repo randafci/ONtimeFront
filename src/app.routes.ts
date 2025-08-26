@@ -11,6 +11,10 @@ import { AuthGuard } from '@/auth/gurads/auth.guard';
 import { LoginGuard } from '@/auth/gurads/login.guard';
 
 
+import { RolesListComponent } from '@/pages/roles/roles-list/roles-list.component';
+import { AddEditRoleComponent } from '@/pages/roles/add-role/add-edit-role.component';
+import { TranslationManagerComponent } from '@/pages/translation-manager/translation-manager/translation-manager.component';
+
 export const appRoutes: Routes = [
     {
         path: '',
@@ -27,6 +31,9 @@ export const appRoutes: Routes = [
                 loadChildren: () => import('./app/pages/organization/oraganization.routes')
                     .then(m => m.ORGANIZATION_ROUTES)
             },
+            { path: 'roles', component: RolesListComponent },
+            { path: 'roles/add', component: AddEditRoleComponent },
+            { path: 'roles/edit/:id', component: AddEditRoleComponent },
             { 
                 path: 'companies', 
                 loadChildren: () => import('./app/pages/company/company.routes')
@@ -42,11 +49,12 @@ export const appRoutes: Routes = [
             { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
         ]
     },
-    { 
-        path: 'landing', 
-        component: Landing,
-        canActivate: [LoginGuard] // Prevent logged-in users from accessing
-    },
+    { path: 'landing', component: Landing },
+    // { path: 'translation', component: TranslationManagerComponent },
+    {
+    path: 'translations/:lang',
+    component: TranslationManagerComponent
+  },
     { path: 'notfound', component: Notfound },
     { 
         path: 'login', 

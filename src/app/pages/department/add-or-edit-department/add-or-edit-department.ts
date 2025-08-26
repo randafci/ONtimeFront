@@ -16,6 +16,8 @@ import { Company } from '@/interfaces/company.interface';
 import { Organization } from '@/interfaces/organization.interface';
 import { ApiResponse } from '@/interfaces/apiResponse.interface';
 import { CommonModule } from '@angular/common';
+import { TranslationService } from '@/pages/translation-manager/translation-manager/translation.service';
+import { TranslatePipe } from '@/core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-add-or-edit-department',
@@ -28,6 +30,7 @@ import { CommonModule } from '@angular/common';
     InputTextModule,
     SelectModule,
     ToastModule,
+    TranslatePipe
   ],
   templateUrl: './add-or-edit-department.html',
   styleUrl: './add-or-edit-department.scss',
@@ -45,6 +48,8 @@ export class AddOrEditDepartment implements OnInit {
   departmentTypes: DepartmentType[] = [];
   mainDepartments: Department[] = [];
 
+  private translations: any = {}; // Store current translations
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -53,7 +58,8 @@ export class AddOrEditDepartment implements OnInit {
     private departmentTypeService: DepartmentTypeService,
     private companyService: CompanyService,
     private organizationService: LookupService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private translationService: TranslationService
   ) {
     this.departmentForm = this.fb.group({
       code: ['', Validators.required],
@@ -67,6 +73,10 @@ export class AddOrEditDepartment implements OnInit {
   }
 
   ngOnInit(): void {
+    // Subscribe to translation changes
+    this.translationService.translations$.subscribe(translations => {
+      this.translations = translations;
+    });
     this.loadOrganizations();
     this.loadCompanies();
     this.loadDepartments();
@@ -175,8 +185,8 @@ export class AddOrEditDepartment implements OnInit {
       error: (error) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load department data'
+          summary: this.translations.common?.error || 'Error',
+          detail: this.translations.departmentForm?.toasts?.loadError
         });
         this.loading = false;
       }
@@ -223,16 +233,16 @@ export class AddOrEditDepartment implements OnInit {
       next: (response: ApiResponse<Department>) => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Success',
-          detail: 'Department created successfully'
+          summary: this.translations.common?.success || 'Success',
+          detail: this.translations.departmentForm?.toasts?.createSuccess
         });
         this.router.navigate(['/departments']);
       },
       error: (error) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to create department'
+          summary: this.translations.common?.error || 'Error',
+          detail: this.translations.departmentForm?.toasts?.createError
         });
         this.loading = false;
       }
@@ -244,16 +254,16 @@ export class AddOrEditDepartment implements OnInit {
       next: (response: ApiResponse<Department>) => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Success',
-          detail: 'Department updated successfully'
+          summary: this.translations.common?.success || 'Success',
+          detail: this.translations.departmentForm?.toasts?.updateSuccess
         });
         this.router.navigate(['/departments']);
       },
       error: (error) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to update department'
+          summary: this.translations.common?.error || 'Error',
+          detail: this.translations.departmentForm?.toasts?.updateError
         });
         this.loading = false;
       }

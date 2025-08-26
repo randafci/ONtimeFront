@@ -5,11 +5,14 @@ import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
+import { TooltipModule } from 'primeng/tooltip';
+import { TranslationService } from '@/pages/translation-manager/translation-manager/translation.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator],
+    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator,TooltipModule],
     template: ` <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -38,6 +41,12 @@ import { LayoutService } from '../service/layout.service';
         </div>
 
         <div class="layout-topbar-actions">
+        <button type="button" class="layout-topbar-action"
+                        (click)="switchLanguage()"
+                        [pTooltip]="(currentLang === 'ar' ? 'Switch to English' : 'Switch to Arabic')"
+                        tooltipPosition="bottom">
+                    <i class="pi pi-globe p-text-secondary" style="font-size: 1.5rem"></i>
+                </button>
             <div class="layout-config-menu">
                 <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
                     <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
@@ -83,10 +92,30 @@ import { LayoutService } from '../service/layout.service';
 })
 export class AppTopbar {
     items!: MenuItem[];
+    currentLang: string = 'ar';
+    private langSubscription!: Subscription;
 
-    constructor(public layoutService: LayoutService) {}
+    constructor(public layoutService: LayoutService, private translationService: TranslationService) {}
+    ngOnInit(): void {
+        // Subscribe to the current language from the service
+        this.langSubscription = this.translationService.currentLang$.subscribe(lang => {
+            this.currentLang = lang;
+        });
+    }
+
+    // Method to be called on button click
+    switchLanguage(): void {
+        this.translationService.toggleLanguage();
+    }
+
 
     toggleDarkMode() {
         this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
+    }
+    ngOnDestroy(): void {
+        // Unsubscribe to prevent memory leaks
+        if (this.langSubscription) {
+            this.langSubscription.unsubscribe();
+        }
     }
 }

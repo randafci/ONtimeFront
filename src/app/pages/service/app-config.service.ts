@@ -21,7 +21,7 @@ export class AppConfigService {
     // Method to load configuration
     loadConfig(): Promise<void> {
         return axios.get(`/config.${environment.name}.json`)
-            .then((response) => {
+            .then((response: { data: { [x: string]: string; }; }) => {
                 this.apiUrl = response.data['apiUrl'] || SharedAppSettings.apiUrl;
                 this.scannerUrl = response.data['scannerUrl'] || SharedAppSettings.scannerUrl;
                 this.configLoaded = true;
@@ -30,7 +30,7 @@ export class AppConfigService {
                 SharedAppSettings.apiUrl = this.apiUrl;
                 SharedAppSettings.scannerUrl = this.scannerUrl;
             })
-            .catch((err) => {
+            .catch((err: any) => {
                 console.error('Failed to load configuration:', err);
                 // Fall back to default values
                 this.configLoaded = true;
