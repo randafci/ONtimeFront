@@ -42,6 +42,7 @@ import { TranslatePipe } from '@/core/pipes/translate.pipe';
     RouterModule,
     DatePipe,
     TranslatePipe
+
   ],
   providers: [MessageService],
   templateUrl: './organization-list.html',
