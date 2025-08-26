@@ -1,29 +1,19 @@
 import { Component } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-<<<<<<< HEAD
 import { Router, RouterModule } from '@angular/router';
-=======
-import { RouterModule } from '@angular/router';
->>>>>>> d02cfac (Merge pull request #6 from randafci/Esraa/OnTimeFront)
 import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
-<<<<<<< HEAD
-=======
+
 import { TooltipModule } from 'primeng/tooltip';
 import { TranslationService } from '@/pages/translation-manager/translation-manager/translation.service';
 import { Subscription } from 'rxjs';
->>>>>>> d02cfac (Merge pull request #6 from randafci/Esraa/OnTimeFront)
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
-<<<<<<< HEAD
-    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator],
-=======
     imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator,TooltipModule],
->>>>>>> d02cfac (Merge pull request #6 from randafci/Esraa/OnTimeFront)
     template: ` <div class="layout-topbar">
         <div class="layout-topbar-logo-container">
             <button class="layout-menu-button layout-topbar-action" (click)="layoutService.onMenuToggle()">
@@ -52,15 +42,13 @@ import { Subscription } from 'rxjs';
         </div>
 
         <div class="layout-topbar-actions">
-<<<<<<< HEAD
-=======
+
         <button type="button" class="layout-topbar-action"
                         (click)="switchLanguage()"
                         [pTooltip]="(currentLang === 'ar' ? 'Switch to English' : 'Switch to Arabic')"
                         tooltipPosition="bottom">
                     <i class="pi pi-globe p-text-secondary" style="font-size: 1.5rem"></i>
                 </button>
->>>>>>> d02cfac (Merge pull request #6 from randafci/Esraa/OnTimeFront)
             <div class="layout-config-menu">
                 <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
                     <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
@@ -99,13 +87,10 @@ import { Subscription } from 'rxjs';
                         <i class="pi pi-user"></i>
                         <span>Profile</span>
                     </button>
-<<<<<<< HEAD
                     <button type="button" class="layout-topbar-action"  (click)="LogOut()">
                         <i class="pi pi-user"></i>
                         <span>logout</span>
                     </button>
-=======
->>>>>>> d02cfac (Merge pull request #6 from randafci/Esraa/OnTimeFront)
                 </div>
             </div>
         </div>
@@ -113,17 +98,11 @@ import { Subscription } from 'rxjs';
 })
 export class AppTopbar {
     items!: MenuItem[];
-<<<<<<< HEAD
 
-    constructor(public layoutService: LayoutService,
-        private router: Router
-
-    ) {}
-=======
     currentLang: string = 'ar';
     private langSubscription!: Subscription;
 
-    constructor(public layoutService: LayoutService, private translationService: TranslationService) {}
+    constructor(public layoutService: LayoutService, private router: Router ,private translationService: TranslationService) {}
     ngOnInit(): void {
         // Subscribe to the current language from the service
         this.langSubscription = this.translationService.currentLang$.subscribe(lang => {
@@ -136,21 +115,20 @@ export class AppTopbar {
         this.translationService.toggleLanguage();
     }
 
->>>>>>> d02cfac (Merge pull request #6 from randafci/Esraa/OnTimeFront)
 
     toggleDarkMode() {
         this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
     }
-<<<<<<< HEAD
      LogOut() {
     // redirect to login
     this.router.navigate(['/login']);
-=======
-    ngOnDestroy(): void {
+  
+}
+  ngOnDestroy(): void {
         // Unsubscribe to prevent memory leaks
         if (this.langSubscription) {
             this.langSubscription.unsubscribe();
         }
->>>>>>> d02cfac (Merge pull request #6 from randafci/Esraa/OnTimeFront)
     }
+
 }
