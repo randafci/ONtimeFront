@@ -10,6 +10,14 @@ export class TranslationService {
   // Re-structure the DB to hold objects per language code
   private mockDb: { [key: string]: any } = {
     ar: {
+      common: { // Reusable common keys
+        yes: "نعم",
+        no: "لا",
+        error: "خطأ",
+        success: "نجاح",
+        delete: "حذف",
+        backButton: "الرجوع"
+      },
       theme: {
         dim: "ضبابي",
         dark: "مظلم",
@@ -62,7 +70,6 @@ export class TranslationService {
       },
       addRole: {
         pageTitle: "إضافة دور",
-        backButton: "الرجوع",
         nameLabel: "الاسم",
         hrRoleLabel: "دور الموارد البشرية؟",
         addButton: "إضافة",
@@ -73,9 +80,99 @@ export class TranslationService {
           mustLessThan: "يجب أن يكون أقل من",
           characters: "حرف"
         }
+      },
+      editRole: {
+        pageTitle: "تعديل الدور",
+        saveButton: "حفظ التغييرات",
+        savingButton: "جاري الحفظ...",
+        defaultRoleLabel: "هل هو الدور الافتراضي؟", // For the checkbox in the edit form
+        messages: {
+            success: "تم تحديث الدور بنجاح!"
+        }
+      },
+      departmentList: {
+        title: "الأقسام",
+        addButton: "إضافة قسم",
+        clearButton: "مسح",
+        searchPlaceholder: "ابحث في الأقسام",
+        headers: {
+          code: "الرمز",
+          name: "الاسم",
+          nameSE: "الاسم (SE)",
+          parentDepartment: "القسم الأصل",
+          departmentType: "نوع القسم",
+          company: "الشركة",
+          status: "الحالة",
+          createdDate: "تاريخ الإنشاء",
+          actions: "الإجراءات"
+        },
+        filters: {
+          searchByCode: "بحث بالرمز",
+          searchByName: "بحث بالاسم",
+          searchByNameSE: "بحث بالاسم (SE)",
+          searchByParent: "بحث بالقسم الأصل",
+          searchByCompany: "بحث بالشركة",
+          any: "أي",
+          datePlaceholder: "شهر/يوم/سنة"
+        },
+        statusValues: {
+          active: "نشط",
+          inactive: "غير نشط"
+        },
+        messages: {
+          empty: "لم يتم العثور على أقسام.",
+          loading: "جاري تحميل بيانات الأقسام. يرجى الانتظار.",
+          loadError: "فشل تحميل الأقسام",
+          deleteConfirm: "هل أنت متأكد أنك تريد حذف القسم '${name}'؟",
+          deleteHeader: "تأكيد الحذف"
+        }
+      },
+      departmentForm: {
+        title: {
+          add: "إضافة قسم",
+          edit: "تعديل قسم"
+        },
+        labels: {
+          code: "الرمز",
+          name: "الاسم",
+          nameSE: "الاسم (SE)",
+          organization: "المنظمة",
+          departmentType: "نوع القسم",
+          company: "الشركة",
+          parentDepartment: "القسم الأصل"
+        },
+        placeholders: {
+          selectOrganization: "اختر منظمة",
+          selectDepartmentType: "اختر نوع القسم",
+          selectCompany: "اختر شركة (اختياري)",
+          selectParent: "اختر القسم الأصل"
+        },
+        buttons: {
+          cancel: "إلغاء",
+          update: "تحديث",
+          save: "حفظ"
+        },
+        validation: {
+          required: "هذا الحقل مطلوب"
+        },
+        toasts: {
+          loadError: "فشل تحميل بيانات القسم",
+          createSuccess: "تم إنشاء القسم بنجاح",
+          createError: "فشل إنشاء القسم",
+          updateSuccess: "تم تحديث القسم بنجاح",
+          updateError: "فشل تحديث القسم"
+        }
       }
     },
     en: {
+      common: { // Reusable common keys
+        yes: "Yes",
+        no: "No",
+        error: "Error",
+        success: "Success",
+        delete: "Delete",
+        backButton: "Back"
+      },
       theme: {
         dim: "Dim",
         dark: "Dark",
@@ -128,7 +225,6 @@ export class TranslationService {
       },
       addRole: {
         pageTitle: "Add Role",
-        backButton: "Back",
         nameLabel: "Name",
         hrRoleLabel: "Is HR Role?",
         addButton: "Add",
@@ -138,6 +234,88 @@ export class TranslationService {
           fieldIsRequired: "This field is required",
           mustLessThan: "Must be less than",
           characters: "characters"
+        }
+      },
+      editRole: {
+        pageTitle: "Edit Role",
+        saveButton: "Save Changes",
+        savingButton: "Saving...",
+        defaultRoleLabel: "Is Default Role?", // For the checkbox in the edit form
+        messages: {
+            success: "Role updated successfully!"
+        }
+      },
+      departmentList: {
+        title: "Departments",
+        addButton: "Add Department",
+        clearButton: "Clear",
+        searchPlaceholder: "Search departments",
+        headers: {
+          code: "Code",
+          name: "Name",
+          nameSE: "Name (SE)",
+          parentDepartment: "Parent Department",
+          departmentType: "Department Type",
+          company: "Company",
+          status: "Status",
+          createdDate: "Created Date",
+          actions: "Actions"
+        },
+        filters: {
+          searchByCode: "Search by code",
+          searchByName: "Search by name",
+          searchByNameSE: "Search by name (SE)",
+          searchByParent: "Search by parent",
+          searchByCompany: "Search by company",
+          any: "Any",
+          datePlaceholder: "mm/dd/yyyy"
+        },
+        statusValues: {
+          active: "Active",
+          inactive: "Inactive"
+        },
+        messages: {
+          empty: "No departments found.",
+          loading: "Loading departments data. Please wait.",
+          loadError: "Failed to load departments",
+          deleteConfirm: "Are you sure you want to delete the department '${name}'?",
+          deleteHeader: "Confirm Deletion"
+        }
+      },
+      departmentForm: {
+        title: {
+          add: "Add Department",
+          edit: "Edit Department"
+        },
+        labels: {
+          code: "Code",
+          name: "Name",
+          nameSE: "Name (SE)",
+          organization: "Organization",
+          departmentType: "Department Type",
+          company: "Company",
+          parentDepartment: "Parent Department"
+        },
+        placeholders: {
+          selectOrganization: "Select Organization",
+          selectDepartmentType: "Select Department Type",
+          selectCompany: "Select Company (Optional)",
+          selectParent: "Select Parent Department"
+        },
+        buttons: {
+          cancel: "Cancel",
+          update: "Update",
+          save: "Save"
+        },
+        validation: {
+          required: "This field is required"
+        },
+        toasts: {
+          loadError: "Failed to load department data",
+          createSuccess: "Department created successfully",
+          createError: "Failed to create department",
+          updateSuccess: "Department updated successfully",
+          updateError: "Failed to update department"
         }
       }
     }
