@@ -47,9 +47,7 @@ export class AddOrEditDepartment implements OnInit {
   departments: Department[] = [];
   departmentTypes: DepartmentType[] = [];
   mainDepartments: Department[] = [];
-
   private translations: any = {}; // Store current translations
-
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -77,6 +75,7 @@ export class AddOrEditDepartment implements OnInit {
     this.translationService.translations$.subscribe(translations => {
       this.translations = translations;
     });
+
     this.loadOrganizations();
     this.loadCompanies();
     this.loadDepartments();
@@ -186,7 +185,8 @@ export class AddOrEditDepartment implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: this.translations.common?.error || 'Error',
-          detail: this.translations.departmentForm?.toasts?.loadError
+          detail: this.translations.departmentForm?.toasts?.loadError || 'Failed to load department data'
+
         });
         this.loading = false;
       }
@@ -234,7 +234,8 @@ export class AddOrEditDepartment implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: this.translations.common?.success || 'Success',
-          detail: this.translations.departmentForm?.toasts?.createSuccess
+          detail: this.translations.departmentForm?.toasts?.createSuccess || 'Department created successfully'
+
         });
         this.router.navigate(['/departments']);
       },
@@ -242,7 +243,8 @@ export class AddOrEditDepartment implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: this.translations.common?.error || 'Error',
-          detail: this.translations.departmentForm?.toasts?.createError
+          detail: this.translations.departmentForm?.toasts?.createError || 'Failed to create department'
+
         });
         this.loading = false;
       }
@@ -255,7 +257,8 @@ export class AddOrEditDepartment implements OnInit {
         this.messageService.add({
           severity: 'success',
           summary: this.translations.common?.success || 'Success',
-          detail: this.translations.departmentForm?.toasts?.updateSuccess
+          detail: this.translations.departmentForm?.toasts?.updateSuccess || 'Department updated successfully'
+
         });
         this.router.navigate(['/departments']);
       },
@@ -263,7 +266,8 @@ export class AddOrEditDepartment implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: this.translations.common?.error || 'Error',
-          detail: this.translations.departmentForm?.toasts?.updateError
+          detail: this.translations.departmentForm?.toasts?.updateError || 'Failed to update department'
+
         });
         this.loading = false;
       }

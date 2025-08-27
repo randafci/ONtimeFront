@@ -13,6 +13,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
+
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Department } from '@/interfaces/department.interface';
 import { DepartmentService } from '../DepartmentService';
@@ -21,6 +22,7 @@ import { Router, RouterModule } from "@angular/router";
 import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@/core/pipes/translate.pipe';
 import { TranslationService } from '@/pages/translation-manager/translation-manager/translation.service';
+
 
 @Component({
   selector: 'app-department-list',
@@ -50,10 +52,12 @@ import { TranslationService } from '@/pages/translation-manager/translation-mana
 export class DepartmentListComponent implements OnInit {
   departments: Department[] = [];
   loading: boolean = true;
+
   // statuses: any[] = [
   //   { label: 'Active', value: 'active' },
   //   { label: 'Inactive', value: 'inactive' }
   // ];
+
 
   statuses: any[] = []; // Will be populated from translations
   integrationOptions: any[] = [
@@ -65,6 +69,7 @@ export class DepartmentListComponent implements OnInit {
 
   @ViewChild('dt') table!: Table;
   @ViewChild('filter') filter!: ElementRef;
+
 
   // Store the current translations
   private translations: any = {};
@@ -99,6 +104,7 @@ export class DepartmentListComponent implements OnInit {
         } else {
           this.messageService.add({
             severity: 'error',
+
             summary: this.translations.common?.error || 'Error',
             detail: response.message || this.translations.departmentList?.messages?.loadError
           });
@@ -109,6 +115,7 @@ export class DepartmentListComponent implements OnInit {
         console.error('Error loading departments:', error);
         this.messageService.add({
           severity: 'error',
+
           summary: this.translations.common?.error || 'Error',
           detail: this.translations.departmentList?.messages?.loadError
         });
@@ -147,6 +154,7 @@ export class DepartmentListComponent implements OnInit {
   }
 
   deleteDepartment(department: Department) {
+
     const message = (this.translations.departmentList?.messages?.deleteConfirm || '')
                     .replace('${name}', department.name);
 

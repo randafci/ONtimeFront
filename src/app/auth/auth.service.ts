@@ -6,10 +6,11 @@ import { BehaviorSubject, catchError, Observable, tap, throwError } from "rxjs";
 //import { LoginLogoutTabService } from "../shared/custom/services/login-logout-tab/login-logout-tab.service";
 //import { SignalRService } from "../shared/custom/services/signalR/signalR.service";
 //import { SharedSettings } from "../shared/custom/shared.settings";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { AppConfigService } from "@/pages/service/app-config.service";
 import { User } from "./user.model";
 import { AdminLoginCommand, CreateSignupCommand } from "@/interfaces/userLoginCommand.interface";
+import { environment } from "environments/environment";
 
 @Injectable({
   providedIn: "root",
@@ -17,13 +18,19 @@ import { AdminLoginCommand, CreateSignupCommand } from "@/interfaces/userLoginCo
 export class AuthService {
   private authorizations: string[] = [];
   //public user = new BehaviorSubject<User>(null);
-  public apiUrl: string;
+    private apiUrl = environment.apiUrl;
+  private permissions: string[] = [];
+
   constructor(
     private router: Router,
     private http: HttpClient,
     private appConfig: AppConfigService
   ) {
-    this.apiUrl = this.appConfig.apiUrl + "/api";
+
+        console.log('[AuthService] constructor() - apiUrl =', this.apiUrl);
+
+  
+
     this.loadPermissions();
   }
 
@@ -60,11 +67,12 @@ export class AuthService {
   }
 
   /*  accountLogin(data: any): Observable<any> {
-    return this.http.post(`${this.appConfig.apiUrl}/api/Account/Login`, data);
+    return this.http.post(`${this.apiUrl}/api/Account/Login`, data);
   } */
   accountLogin(data: any): Observable<any> {
+    console.log(" this.apiUrl" , this.apiUrl)
     return this.http
-      .post(`${this.appConfig.apiUrl}/api/Account/Login`, data)
+      .post(`${this.apiUrl}/api/Account/Login`, data)
       .pipe(
         tap((response: any) => {
           if (response.token) {
@@ -93,12 +101,27 @@ export class AuthService {
       );
   }
 
-  getAuthUserInfo(data: any): Observable<any> {
-    return this.http.post(
-      `${this.appConfig.apiUrl}/api/Account/GetAuthenticatedUserDetails`,
-      data
-    );
-  }
+getAuthUserInfo(): Observable<any> {
+  const token = localStorage.getItem('token'); // adjust the key you use
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+
+  return this.http.get<any>(
+    `${this.apiUrl}/api/account/user-claims`,
+    { headers }
+  ).pipe(
+    tap((response: any) => {
+      // directly store the permissions list from response.data
+      if (response && response.data) {
+        localStorage.setItem("permissions", JSON.stringify(response.data));
+      }
+    })
+  );
+}
+
+
+
 
   getUserDataFromLocalStorage(): {
     expireIn: string;
@@ -278,6 +301,58 @@ export class AuthService {
     var headers = this.getAuthHeaders();
     return this.http.post<number>(`${this.apiUrl}/Signup`, command );
   }
+
+
+
+  setPermissions(permissions: string[]) {
+    this.permissions = permissions;
+    localStorage.setItem("permissions", JSON.stringify(permissions));
+  }
+
+  loadPermissionsFromStorage() {
+    const stored = localStorage.getItem("permissions");
+    this.permissions = stored ? JSON.parse(stored) : [];
+  }
+
+  hasPermission(required: string): boolean {
+    return this.permissions.includes(required);
+  }
+
+  isAuthorized(requiredList: string[], any: boolean = false): boolean {
+    if (!requiredList || requiredList.length === 0) return true;
+    if (any) return requiredList.some(r => this.permissions.includes(r));
+    return requiredList.every(r => this.permissions.includes(r));
+  }
+
+// Enhanced getHeaders method with better debugging
+getHeaders(): HttpHeaders {
+  try {
+    const userData = this.getUserDataFromLocalStorage();
+    const token = userData?.token;
+    
+    console.log('Token being used:', token ? 'Present' : 'Missing');
+    
+    if (token) {
+      // Verify token format
+      if (!token.startsWith('eyJ')) {
+        console.error('Token format appears invalid');
+      }
+      
+      return new HttpHeaders({
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      });
+    }
+  } catch (error) {
+    console.error('Error getting auth headers:', error);
+  }
+  
+  return new HttpHeaders({
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  });
+}
 
   
 }
