@@ -9,10 +9,6 @@ import { TooltipModule } from 'primeng/tooltip';
 import { TranslationService } from '@/pages/translation-manager/translation-manager/translation.service';
 import { Subscription } from 'rxjs';
 
-import { TooltipModule } from 'primeng/tooltip';
-import { TranslationService } from '@/pages/translation-manager/translation-manager/translation.service';
-import { Subscription } from 'rxjs';
-
 @Component({
     selector: 'app-topbar',
     standalone: true,
@@ -95,23 +91,6 @@ export class AppTopbar implements OnInit, OnDestroy {
     items!: MenuItem[];
     currentLang: string = 'ar';
     private langSubscription!: Subscription;
-
-    constructor(public layoutService: LayoutService, private translationService: TranslationService) {}
-    ngOnInit(): void {
-        // Subscribe to the current language from the service
-        this.langSubscription = this.translationService.currentLang$.subscribe(lang => {
-            this.currentLang = lang;
-        });
-    }
-
-    // Method to be called on button click
-    switchLanguage(): void {
-        this.translationService.toggleLanguage();
-    }
-
-    currentLang: string = 'ar';
-    private langSubscription!: Subscription;
-
     constructor(public layoutService: LayoutService, private router: Router ,private translationService: TranslationService) {}
     ngOnInit(): void {
         // Subscribe to the current language from the service
