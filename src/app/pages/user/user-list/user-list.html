@@ -1,0 +1,135 @@
+<div class="card">
+    <div class="flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">{{ 'userList.title' | translate }}</h2>
+        <div class="flex-grow-1"></div>
+        <button 
+            pButton 
+            [label]="'userList.addButton' | translate" 
+            icon="pi pi-plus" 
+            class="p-button-sm"
+            (click)="navigateToAdd()"
+        ></button>
+    </div>
+    
+    <p-table
+        #dt
+        [value]="users"
+        dataKey="id"
+        [rows]="10"
+        [loading]="loading"
+        [rowHover]="true"
+        [showGridlines]="true"
+        [paginator]="true"
+        [globalFilterFields]="['userName', 'email']"
+        responsiveLayout="scroll"
+    >
+        <ng-template pTemplate="caption">
+            <div class="flex justify-between items-center flex-column sm:flex-row">
+                <button 
+                    pButton 
+                    [label]="'userList.clearButton' | translate" 
+                    class="p-button-outlined mb-2" 
+                    icon="pi pi-filter-slash" 
+                    (click)="clear(dt)"
+                ></button>
+                <p-iconfield iconPosition="left" class="ml-auto">
+                    <p-inputicon>
+                        <i class="pi pi-search"></i>
+                    </p-inputicon>
+                    <input 
+                        pInputText 
+                        type="text" 
+                        #filter
+                        (input)="onGlobalFilter(dt, $event)" 
+                        [placeholder]="'userList.searchPlaceholder' | translate" 
+                    />
+                </p-iconfield>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <!-- Username Header -->
+                <th style="min-width: 10rem">
+                    <div class="flex justify-between items-center">
+                        {{ 'userList.headers.username' | translate }}
+                        <p-columnFilter type="text" field="userName" display="menu" [placeholder]="'userList.filters.searchByUsername' | translate"></p-columnFilter>
+                    </div>
+                </th>
+                
+                <!-- Email Header -->
+                <th style="min-width: 12rem">
+                    <div class="flex justify-between items-center">
+                        {{ 'userList.headers.email' | translate }}
+                        <p-columnFilter type="text" field="email" display="menu" [placeholder]="'userList.filters.searchByEmail' | translate"></p-columnFilter>
+                    </div>
+                </th>
+                
+                <!-- LDAP User Header -->
+                <th style="min-width: 8rem">
+                    <div class="flex justify-between items-center">
+                        {{ 'userList.headers.ldapUser' | translate }}
+                        <p-columnFilter field="isLdapUser" matchMode="equals" display="menu">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-select 
+                                    [ngModel]="value" 
+                                    [options]="integrationOptions" 
+                                    (onChange)="filter($event.value)" 
+                                    [placeholder]="'userList.filters.any' | translate" 
+                                    [style]="{ 'min-width': '12rem' }"
+                                >
+                                    <ng-template let-option pTemplate="item">
+                                        {{ option.label }}
+                                    </ng-template>
+                                </p-select>
+                            </ng-template>
+                        </p-columnFilter>
+                    </div>
+                </th>
+
+                <th style="min-width: 8rem">{{ 'userList.headers.actions' | translate }}</th>
+            </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="body" let-user>
+            <tr>
+                <td>{{ user.userName }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    <p-tag 
+                        [value]="user.isLdapUser ? 'Yes' : 'No'" 
+                        [severity]="user.isLdapUser ? 'success' : 'info'"
+                    ></p-tag>
+                </td>
+                <td>
+                    <button 
+                        pButton 
+                        icon="pi pi-pencil" 
+                        class="p-button-rounded p-button-text p-button-sm"
+                        (click)="navigateToEdit(user.id)"
+                    ></button>
+                    <button 
+                        pButton 
+                        icon="pi pi-trash" 
+                        class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                        (click)="deleteUser(user)"
+                    ></button>
+                </td>
+            </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="4">{{ 'userList.messages.empty' | translate }}</td>
+            </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="loadingbody">
+            <tr>
+                <td colspan="4">{{ 'userList.messages.loading' | translate }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-toast></p-toast>

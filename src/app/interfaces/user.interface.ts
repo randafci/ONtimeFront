@@ -1,0 +1,24 @@
+export interface UserDto {
+  id: string;
+  userName: string;
+  email: string;
+  isLdapUser: boolean;
+  extraEmployeesView: string;
+  employeeId?: number;
+}
+
+export interface CreateUserDto {
+  password: string;
+  isLdapUser: boolean;
+  extraEmployeesView: string;
+  employeeId?: number;
+}
+
+export interface UpdateUserDto {
+  id: string;
+  userName: string;
+  email: string;
+  isLdapUser: boolean;
+  extraEmployeesView: string;
+  employeeId?: number;
+}

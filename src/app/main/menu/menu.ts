@@ -31,6 +31,10 @@ export class MenuComponent {
             {
                 label: 'Department',
                 items: [{ label: 'Department', icon: 'pi pi-fw pi-sitemap', routerLink: ['/departments/list'] }]
+            },  
+            {
+                label: 'Users',
+                items: [{ label: 'User', icon: 'pi pi-fw pi-sitemap', routerLink: ['/users/list'] }]
             }
 
             
