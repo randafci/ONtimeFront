@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CreateCompany, EditCompany, Company } from '@/interfaces/company.interface';
-import { ApiResponse } from '@/interfaces/apiResponse.interface';
 import { AuthService } from '@/auth/auth.service';
+import { ApiResponse } from '@/core/models/api-response.model';
 
 @Injectable({
   providedIn: 'root'

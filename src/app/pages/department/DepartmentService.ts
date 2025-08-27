@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CreateDepartment, EditDepartment, Department } from '@/interfaces/department.interface';
-import { ApiResponse } from '@/interfaces/apiResponse.interface';
+import { ApiResponse } from '@/core/models/api-response.model';
 
 @Injectable({
   providedIn: 'root'

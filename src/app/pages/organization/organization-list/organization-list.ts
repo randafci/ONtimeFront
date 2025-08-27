@@ -17,10 +17,10 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Organization } from '@/interfaces/organization.interface';
 import { LookupService } from '../OrganizationService';
-import { ApiResponse } from '@/interfaces/apiResponse.interface';
 import { Router, RouterModule } from "@angular/router";
 import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@/core/pipes/translate.pipe';
+import { ApiResponse } from '@/core/models/api-response.model';
 
 @Component({
   selector: 'app-organization-list',
@@ -76,7 +76,7 @@ export class OrganizationListComponent implements OnInit {
     this.lookupService.getAllOrganizations().subscribe({
       next: (response: ApiResponse<Organization[]>) => {
         if (response.succeeded) {
-          this.organizations = response.data;
+          this.organizations = response.data||[];
         } else {
           this.messageService.add({
             severity: 'error',

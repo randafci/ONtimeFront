@@ -16,9 +16,9 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Company } from '@/interfaces/company.interface';
 import { CompanyService } from '../CompanyService';
-import { ApiResponse } from '@/interfaces/apiResponse.interface';
 import { Router, RouterModule } from "@angular/router";
 import { DatePipe } from '@angular/common';
+import { ApiResponse } from '@/core/models/api-response.model';
 
 @Component({
   selector: 'app-company-list',
