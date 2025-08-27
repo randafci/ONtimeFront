@@ -19,7 +19,7 @@ export const appRoutes: Routes = [
     {
         path: '',
         component: Layout, //AppLayout,
-        //canActivate: [AuthGuard], // Protect entire layout
+        canActivate: [AuthGuard], // Protect entire layout
         children: [
             { path: '', component: Dashboard },
             { 
@@ -43,6 +43,11 @@ export const appRoutes: Routes = [
                 path: 'departments', 
                 loadChildren: () => import('./app/pages/department/department.routes')
                     .then(m => m.DEPARTMENT_ROUTES)
+            },
+            { 
+                path: 'employees', 
+                loadChildren: () => import('./app/pages/employee/employee.routes')
+                    .then(m => m.EMPLOYEE_ROUTES)
             },
             { path: 'documentation', component: Documentation },
             { path: 'test', component: Layout },
