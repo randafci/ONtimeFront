@@ -33,6 +33,10 @@ export class MenuComponent {
                 items: [{ label: 'Department', icon: 'pi pi-fw pi-sitemap', routerLink: ['/departments/list'] }]
             },
             {
+                label: 'Employee',
+                items: [{ label: 'Employee', icon: 'pi pi-fw pi-users', routerLink: ['/employees'] }]
+            },
+            {
                 label: 'UI Components',
                 items: [
                     { label: 'Form Layout', icon: 'pi pi-fw pi-id-card', routerLink: ['/uikit/formlayout'] },

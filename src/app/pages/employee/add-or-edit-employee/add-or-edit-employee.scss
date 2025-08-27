@@ -1,0 +1,497 @@
+:host ::ng-deep {
+  // Force all form elements to be visible and use theme colors
+  * {
+    &[class*="p-inputtext"],
+    &[class*="p-select"],
+    &[class*="p-dropdown"],
+    &[class*="p-multiselect"],
+    &[class*="p-calendar"],
+    &[class*="p-inputnumber"],
+    &[class*="p-inputtextarea"] {
+      background-color: var(--surface-card, white) !important;
+      color: var(--text-color, #495057) !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      
+      &:focus,
+      &:hover,
+      &:active,
+      &.p-focus,
+      &.p-hover,
+      &.p-active {
+        background-color: var(--surface-card, white) !important;
+        color: var(--text-color, #495057) !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+    }
+  }
+
+  // Button styling - let theme control colors
+  .p-button {
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    
+    // Secondary button (Cancel) - use theme colors
+    &.p-button-secondary {
+      background: var(--surface-200, #e9ecef);
+      border-color: var(--surface-300, #dee2e6);
+      color: var(--text-color, #495057);
+      
+      &:hover {
+        background: var(--surface-300, #dee2e6);
+        border-color: var(--surface-400, #ced4da);
+        color: var(--text-color, #495057);
+      }
+      
+      &:focus {
+        box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+      }
+    }
+    
+    // Danger button (Back and Create/Update) - use system theme color with solid background
+    &.p-button-danger {
+      background: var(--primary-color, #dc3545) !important;
+      border-color: var(--primary-color, #dc3545) !important;
+      color: white !important;
+      
+      &:hover {
+        background: var(--primary-color, #dc3545) !important;
+        border-color: var(--primary-color, #dc3545) !important;
+        color: white !important;
+        opacity: 0.9;
+      }
+      
+      &:focus {
+        background: var(--primary-color, #dc3545) !important;
+        border-color: var(--primary-color, #dc3545) !important;
+        color: white !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+      }
+      
+      &:active {
+        background: var(--primary-color, #dc3545) !important;
+        border-color: var(--primary-color, #dc3545) !important;
+        color: white !important;
+        opacity: 0.8;
+      }
+    }
+  }
+
+  // Override ALL input styling - force visibility and use theme colors
+  input,
+  .p-inputtext,
+  .p-select-label,
+  .p-dropdown-label,
+  .p-multiselect-label,
+  .p-calendar input,
+  .p-inputnumber-input,
+  .p-inputtextarea {
+    background-color: var(--surface-card, white) !important;
+    color: var(--text-color, #495057) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    border: 1px solid var(--surface-border, #ced4da) !important;
+    border-radius: 0.375rem !important;
+    padding: 0.75rem !important;
+    
+    &:focus,
+    &:hover,
+    &:active,
+    &.p-focus,
+    &.p-hover,
+    &.p-active {
+      background-color: var(--surface-card, white) !important;
+      color: var(--text-color, #495057) !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      border-color: var(--primary-color, #dc3545) !important;
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    }
+    
+    &::placeholder {
+      color: var(--text-color-secondary, #6c757d) !important;
+      opacity: 1 !important;
+    }
+  }
+
+  // Specific override for p-select - force visibility and use theme colors
+  .p-select {
+    width: 100%;
+    
+    .p-select-label {
+      background-color: var(--surface-card, white) !important;
+      color: var(--text-color, #495057) !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      border: 1px solid var(--surface-border, #ced4da) !important;
+      border-radius: 0.375rem !important;
+      padding: 0.75rem !important;
+      
+      &:focus,
+      &:hover,
+      &:active,
+      &.p-focus,
+      &.p-hover,
+      &.p-active {
+        background-color: var(--surface-card, white) !important;
+        color: var(--text-color, #495057) !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        border-color: var(--primary-color, #dc3545) !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+      }
+    }
+    
+    .p-select-trigger {
+      background-color: var(--surface-card, white) !important;
+      border: 1px solid var(--surface-border, #ced4da) !important;
+      border-radius: 0.375rem !important;
+      
+      &:focus,
+      &:hover,
+      &:active {
+        background-color: var(--surface-card, white) !important;
+        border-color: var(--primary-color, #dc3545) !important;
+      }
+    }
+    
+    .p-select-panel {
+      background-color: var(--surface-card, white);
+      border: 1px solid var(--surface-border, #ced4da);
+      border-radius: 0.375rem;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .p-select-item {
+      padding: 0.75rem;
+      color: var(--text-color, #495057);
+      
+      &:hover {
+        background-color: var(--surface-hover, #f8f9fa);
+      }
+      
+      &.p-highlight {
+        background-color: var(--primary-color, #dc3545);
+        color: white;
+      }
+    }
+    
+    &.p-focus,
+    &.p-hover,
+    &.p-active {
+      .p-select-label {
+        background-color: var(--surface-card, white) !important;
+        color: var(--text-color, #495057) !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+    }
+    
+    &.p-disabled {
+      .p-select-label {
+        background-color: var(--surface-ground, #f8f9fa) !important;
+        color: var(--text-color-secondary, #6c757d) !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+    }
+  }
+
+  .p-tag {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+.card {
+  background: var(--surface-card, white);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  padding: 2rem;
+}
+
+.field {
+  margin-bottom: 1.5rem;
+}
+
+.required-field {
+  color: var(--primary-color, #dc3545);
+}
+
+.employee-profile-section {
+  background: linear-gradient(135deg, var(--surface-ground, #f8f9fa) 0%, var(--surface-section, #e9ecef) 100%);
+  border: 1px solid var(--surface-border, #dee2e6);
+}
+
+// Navigation tabs - use system theme color for text and icons
+.tabs-navigation {
+  .tab-button {
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    color: var(--text-color-secondary, #6c757d);
+    border-bottom: 2px solid transparent;
+    
+    &:hover {
+      background-color: var(--surface-hover, #f8f9fa);
+      color: var(--primary-color, #dc3545);
+      border-bottom-color: var(--surface-border, #dee2e6);
+    }
+    
+    &.active {
+      font-weight: 600;
+      color: var(--primary-color, #dc3545);
+      border-bottom-color: var(--primary-color, #dc3545);
+    }
+  }
+}
+
+.tab-content {
+  min-height: 400px;
+  padding: 1rem 0;
+}
+
+// Custom Toggle Switch
+.toggle-checkbox {
+  &:checked {
+    transform: translateX(1.5rem);
+    border-color: var(--primary-color, #dc3545);
+  }
+}
+
+.toggle-label {
+  background-color: var(--surface-border, #ced4da);
+  
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s ease-in-out;
+  }
+}
+
+.form-actions {
+  border-top: 1px solid var(--surface-border, #e9ecef);
+  padding-top: 1.5rem;
+  margin-top: 2rem;
+}
+
+.special-needs-toggle {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: var(--surface-ground, #f8f9fa);
+  border-radius: 0.375rem;
+}
+
+.contact-details-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: var(--surface-ground, #f8f9fa);
+  border-radius: 0.375rem;
+}
+
+.empty-tab-content {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-color-secondary, #6c757d);
+  
+  i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+}
+
+// Responsive improvements
+@media (max-width: 768px) {
+  .tabs-navigation {
+    nav {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    
+    .tab-button {
+      font-size: 0.875rem;
+      padding: 0.5rem 0.75rem;
+    }
+  }
+  
+  .employee-profile-section {
+    .flex {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+}
+
+// Focus states for accessibility
+.tab-button:focus {
+  outline: 2px solid var(--primary-color, #dc3545);
+  outline-offset: 2px;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid var(--primary-color, #dc3545);
+  outline-offset: 2px;
+}
+
+// Ensure date inputs are visible
+input[type="date"] {
+  background-color: var(--surface-card, white) !important;
+  color: var(--text-color, #495057) !important;
+  border: 1px solid var(--surface-border, #ced4da) !important;
+  border-radius: 0.375rem !important;
+  padding: 0.75rem !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  
+  &:focus,
+  &:hover,
+  &:active {
+    border-color: var(--primary-color, #dc3545) !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    background-color: var(--surface-card, white) !important;
+    color: var(--text-color, #495057) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+}
+
+// Ensure checkboxes are visible
+input[type="checkbox"] {
+  background-color: var(--surface-card, white) !important;
+  border: 1px solid var(--surface-border, #ced4da) !important;
+  border-radius: 0.25rem !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  
+  &:checked {
+    background-color: var(--primary-color, #dc3545) !important;
+    border-color: var(--primary-color, #dc3545) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  
+  &:focus,
+  &:hover,
+  &:active {
+    border-color: var(--primary-color, #dc3545) !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    background-color: var(--surface-card, white) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+}
+
+// Nuclear option - force visibility and use theme colors
+:host ::ng-deep {
+  .p-inputtext,
+  .p-select .p-select-label,
+  .p-dropdown .p-dropdown-label,
+  .p-multiselect .p-multiselect-label,
+  .p-calendar input,
+  .p-inputnumber-input,
+  .p-inputtextarea,
+  input[type="date"],
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="password"],
+  input[type="search"],
+  input[type="url"],
+  textarea,
+  select {
+    background-color: var(--surface-card, white) !important;
+    color: var(--text-color, #495057) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    border: 1px solid var(--surface-border, #ced4da) !important;
+    border-radius: 0.375rem !important;
+    padding: 0.75rem !important;
+    
+    &::placeholder {
+      color: var(--text-color-secondary, #6c757d) !important;
+      opacity: 1 !important;
+    }
+    
+    &:focus,
+    &:hover,
+    &:active,
+    &.p-focus,
+    &.p-hover,
+    &.p-active {
+      background-color: var(--surface-card, white) !important;
+      color: var(--text-color, #495057) !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      border-color: var(--primary-color, #dc3545) !important;
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    }
+  }
+  
+  // Override any PrimeNG transparency - force visibility and use theme colors
+  .p-component,
+  .p-inputtext.p-component,
+  .p-select.p-component,
+  .p-dropdown.p-component,
+  .p-multiselect.p-component,
+  .p-calendar.p-component,
+  .p-inputnumber.p-component,
+  .p-inputtextarea.p-component {
+    background-color: var(--surface-card, white) !important;
+    color: var(--text-color, #495057) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+}
+
+// Profile Picture Upload Styles
+.employee-profile-section {
+  .relative {
+    position: relative;
+    
+    .w-24.h-24 {
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      }
+    }
+    
+    .absolute {
+      transition: opacity 0.3s ease;
+      
+      &:hover {
+        opacity: 1 !important;
+      }
+    }
+    
+    img {
+      transition: all 0.3s ease;
+    }
+  }
+}
+
+// File input styling
+input[type="file"] {
+  &::-webkit-file-upload-button {
+    display: none;
+  }
+  
+  &::file-selector-button {
+    display: none;
+  }
+}
