@@ -48,9 +48,6 @@ export class AddOrEditDepartment implements OnInit {
   departmentTypes: DepartmentType[] = [];
   mainDepartments: Department[] = [];
   private translations: any = {}; // Store current translations
-
-  private translations: any = {}; // Store current translations
-
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
