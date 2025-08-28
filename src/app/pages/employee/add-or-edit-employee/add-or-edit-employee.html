@@ -1,0 +1,573 @@
+<div class="card">
+  <!-- Header Section -->
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-semibold text-gray-800">{{ isEditMode ? 'Edit Employee' : 'Add Employee' }}</h1>
+    <button 
+      pButton 
+      label="Back" 
+      class="p-button-danger" 
+      icon="pi pi-arrow-left"
+      (click)="onBack()">
+    </button>
+  </div>
+
+  <!-- Employee Profile Overview -->
+  <div class="employee-profile-section mb-8 p-6 bg-gray-50 rounded-lg">
+    <div class="flex flex-col items-center text-center">
+      <!-- Profile Picture Upload -->
+      <div class="relative mb-4">
+        <div 
+          class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center border-4 border-white shadow-lg cursor-pointer hover:bg-gray-300 transition-colors"
+          (click)="fileInput.click()">
+          <!-- Show uploaded image if available -->
+          <img 
+            *ngIf="profileImageUrl" 
+            [src]="profileImageUrl" 
+            alt="Profile Picture"
+            class="w-full h-full rounded-full object-cover">
+          <!-- Show default icon if no image -->
+          <i 
+            *ngIf="!profileImageUrl" 
+            class="pi pi-user text-4xl text-gray-400"></i>
+        </div>
+        <!-- Upload overlay -->
+        <div 
+          class="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+          (click)="fileInput.click()">
+          <i class="pi pi-camera text-white text-xl"></i>
+        </div>
+        <!-- Remove image button -->
+        <button 
+          *ngIf="profileImageUrl"
+          type="button"
+          class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+          (click)="removeImage($event)">
+          <i class="pi pi-times text-xs"></i>
+        </button>
+        <!-- Hidden file input -->
+        <input 
+          #fileInput
+          type="file" 
+          accept="image/*"
+          (change)="onImageUpload($event)"
+          class="hidden">
+      </div>
+      <div class="text-center">
+        <h3 class="text-xl font-semibold text-gray-900 mb-1">{{ fullName || 'Full Name' }}</h3>
+        <p class="text-gray-600 text-lg mb-2">{{ jobTitle || 'Job Title' }}</p>
+        <div class="flex items-center justify-center gap-4">
+          <span class="text-sm text-gray-500">Employee ID: {{ employeeForm.get('employeeCode')?.value || 'N/A' }}</span>
+          <span class="text-sm text-gray-500">Status: {{ employeeForm.get('employeeStatus')?.value || 'Active' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="tabs-navigation mb-6">
+    <div class="border-b border-gray-200">
+      <nav class="flex space-x-8">
+        <button 
+          class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
+          [class.active]="activeTabIndex === 0"
+          (click)="activeTabIndex = 0">
+          <i class="pi pi-user mr-2"></i>
+          General
+        </button>
+        <button 
+          class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
+          [class.active]="activeTabIndex === 1"
+          (click)="activeTabIndex = 1">
+          <i class="pi pi-phone mr-2"></i>
+          Contact
+        </button>
+        <button 
+          class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
+          [class.active]="activeTabIndex === 2"
+          (click)="activeTabIndex = 2">
+          <i class="pi pi-building mr-2"></i>
+          Organizational
+        </button>
+        <button 
+          class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
+          [class.active]="activeTabIndex === 3"
+          (click)="activeTabIndex = 3">
+          <i class="pi pi-file mr-2"></i>
+          Documents
+        </button>
+        <button 
+          class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
+          [class.active]="activeTabIndex === 4"
+          (click)="activeTabIndex = 4">
+          <i class="pi pi-users mr-2"></i>
+          Report Managers
+        </button>
+        <button 
+          class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
+          [class.active]="activeTabIndex === 5"
+          (click)="activeTabIndex = 5">
+          <i class="pi pi-calendar mr-2"></i>
+          Assign Schedule
+        </button>
+        <button 
+          class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
+          [class.active]="activeTabIndex === 6"
+          (click)="activeTabIndex = 6">
+          <i class="pi pi-shield mr-2"></i>
+          Policies
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Tab Content -->
+  <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+    
+    <!-- General Tab -->
+    <div *ngIf="activeTabIndex === 0" class="tab-content">
+      <h3 class="text-lg font-medium mb-6 text-gray-900 text-center">General Information</h3>
+      
+      <!-- Employment Information Section -->
+      <div class="mb-8">
+        <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">Employment Information</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="field">
+            <label for="employeeCode" class="block text-sm font-medium mb-2 text-gray-700">
+              Employee ID <span class="text-red-500">*</span>
+            </label>
+            <input 
+              id="employeeCode"
+              pInputText 
+              formControlName="employeeCode"
+              placeholder="Employee ID"
+              class="w-full"
+              [class.ng-invalid]="employeeForm.get('employeeCode')?.invalid && employeeForm.get('employeeCode')?.touched">
+            <small class="text-red-500" *ngIf="employeeForm.get('employeeCode')?.invalid && employeeForm.get('employeeCode')?.touched">
+              Employee ID is required
+            </small>
+          </div>
+
+          <div class="field">
+            <label for="employeeStatus" class="block text-sm font-medium mb-2 text-gray-700">
+              Employee Status
+            </label>
+            <p-select 
+              id="employeeStatus"
+              formControlName="employeeStatus"
+              [options]="employeeStatusOptions"
+              placeholder="Select Employee Status"
+              optionLabel="label"
+              optionValue="value"
+              class="w-full">
+            </p-select>
+          </div>
+
+          <div class="field">
+            <label for="employeeType" class="block text-sm font-medium mb-2 text-gray-700">
+              Employee Type
+            </label>
+            <input 
+              id="employeeType"
+              pInputText 
+              formControlName="employeeType"
+              placeholder="Enter Employee Type"
+              class="w-full">
+          </div>
+        </div>
+      </div>
+
+      <!-- Personal Information Section -->
+      <div class="mb-8">
+        <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">Personal Information</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="field">
+            <label for="firstName" class="block text-sm font-medium mb-2 text-gray-700">
+              First Name <span class="text-red-500">*</span>
+            </label>
+            <input 
+              id="firstName"
+              pInputText 
+              formControlName="firstName"
+              placeholder="First Name"
+              class="w-full"
+              [class.ng-invalid]="employeeForm.get('firstName')?.invalid && employeeForm.get('firstName')?.touched">
+            <small class="text-red-500" *ngIf="employeeForm.get('firstName')?.invalid && employeeForm.get('firstName')?.touched">
+              First Name is required
+            </small>
+          </div>
+
+          <div class="field">
+            <label for="lastName" class="block text-sm font-medium mb-2 text-gray-700">
+              Family Name <span class="text-red-500">*</span>
+            </label>
+            <input 
+              id="lastName"
+              pInputText 
+              formControlName="lastName"
+              placeholder="Family Name"
+              class="w-full"
+              [class.ng-invalid]="employeeForm.get('lastName')?.invalid && employeeForm.get('lastName')?.touched">
+            <small class="text-red-500" *ngIf="employeeForm.get('lastName')?.invalid && employeeForm.get('lastName')?.touched">
+              Family Name is required
+            </small>
+          </div>
+
+          <div class="field">
+            <label for="gender" class="block text-sm font-medium mb-2 text-gray-700">
+              Gender <span class="text-red-500">*</span>
+            </label>
+            <p-select 
+              id="gender"
+              formControlName="gender"
+              [options]="genderOptions" 
+              optionLabel="label" 
+              optionValue="value"
+              placeholder="Select Gender"
+              class="w-full"
+              [class.ng-invalid]="employeeForm.get('gender')?.invalid && employeeForm.get('gender')?.touched">
+            </p-select>
+            <small class="text-red-500" *ngIf="employeeForm.get('gender')?.invalid && employeeForm.get('gender')?.touched">
+              Gender is required
+            </small>
+          </div>
+
+          <div class="field">
+            <label for="nationality" class="block text-sm font-medium mb-2 text-gray-700">
+              Nationality
+            </label>
+            <input 
+              id="nationality"
+              pInputText 
+              formControlName="nationality"
+              placeholder="Enter Nationality"
+              class="w-full">
+          </div>
+
+          <div class="field">
+            <label for="religionType" class="block text-sm font-medium mb-2 text-gray-700">
+              Religion
+            </label>
+            <input 
+              id="religionType"
+              pInputText 
+              formControlName="religionType"
+              placeholder="Enter Religion"
+              class="w-full">
+          </div>
+
+          <div class="field">
+            <label for="isSpecialNeeds" class="block text-sm font-medium mb-2 text-gray-700">
+              Special Needs
+            </label>
+            <div class="flex items-center">
+              <input 
+                type="checkbox"
+                id="isSpecialNeeds"
+                formControlName="isSpecialNeeds"
+                class="mr-3 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+              <label for="isSpecialNeeds" class="text-sm text-gray-700">Enable special needs</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Display Settings Section -->
+      <div>
+        <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">Display Settings</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="field">
+            <label for="displayInReport" class="block text-sm font-medium mb-2 text-gray-700">
+              Display in Report
+            </label>
+            <div class="flex items-center">
+              <input 
+                type="checkbox"
+                id="displayInReport"
+                formControlName="displayInReport"
+                class="mr-3 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+              <label for="displayInReport" class="text-sm text-gray-700">Show in reports</label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="displayInReportsDashboard" class="block text-sm font-medium mb-2 text-gray-700">
+              Display in Reports Dashboard
+            </label>
+            <div class="flex items-center">
+              <input 
+                type="checkbox"
+                id="displayInReportsDashboard"
+                formControlName="displayInReportsDashboard"
+                class="mr-3 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+              <label for="displayInReportsDashboard" class="text-sm text-gray-700">Show in dashboard</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Tab -->
+    <div *ngIf="activeTabIndex === 1" class="tab-content">
+      <div class="mb-6">
+        <!-- Contact Details Section -->
+        <div class="text-center mb-8">
+          <h3 class="text-lg font-medium text-gray-900">Contact Details</h3>
+        </div>
+
+                 <!-- Personal Contact Information -->
+         <div class="mb-8">
+           <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">Personal Contact</h4>
+           <div formGroupName="contact" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+             
+             <!-- Personal Email -->
+             <div class="field">
+               <label for="personalEmail" class="block text-sm font-medium mb-2 text-gray-700">
+                 Personal Email
+               </label>
+               <input 
+                 id="personalEmail"
+                 pInputText 
+                 formControlName="personalEmail"
+                 placeholder="Personal Email"
+                 class="w-full">
+             </div>
+
+             <!-- Personal Phone -->
+             <div class="field">
+               <label for="personalPhone" class="block text-sm font-medium mb-2 text-gray-700">
+                 Personal Phone
+               </label>
+               <input 
+                 id="personalPhone"
+                 pInputText 
+                 formControlName="personalPhone"
+                 placeholder="Personal Phone"
+                 class="w-full">
+             </div>
+
+             <!-- Personal Mobile -->
+             <div class="field">
+               <label for="personalMobile" class="block text-sm font-medium mb-2 text-gray-700">
+                 Personal Mobile Phone
+               </label>
+               <input 
+                 id="personalMobile"
+                 pInputText 
+                 formControlName="personalMobile"
+                 placeholder="Personal Mobile Phone"
+                 class="w-full">
+             </div>
+           </div>
+         </div>
+
+                 <!-- Official Contact Information -->
+         <div class="mb-8">
+           <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">Official Contact</h4>
+           <div formGroupName="contact" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+             
+             <!-- Official Email -->
+             <div class="field">
+               <label for="officialEmail" class="block text-sm font-medium mb-2 text-gray-700">
+                 Official Email
+               </label>
+               <input 
+                 id="officialEmail"
+                 pInputText 
+                 formControlName="officialEmail"
+                 placeholder="Official Email"
+                 class="w-full">
+             </div>
+
+             <!-- Official Phone -->
+             <div class="field">
+               <label for="officialPhone" class="block text-sm font-medium mb-2 text-gray-700">
+                 Official Phone
+               </label>
+               <input 
+                 id="officialPhone"
+                 pInputText 
+                 formControlName="officialPhone"
+                 placeholder="Official Phone"
+                 class="w-full">
+               </div>
+
+             <!-- Official Mobile -->
+             <div class="field">
+               <label for="officialMobile" class="block text-sm font-medium mb-2 text-gray-700">
+                 Official Mobile Phone
+               </label>
+               <input 
+                 id="officialMobile"
+                 pInputText 
+                 formControlName="officialMobile"
+                 placeholder="Official Mobile Phone"
+                 class="w-full">
+             </div>
+           </div>
+         </div>
+
+                 <!-- Address Information -->
+         <div class="mb-8">
+           <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">Address Information</h4>
+           <div formGroupName="contact" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+             
+             <!-- Address -->
+             <div class="field md:col-span-3">
+               <label for="address" class="block text-sm font-medium mb-2 text-gray-700">
+                 Address
+               </label>
+               <input 
+                 id="address"
+                 pInputText 
+                 formControlName="address"
+                 placeholder="Full Address"
+                 class="w-full">
+             </div>
+
+             <!-- City -->
+             <div class="field">
+               <label for="city" class="block text-sm font-medium mb-2 text-gray-700">
+                 City
+               </label>
+               <input 
+                 id="city"
+                 pInputText 
+                 formControlName="city"
+                 placeholder="City"
+                 class="w-full">
+             </div>
+
+             <!-- State -->
+             <div class="field">
+               <label for="state" class="block text-sm font-medium mb-2 text-gray-700">
+                 State
+               </label>
+               <input 
+                 id="state"
+                 pInputText 
+                 formControlName="state"
+                 placeholder="State"
+                 class="w-full">
+             </div>
+           </div>
+         </div>
+      </div>
+    </div>
+
+    <!-- Organizational Tab -->
+    <div *ngIf="activeTabIndex === 2" class="tab-content">
+      <div class="text-center py-12">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="pi pi-building text-2xl text-gray-400"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Organizational Information</h3>
+        <p class="text-gray-500">Organizational settings will be available soon</p>
+      </div>
+    </div>
+
+         <!-- Documents Tab -->
+     <div *ngIf="activeTabIndex === 3" class="tab-content">
+       <h3 class="text-lg font-medium mb-6 text-gray-900">Document Information</h3>
+       <div formGroupName="document" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+         
+         <div class="field">
+           <label for="passportNumber" class="block text-sm font-medium mb-2 text-gray-700">
+             Passport Number
+           </label>
+           <input 
+             id="passportNumber"
+             pInputText 
+             formControlName="passportNumber"
+             placeholder="Passport Number"
+             class="w-full">
+         </div>
+
+         <div class="field">
+           <label for="visaNumber" class="block text-sm font-medium mb-2 text-gray-700">
+             Visa Number
+           </label>
+           <input 
+             id="visaNumber"
+             pInputText 
+             formControlName="visaNumber"
+             placeholder="Visa Number"
+             class="w-full">
+         </div>
+
+         <div class="field">
+           <label for="passportExpirationDate" class="block text-sm font-medium mb-2 text-gray-700">
+             Passport Expiration Date
+           </label>
+           <input 
+             id="passportExpirationDate"
+             type="date"
+             formControlName="passportExpirationDate"
+             class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500">
+         </div>
+
+         <div class="field">
+           <label for="visaExpirationDate" class="block text-sm font-medium mb-2 text-gray-700">
+             Visa Expiration Date
+           </label>
+           <input 
+             id="visaExpirationDate"
+             type="date"
+             formControlName="visaExpirationDate"
+             class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500">
+         </div>
+       </div>
+     </div>
+
+    <!-- Report Managers Tab -->
+    <div *ngIf="activeTabIndex === 4" class="tab-content">
+      <div class="text-center py-12">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="pi pi-users text-2xl text-gray-400"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Report Managers</h3>
+        <p class="text-gray-500">Report Managers configuration will be added here</p>
+      </div>
+    </div>
+
+    <!-- Assign Schedule Tab -->
+    <div *ngIf="activeTabIndex === 5" class="tab-content">
+      <div class="text-center py-12">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="pi pi-calendar text-2xl text-gray-400"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Assign Schedule</h3>
+        <p class="text-gray-500">Schedule assignment configuration will be added here</p>
+      </div>
+    </div>
+
+    <!-- Policies Tab -->
+    <div *ngIf="activeTabIndex === 6" class="tab-content">
+      <div class="text-center py-12">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="pi pi-shield text-2xl text-gray-400"></i>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Policies</h3>
+        <p class="text-gray-500">Policies configuration will be added here</p>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
+      <button 
+        pButton 
+        label="Cancel" 
+        class="p-button-secondary" 
+        (click)="onBack()">
+      </button>
+      <button 
+        pButton 
+        label="{{ isEditMode ? 'Update' : 'Create' }}" 
+        class="p-button-danger" 
+        [loading]="loading"
+        type="submit">
+      </button>
+    </div>
+  </form>
+</div>
+
+<p-toast></p-toast>
