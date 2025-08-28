@@ -35,9 +35,11 @@ export class MenuComponent {
             {
                 label: 'Users',
                 items: [{ label: 'User', icon: 'pi pi-fw pi-sitemap', routerLink: ['/users/list'] }]
-            }
-
-            
+            },
+            {
+                label: 'Employee',
+                items: [{ label: 'Employee', icon: 'pi pi-fw pi-users', routerLink: ['/employees'] }]
+            },
 
         ];
     }
