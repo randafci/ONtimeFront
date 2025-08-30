@@ -31,6 +31,7 @@ import { SelectModule } from 'primeng/select';
     TranslatePipe,
     //DatePipe, 
     Toast,
+
     ToggleButtonModule, // <--- for p-toggleButton
     CheckboxModule,
      SelectButtonModule,
@@ -64,8 +65,9 @@ loadingEmployees= false;
     private messageService: MessageService
   ) {
     this.userForm = this.fb.group({
-      userName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
+     // userName: ['', Validators.required],
+     // email: ['', [Validators.required, Validators.email]],
+
       password: [''],
       isLdapUser: [false],
       extraEmployeesView: [''],
@@ -74,6 +76,9 @@ loadingEmployees= false;
   }
 
   ngOnInit(): void {
+
+        this.loadEmployees();
+
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode = true;
@@ -85,6 +90,7 @@ loadingEmployees= false;
 
   loadUser(id: string): void {
     this.loadEmployees();
+
 
     this.loading = true;
     this.userService.getById(id).subscribe({

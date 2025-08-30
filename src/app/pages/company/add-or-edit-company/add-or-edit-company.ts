@@ -12,8 +12,8 @@ import { LookupService } from '../../organization/OrganizationService';
 import { Company, CreateCompany, EditCompany } from '@/interfaces/company.interface';
 import { CompanyType } from '@/interfaces/company-type.interface';
 import { Organization } from '@/interfaces/organization.interface';
-import { ApiResponse } from '@/interfaces/apiResponse.interface';
 import { CommonModule } from '@angular/common';
+import { ApiResponse } from '@/core/models/api-response.model';
 
 @Component({
   selector: 'app-add-or-edit-company',

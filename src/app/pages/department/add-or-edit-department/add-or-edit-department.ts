@@ -14,10 +14,10 @@ import { Department, CreateDepartment, EditDepartment } from '@/interfaces/depar
 import { DepartmentType } from '@/interfaces/department-type.interface';
 import { Company } from '@/interfaces/company.interface';
 import { Organization } from '@/interfaces/organization.interface';
-import { ApiResponse } from '@/interfaces/apiResponse.interface';
 import { CommonModule } from '@angular/common';
 import { TranslationService } from '@/pages/translation-manager/translation-manager/translation.service';
 import { TranslatePipe } from '@/core/pipes/translate.pipe';
+import { ApiResponse } from '@/core/models/api-response.model';
 
 @Component({
   selector: 'app-add-or-edit-department',
@@ -98,7 +98,7 @@ export class AddOrEditDepartment implements OnInit {
     this.organizationService.getAllOrganizations().subscribe({
       next: (response: ApiResponse<Organization[]>) => {
         if (response.succeeded) {
-          this.organizations = response.data;
+          this.organizations = response.data||[];
         }
       },
       error: (error) => {
@@ -111,7 +111,7 @@ export class AddOrEditDepartment implements OnInit {
     this.companyService.getAllCompanies().subscribe({
       next: (response: ApiResponse<Company[]>) => {
         if (response.succeeded) {
-          this.companies = response.data;
+          this.companies = response.data||[];
         }
       },
       error: (error) => {
@@ -124,7 +124,7 @@ export class AddOrEditDepartment implements OnInit {
     this.departmentService.getAllDepartments().subscribe({
       next: (response: ApiResponse<Department[]>) => {
         if (response.succeeded) {
-          this.departments = response.data;
+          this.departments = response.data||[];
           this.updateMainDepartments();
         }
       },
