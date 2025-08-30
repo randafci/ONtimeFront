@@ -1,0 +1,152 @@
+<div class="card">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0 w-full">Employee List</h2>
+    <button 
+      pButton 
+      label="Create" 
+      icon="pi pi-plus" 
+      class="p-button-sm h-fit"
+      (click)="navigateToAdd()"
+    ></button>
+  </div>
+  
+  <p-table
+    #dt
+    [value]="employees"
+    dataKey="id"
+    [rows]="10"
+    [loading]="loading"
+    [rowHover]="true"
+    [showGridlines]="true"
+    [paginator]="true"
+    [globalFilterFields]="['employeeCode', 'firstName', 'lastName', 'employeeType']"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex justify-between items-center flex-column sm:flex-row">
+        <button 
+          pButton 
+          label="Clear" 
+          class="p-button-outlined mb-2" 
+          icon="pi pi-filter-slash" 
+          (click)="clear(dt)"
+        ></button>
+        <p-iconfield iconPosition="left" class="ml-auto">
+          <p-inputicon>
+            <i class="pi pi-search"></i>
+          </p-inputicon>
+          <input 
+            pInputText 
+            type="text" 
+            #filter
+            (input)="onGlobalFilter(dt, $event)" 
+            placeholder="Search employees..." 
+          />
+        </p-iconfield>
+      </div>
+    </ng-template>
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="min-width: 10rem">
+          <div class="flex justify-between items-center">
+            Employee ID
+            <p-columnFilter type="text" field="employeeCode" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 12rem">
+          <div class="flex justify-between items-center">
+            Employee Name
+            <p-columnFilter type="text" field="firstName" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 12rem">
+          <div class="flex justify-between items-center">
+            Job Title
+            <p-columnFilter type="text" field="employeeType" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 12rem">
+          <div class="flex justify-between items-center">
+            Department
+            <p-columnFilter type="text" field="department" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 10rem">
+          <div class="flex justify-between items-center">
+            Status
+            <p-columnFilter field="employeeStatus" matchMode="equals" display="menu">
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                <p-select 
+                  [ngModel]="value" 
+                  [options]="statuses" 
+                  (onChange)="filter($event.value)" 
+                  placeholder="Any" 
+                  [style]="{ 'min-width': '12rem' }"
+                >
+                  <ng-template let-option pTemplate="item">
+                    <p-tag 
+                      [value]="option.label" 
+                      [severity]="getSeverity(option.value)"
+                    ></p-tag>
+                  </ng-template>
+                </p-select>
+              </ng-template>
+            </p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 8rem">Actions</th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-employee>
+      <tr>
+        <td>{{ employee.employeeCode }}</td>
+        <td>{{ getFullName(employee) }}</td>
+        <td>{{ employee.employeeType || 'N/A' }}</td>
+        <td>{{ employee.department || 'N/A' }}</td>
+        <td>
+          <p-tag class="uppercase"
+            [value]="getStatus(employee)" 
+            [severity]="getSeverity(getStatus(employee))"
+          ></p-tag>
+        </td>
+        <td>
+          <div class="action-buttons">
+            <button 
+              pButton 
+              icon="pi pi-pencil" 
+              class="p-button-rounded p-button-text p-button-sm"
+              (click)="navigateToEdit(employee.id)"
+              pTooltip="Edit Employee"
+              tooltipPosition="top"
+            ></button>
+            <button 
+              pButton 
+              icon="pi pi-trash" 
+              class="p-button-rounded p-button-text p-button-danger p-button-sm"
+              (click)="deleteEmployee(employee)"
+              pTooltip="Delete Employee"
+              tooltipPosition="top"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6">No employees found</td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="loadingbody">
+      <tr>
+        <td colspan="6">Loading employees...</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
