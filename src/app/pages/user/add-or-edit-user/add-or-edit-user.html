@@ -1,0 +1,85 @@
+<div class="card p-fluid max-w-[600px] mx-auto">
+
+  <h2>{{ (isEditMode ? 'userForm.title.edit' : 'userForm.title.add') | translate }}</h2>
+
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- Employee ID -->
+ <div class="field">
+  <label for="employeeId">{{ 'userForm.employee' | translate }}</label>
+
+  <p-select
+    [options]="employees"
+    optionLabel="employeeCode"
+    optionValue="id"
+    formControlName="employeeId"
+    [placeholder]="'userForm.selectEmployee' | translate"
+    [showClear]="true"
+    [filter]="true"
+    [loading]="loadingEmployees"
+  >
+    <ng-template let-employee pTemplate="item">
+      <div class="flex align-items-center">
+        <div>
+          <div>{{ employee.employeeCode }} - {{ employee.firstName }} {{ employee.lastName }}</div>
+          <div class="text-sm text-500">{{ employee.employeeType }} • {{ employee.employeeStatus }}</div>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template let-employee pTemplate="value">
+      <div *ngIf="employee">
+        {{ employee.employeeCode }} - {{ employee.firstName }} {{ employee.lastName }}
+      </div>
+    </ng-template>
+  </p-select>
+</div>
+
+      <!-- Password -->
+      <div class="field" *ngIf="!isEditMode">
+        <label for="password">{{ 'userForm.labels.password' | translate }} <span class="required-star">*</span></label>
+        <input id="password" type="password" pInputText class="w-full" formControlName="password"
+          [ngClass]="{'field-error': userForm.controls['password'].invalid && (userForm.controls['password'].touched || submitted)}"/>
+        <small *ngIf="userForm.controls['password'].invalid && (userForm.controls['password'].touched || submitted)" class="p-error">
+          {{ 'userForm.validation.required' | translate }}
+        </small>
+      </div>
+
+      <!-- isLdapUser -->
+      <div class="field">
+  <label for="isLdapUser">{{ 'userForm.labels.isLdapUser' | translate }}</label>
+  <p-toggleButton
+    id="isLdapUser"
+    formControlName="isLdapUser"
+    onLabel="Yes"
+    offLabel="No"
+    offIcon="pi pi-times"
+  ></p-toggleButton>
+</div>
+
+
+
+      <!-- Extra Employees View -->
+      <div class="field col-span-2">
+        <label for="extraEmployeesView">{{ 'userForm.labels.extraEmployeesView' | translate }}</label>
+        <input id="extraEmployeesView" type="text" pInputText class="w-full" formControlName="extraEmployeesView"/>
+      </div>
+
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex justify-content-start gap-2 mt-4">
+     <p-button type="button" label="{{ 'userForm.buttons.cancel' | translate }}" class="p-button-secondary" (onClick)="onCancel()" [disabled]="loading"></p-button>
+
+<p-button type="submit" 
+  label="{{ isEditMode ? ('userForm.buttons.update' | translate) : ('userForm.buttons.save' | translate) }}" 
+  [disabled]="userForm.invalid || loading">
+</p-button>
+
+    </div>
+
+  </form>
+</div>
+
+<p-toast></p-toast>

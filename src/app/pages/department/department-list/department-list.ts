@@ -17,11 +17,11 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Department } from '@/interfaces/department.interface';
 import { DepartmentService } from '../DepartmentService';
-import { ApiResponse } from '@/interfaces/apiResponse.interface';
 import { Router, RouterModule } from "@angular/router";
 import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@/core/pipes/translate.pipe';
 import { TranslationService } from '@/pages/translation-manager/translation-manager/translation.service';
+import { ApiResponse } from '@/core/models/api-response.model';
 
 
 @Component({
@@ -100,7 +100,7 @@ export class DepartmentListComponent implements OnInit {
     this.departmentService.getAllDepartments().subscribe({
       next: (response: ApiResponse<Department[]>) => {
         if (response.succeeded) {
-          this.departments = response.data;
+          this.departments = response.data||[];
         } else {
           this.messageService.add({
             severity: 'error',
