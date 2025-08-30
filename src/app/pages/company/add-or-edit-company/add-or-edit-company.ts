@@ -57,7 +57,7 @@ export class AddOrEditCompany implements OnInit {
       nameSE: ['', Validators.required],
       parentId: [null],
       organizationId: [null, Validators.required],
-      companyTypeId: [null, Validators.required]
+      companyTypeLookupId: [null, Validators.required]
     });
   }
 
@@ -74,7 +74,7 @@ export class AddOrEditCompany implements OnInit {
     });
 
     // Watch for company type changes
-    this.companyForm.get('companyTypeId')?.valueChanges.subscribe(companyTypeId => {
+    this.companyForm.get('companyTypeLookupId')?.valueChanges.subscribe(companyTypeId => {
       this.onCompanyTypeChange(companyTypeId);
     });
   }
@@ -120,16 +120,16 @@ export class AddOrEditCompany implements OnInit {
   }
 
   updateMainCompanies(): void {
-    // Filter companies to show only Main Companies (companyTypeId = 1)
-    this.mainCompanies = this.companies.filter(company => company.companyTypeId === 1);
+    // Filter companies to show only Main Companies (companyTypeLookupId = 1)
+    this.mainCompanies = this.companies.filter(company => company.companyTypeLookupId === 1);
   }
 
-  onCompanyTypeChange(companyTypeId: number): void {
-    if (companyTypeId === 1) { // Main Company
+  onCompanyTypeChange(companyTypeLookupId: number): void {
+    if (companyTypeLookupId === 1) { // Main Company
       // Hide parent company selection
       this.companyForm.get('parentId')?.setValue(null);
       this.companyForm.get('parentId')?.disable();
-    } else if (companyTypeId === 2) { // Sub Company
+    } else if (companyTypeLookupId === 2) { // Sub Company
       // Show parent company selection with only main companies
       this.companyForm.get('parentId')?.enable();
     }
@@ -146,9 +146,9 @@ export class AddOrEditCompany implements OnInit {
             nameSE: response.data.nameSE,
             parentId: response.data.parentId,
             organizationId: response.data.organizationId,
-            companyTypeId: response.data.companyTypeId
+            companyTypeLookupId: response.data.companyTypeLookupId
           });
-          this.onCompanyTypeChange(response.data.companyTypeId || 0);
+          this.onCompanyTypeChange(response.data.companyTypeLookupId || 0); 
         }
         this.loading = false;
       },
@@ -180,7 +180,7 @@ export class AddOrEditCompany implements OnInit {
         nameSE: formData.nameSE,
         parentId: formData.parentId,
         organizationId: formData.organizationId,
-        companyTypeId: formData.companyTypeId
+        companyTypeLookupId: formData.companyTypeLookupId
       };
       this.updateCompany(editData);
     } else {
@@ -190,7 +190,7 @@ export class AddOrEditCompany implements OnInit {
         nameSE: formData.nameSE,
         parentId: formData.parentId,
         organizationId: formData.organizationId,
-        companyTypeId: formData.companyTypeId
+        companyTypeLookupId: formData.companyTypeLookupId
       };
       this.createCompany(createData);
     }
