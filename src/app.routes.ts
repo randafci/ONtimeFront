@@ -32,6 +32,13 @@ export const appRoutes: Routes = [
             (m) => m.ORGANIZATION_ROUTES
           )
       },
+       {
+        path: 'users',
+        loadChildren: () =>
+          import('./app/pages/user/user.routs').then(
+            (m) => m.USER_ROUTES
+          )
+      },
       { path: 'roles', component: RolesListComponent },
       { path: 'roles/add', component: AddEditRoleComponent },
       { path: 'roles/edit/:id', component: AddEditRoleComponent },

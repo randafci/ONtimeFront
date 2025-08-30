@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CreateOrganization, EditOrganization, Organization } from '@/interfaces/organization.interface';
-import { ApiResponse } from '@/interfaces/apiResponse.interface';
+import { ApiResponse } from '@/core/models/api-response.model';
 
 
 

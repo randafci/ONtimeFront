@@ -7,8 +7,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { LookupService } from '../OrganizationService';
 import { Organization, CreateOrganization, EditOrganization } from '@/interfaces/organization.interface';
-import { ApiResponse } from '@/interfaces/apiResponse.interface';
 import { CommonModule } from '@angular/common';
+import { ApiResponse } from '@/core/models/api-response.model';
 
 @Component({
   selector: 'app-add-or-edit-organization',
