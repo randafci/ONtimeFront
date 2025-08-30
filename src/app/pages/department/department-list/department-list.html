@@ -47,6 +47,7 @@
             </div>
         </ng-template>
         
+
         <ng-template pTemplate="header">
             <tr>
                 <!-- Code Header -->
@@ -70,7 +71,7 @@
                         <p-columnFilter type="text" field="nameSE" display="menu" [placeholder]="'departmentList.filters.searchByNameSE' | translate"></p-columnFilter>
                     </div>
                 </th>
-                <!-- Parent Department Header -->
+
                 <th style="min-width: 12rem">
                     <div class="flex justify-between items-center">
                         {{ 'departmentList.headers.parentDepartment' | translate }}
@@ -91,7 +92,7 @@
                         <p-columnFilter type="text" field="companyName" display="menu" [placeholder]="'departmentList.filters.searchByCompany' | translate"></p-columnFilter>
                     </div>
                 </th>
-                <!-- Status Header -->
+
                 <th style="min-width: 10rem">
                     <div class="flex justify-between items-center">
                         {{ 'departmentList.headers.status' | translate }}
@@ -122,7 +123,7 @@
                         <p-columnFilter type="date" field="creationDate" display="menu" [placeholder]="'departmentList.filters.datePlaceholder' | translate"></p-columnFilter>
                     </div>
                 </th>
-                <!-- Actions Header -->
+
                 <th style="min-width: 8rem">{{ 'departmentList.headers.actions' | translate }}</th>
             </tr>
         </ng-template>
