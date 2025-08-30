@@ -100,8 +100,8 @@
     </ng-template>
     
     <ng-template pTemplate="body" let-employee>
-      <tr>
-        <td>{{ employee.employeeCode }}</td>
+      <tr (click)="navigateToEmployments(employee)" class='cursor-pointer '>
+        <td>{{ employee.employeeCode }}</td>  
         <td>{{ getFullName(employee) }}</td>
         <td>{{ employee.employeeType || 'N/A' }}</td>
         <td>{{ employee.department || 'N/A' }}</td>
@@ -117,7 +117,7 @@
               pButton 
               icon="pi pi-pencil" 
               class="p-button-rounded p-button-text p-button-sm"
-              (click)="navigateToEdit(employee.id)"
+              (click)="navigateToEdit(employee.id); $event.stopPropagation()"
               pTooltip="Edit Employee"
               tooltipPosition="top"
             ></button>
@@ -125,7 +125,7 @@
               pButton 
               icon="pi pi-trash" 
               class="p-button-rounded p-button-text p-button-danger p-button-sm"
-              (click)="deleteEmployee(employee)"
+              (click)="deleteEmployee(employee); $event.stopPropagation()"
               pTooltip="Delete Employee"
               tooltipPosition="top"
             ></button>

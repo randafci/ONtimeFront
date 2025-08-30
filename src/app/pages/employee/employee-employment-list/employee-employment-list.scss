@@ -1,5 +1,5 @@
 :host ::ng-deep {
-  // Force dark theme for table headers - this is the main fix
+  // Force dark theme for table headers
   .p-datatable .p-datatable-thead > tr > th {
     background-color: var(--surface-section) !important;
     color: var(--text-color) !important;
@@ -18,6 +18,17 @@
   // Force filter icons to use theme colors
   .p-datatable .p-datatable-thead > tr > th .p-column-filter-trigger {
     color: var(--text-color) !important;
+  }
+
+  // Table body styling
+  .p-datatable .p-datatable-tbody > tr > td {
+    background-color: var(--surface-card) !important;
+    color: var(--text-color) !important;
+    border-color: var(--surface-border) !important;
+  }
+
+  .p-datatable .p-datatable-tbody > tr:hover {
+    background-color: var(--surface-hover) !important;
   }
 
   // Input styling
@@ -59,53 +70,21 @@
     color: var(--text-color) !important;
   }
 
-  // Responsive table styling
-  .p-datatable {
-    // Mobile responsive
-    @media (max-width: 768px) {
-      .p-datatable-thead > tr > th {
-        padding: 0.5rem !important;
-        font-size: 0.875rem !important;
-        min-width: auto !important;
-      }
-
-      .p-datatable-tbody > tr > td {
-        padding: 0.5rem !important;
-        font-size: 0.875rem !important;
-      }
-
-      // Hide less important columns on mobile
-      .p-datatable-thead > tr > th:nth-child(3), // Job Title
-      .p-datatable-thead > tr > th:nth-child(4), // Department
-      .p-datatable-tbody > tr > td:nth-child(3),
-      .p-datatable-tbody > tr > td:nth-child(4) {
-        display: none;
-      }
-
-      // Make action buttons smaller on mobile
-      .action-buttons .p-button {
-        padding: 0.25rem !important;
-        font-size: 0.75rem !important;
+  // Dialog styling
+  .p-dialog {
+    .p-dialog-header {
+      background: var(--surface-section);
+      border-bottom: 1px solid var(--surface-border);
+      
+      .p-dialog-title {
+        color: var(--text-color);
+        font-weight: 600;
       }
     }
-
-    // Tablet responsive
-    @media (min-width: 769px) and (max-width: 1024px) {
-      .p-datatable-thead > tr > th {
-        padding: 0.75rem !important;
-        font-size: 0.9rem !important;
-      }
-
-      .p-datatable-tbody > tr > td {
-        padding: 0.75rem !important;
-        font-size: 0.9rem !important;
-      }
-
-      // Hide department column on tablet
-      .p-datatable-thead > tr > th:nth-child(4),
-      .p-datatable-tbody > tr > td:nth-child(4) {
-        display: none;
-      }
+    
+    .p-dialog-content {
+      background: var(--surface-card);
+      color: var(--text-color);
     }
   }
 }
@@ -124,40 +103,25 @@
   }
 }
 
-// Header section responsive styling
-.flex.justify-content-between.align-items-center {
-  @media (max-width: 768px) {
-    flex-direction: column !important;
-    gap: 1rem;
-    align-items: stretch !important;
-
-    h2 {
-      text-align: center;
-      margin-bottom: 0.5rem !important;
-    }
-
-    .p-button {
-      width: 100%;
-    }
-  }
+.field {
+  margin-bottom: 1.5rem;
 }
 
-// Search and filter section responsive
-.flex.justify-between.items-center {
-  @media (max-width: 768px) {
-    flex-direction: column !important;
-    gap: 1rem;
+.required-field {
+  color: var(--primary-color, #dc3545);
+}
 
-    button {
-      width: 100%;
-    }
-
-    p-iconfield {
-      width: 100%;
-      
-      input {
-        width: 100%;
-      }
+// Action buttons container
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  
+  .p-button {
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+      transform: scale(1.05);
     }
   }
 }
@@ -205,6 +169,7 @@ input:focus {
   transition: transform 0.2s ease-in-out;
 }
 
+// Delete button styling
 .p-button-danger {
   &:hover {
     transform: translateY(-1px);
@@ -215,32 +180,7 @@ input:focus {
   }
 }
 
-.p-button-info {
-  &:hover {
-    background-color: #17a2b8 !important;
-    border-color: #17a2b8 !important;
-    transform: translateY(-1px);
-  }
-  
-  &:focus {
-    box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
-  }
-}
-
-.action-buttons {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  
-  .p-button {
-    transition: all 0.2s ease-in-out;
-    
-    &:hover {
-      transform: scale(1.05);
-    }
-  }
-}
-
+// Confirmation dialog styling
 :host ::ng-deep {
   .p-confirmdialog {
     .p-dialog-header {
@@ -299,6 +239,7 @@ input:focus {
       }
     }
 
+    // Mobile responsive dialog
     @media (max-width: 768px) {
       .p-dialog {
         width: 95% !important;
