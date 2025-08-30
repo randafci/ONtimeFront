@@ -1,0 +1,327 @@
+:host ::ng-deep {
+  // Force dark theme for table headers - this is the main fix
+  .p-datatable .p-datatable-thead > tr > th {
+    background-color: var(--surface-section) !important;
+    color: var(--text-color) !important;
+    border-color: var(--surface-border) !important;
+  }
+
+  // Ensure all text and icons in headers use theme colors
+  .p-datatable .p-datatable-thead > tr > th,
+  .p-datatable .p-datatable-thead > tr > th span,
+  .p-datatable .p-datatable-thead > tr > th div,
+  .p-datatable .p-datatable-thead > tr > th i,
+  .p-datatable .p-datatable-thead > tr > th button {
+    color: var(--text-color) !important;
+  }
+
+  // Force filter icons to use theme colors
+  .p-datatable .p-datatable-thead > tr > th .p-column-filter-trigger {
+    color: var(--text-color) !important;
+  }
+
+  // Table body styling
+  .p-datatable .p-datatable-tbody > tr > td {
+    background-color: var(--surface-card) !important;
+    color: var(--text-color) !important;
+    border-color: var(--surface-border) !important;
+  }
+
+  .p-datatable .p-datatable-tbody > tr:hover {
+    background-color: var(--surface-hover) !important;
+  }
+
+  // Input styling
+  .p-inputtext {
+    background-color: var(--surface-card) !important;
+    color: var(--text-color) !important;
+    border-color: var(--surface-border) !important;
+  }
+
+  // Button styling
+  .p-button-sm {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  // Tag styling
+  .p-tag {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    font-weight: 500;
+  }
+
+  // Select styling
+  .p-select {
+    width: 100%;
+    
+    .p-select-label {
+      padding: 0.75rem;
+      background-color: var(--surface-card) !important;
+      color: var(--text-color) !important;
+    }
+  }
+
+  // Paginator styling
+  .p-paginator {
+    background: transparent;
+    border: none;
+    padding: 1rem 0;
+    color: var(--text-color) !important;
+  }
+
+  // Responsive table styling
+  .p-datatable {
+    // Mobile responsive
+    @media (max-width: 768px) {
+      .p-datatable-thead > tr > th {
+        padding: 0.5rem !important;
+        font-size: 0.875rem !important;
+        min-width: auto !important;
+      }
+
+      .p-datatable-tbody > tr > td {
+        padding: 0.5rem !important;
+        font-size: 0.875rem !important;
+      }
+
+      // Hide less important columns on mobile
+      .p-datatable-thead > tr > th:nth-child(3), // Job Title
+      .p-datatable-thead > tr > th:nth-child(4), // Department
+      .p-datatable-tbody > tr > td:nth-child(3),
+      .p-datatable-tbody > tr > td:nth-child(4) {
+        display: none;
+      }
+
+      // Make action buttons smaller on mobile
+      .action-buttons .p-button {
+        padding: 0.25rem !important;
+        font-size: 0.75rem !important;
+      }
+    }
+
+    // Tablet responsive
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .p-datatable-thead > tr > th {
+        padding: 0.75rem !important;
+        font-size: 0.9rem !important;
+      }
+
+      .p-datatable-tbody > tr > td {
+        padding: 0.75rem !important;
+        font-size: 0.9rem !important;
+      }
+
+      // Hide department column on tablet
+      .p-datatable-thead > tr > th:nth-child(4),
+      .p-datatable-tbody > tr > td:nth-child(4) {
+        display: none;
+      }
+    }
+  }
+}
+
+.card {
+  background: var(--surface-card);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+  color: var(--text-color);
+
+  // Mobile responsive card
+  @media (max-width: 768px) {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+}
+
+// Header section responsive styling
+.flex.justify-content-between.align-items-center {
+  @media (max-width: 768px) {
+    flex-direction: column !important;
+    gap: 1rem;
+    align-items: stretch !important;
+
+    h2 {
+      text-align: center;
+      margin-bottom: 0.5rem !important;
+    }
+
+    .p-button {
+      width: 100%;
+    }
+  }
+}
+
+// Search and filter section responsive
+.flex.justify-between.items-center {
+  @media (max-width: 768px) {
+    flex-direction: column !important;
+    gap: 1rem;
+
+    button {
+      width: 100%;
+    }
+
+    p-iconfield {
+      width: 100%;
+      
+      input {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// Responsive improvements
+@media (max-width: 768px) {
+  // Make table scroll horizontally on mobile
+  .p-datatable {
+    overflow-x: auto;
+    
+    .p-datatable-wrapper {
+      min-width: 600px; // Ensure minimum width for readability
+    }
+  }
+
+  // Adjust action buttons for mobile
+  .action-buttons {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: center;
+    
+    .p-button {
+      min-width: 2rem;
+      height: 2rem;
+    }
+  }
+
+  // Make tags smaller on mobile
+  .p-tag {
+    font-size: 0.7rem !important;
+    padding: 0.2rem 0.4rem !important;
+  }
+}
+
+// Focus states for accessibility
+.p-button:focus,
+input:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+// Hover effects
+.p-button:hover {
+  transform: translateY(-1px);
+  transition: transform 0.2s ease-in-out;
+}
+
+// Delete button styling
+.p-button-danger {
+  &:hover {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    transform: translateY(-1px);
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  }
+}
+
+// Action buttons container
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  
+  .p-button {
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+}
+
+// Confirmation dialog styling
+:host ::ng-deep {
+  .p-confirmdialog {
+    .p-dialog-header {
+      background: var(--surface-section);
+      border-bottom: 1px solid var(--surface-border);
+      
+      .p-dialog-title {
+        color: #dc3545;
+        font-weight: 600;
+      }
+    }
+    
+    .p-dialog-content {
+      padding: 1.5rem;
+      
+      .p-confirmdialog-message {
+        font-size: 1rem;
+        color: var(--text-color);
+        margin-bottom: 1rem;
+      }
+      
+      .p-confirmdialog-icon {
+        color: #dc3545;
+        font-size: 1.5rem;
+        margin-right: 0.5rem;
+      }
+    }
+    
+    .p-dialog-footer {
+      background: var(--surface-section);
+      border-top: 1px solid var(--surface-border);
+      padding: 1rem 1.5rem;
+      
+      .p-button {
+        margin-left: 0.5rem;
+        
+        &.p-confirmdialog-accept {
+          background-color: #dc3545;
+          border-color: #dc3545;
+          
+          &:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+          }
+        }
+        
+        &.p-confirmdialog-reject {
+          background-color: #6c757d;
+          border-color: #6c757d;
+          
+          &:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+          }
+        }
+      }
+    }
+
+    // Mobile responsive dialog
+    @media (max-width: 768px) {
+      .p-dialog {
+        width: 95% !important;
+        margin: 1rem auto !important;
+      }
+      
+      .p-dialog-content {
+        padding: 1rem;
+      }
+      
+      .p-dialog-footer {
+        padding: 1rem;
+        
+        .p-button {
+          width: 100%;
+          margin: 0.25rem 0;
+        }
+      }
+    }
+  }
+}

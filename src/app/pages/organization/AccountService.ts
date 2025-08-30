@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ApiResponse } from '@/core/models/api-response.model';
 
 // interfaces/admin-user.interface.ts
 export interface AdminUser {
@@ -11,14 +12,7 @@ export interface AdminUser {
   email: string;
 }
 
-export interface ApiResponse<T> {
-  statusCode: number;
-  succeeded: boolean;
-  message: string;
-  code: string | null;
-  errors: any | null;
-  data: T[];
-}
+
 
 @Injectable({
   providedIn: 'root'
