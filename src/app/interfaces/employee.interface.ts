@@ -5,7 +5,7 @@ export interface Employee {
   employeeCode: string;
   firstName?: string;
   lastName?: string;
-  fullName?: string; // Computed field for display (from userAdded)
+  fullName?: string; // optional by default, but see EmployeeWithFullName
   gender?: string; // "M" or "F"
   nationality?: string;
   religionType?: string;
@@ -47,6 +47,7 @@ export interface EmployeeDocument {
   employeeId: number;
 }
 
+// Extra DTOs
 export interface CreateEmployee {
   employeeCode: string;
   firstName?: string;
@@ -82,4 +83,9 @@ export interface UpdateEmployee {
 
   contact?: Partial<EmployeeContact>;
   document?: Partial<EmployeeDocument>;
+}
+
+// ✅ Derived interface with required fullName
+export interface EmployeeWithFullName extends Employee {
+  fullName: string;
 }

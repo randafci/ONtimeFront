@@ -29,7 +29,9 @@ import { SelectModule } from 'primeng/select';
     InputTextModule,
     PasswordModule,
     TranslatePipe,
-    DatePipe, Toast,
+    //DatePipe, 
+    Toast,
+
     ToggleButtonModule, // <--- for p-toggleButton
     CheckboxModule,
      SelectButtonModule,
@@ -63,7 +65,9 @@ loadingEmployees= false;
     private messageService: MessageService
   ) {
     this.userForm = this.fb.group({
-     
+     // userName: ['', Validators.required],
+     // email: ['', [Validators.required, Validators.email]],
+
       password: [''],
       isLdapUser: [false],
       extraEmployeesView: [''],
@@ -72,6 +76,7 @@ loadingEmployees= false;
   }
 
   ngOnInit(): void {
+
         this.loadEmployees();
 
     this.route.params.subscribe(params => {
@@ -84,6 +89,8 @@ loadingEmployees= false;
   }
 
   loadUser(id: string): void {
+    this.loadEmployees();
+
 
     this.loading = true;
     this.userService.getById(id).subscribe({

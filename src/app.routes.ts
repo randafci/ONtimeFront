@@ -56,6 +56,13 @@ export const appRoutes: Routes = [
             (m) => m.DEPARTMENT_ROUTES
           )
       },
+       {
+        path: 'users',
+        loadChildren: () =>
+          import('./app/pages/user/user.routs').then(
+            (m) => m.USER_ROUTES
+          )
+      },
         { 
         path: 'employees', 
         loadChildren: () => import('./app/pages/employee/employee.routes').then
