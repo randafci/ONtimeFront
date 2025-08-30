@@ -49,6 +49,13 @@ export const appRoutes: Routes = [
             (m) => m.DEPARTMENT_ROUTES
           )
       },
+       {
+        path: 'users',
+        loadChildren: () =>
+          import('./app/pages/user/user.routs').then(
+            (m) => m.USER_ROUTES
+          )
+      },
       { path: 'documentation', component: Documentation },
       { path: 'test', component: Layout },
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
