@@ -162,6 +162,55 @@ export class TranslationService {
           updateSuccess: "تم تحديث القسم بنجاح",
           updateError: "فشل تحديث القسم"
         }
+      },
+      companies: {
+        listPage: {
+          title: "الشركات",
+          addButton: "إضافة شركة",
+          clearButton: "مسح",
+          searchPlaceholder: "ابحث في الشركات",
+          headers: {
+            code: "الرمز",
+            name: "الاسم",
+            nameSE: "الاسم (SE)",
+            parentCompany: "الشركة الأم",
+            status: "الحالة",
+            createdDate: "تاريخ الإنشاء",
+            actions: "الإجراءات"
+          },
+          statuses: {
+            active: "نشط",
+            inactive: "غير نشط",
+            any: "الكل"
+          },
+          emptyMessage: "لم يتم العثور على شركات.",
+          loadingMessage: "جاري تحميل بيانات الشركات. الرجاء الانتظار."
+        },
+        formPage: {
+          addTitle: "إضافة شركة",
+          editTitle: "تعديل شركة",
+          labels: {
+            code: "الرمز",
+            name: "الاسم",
+            nameSE: "الاسم (SE)",
+            organization: "المنظمة",
+            companyType: "نوع الشركة",
+            parentCompany: "الشركة الأم"
+          },
+          placeholders: {
+            selectOrg: "اختر منظمة",
+            selectType: "اختر نوع الشركة",
+            selectParent: "اختر الشركة الأم"
+          },
+          buttons: {
+            cancel: "إلغاء",
+            save: "حفظ",
+            update: "تحديث"
+          },
+          validation: {
+            required: "هذا الحقل مطلوب"
+          }
+        }
       }
     },
     en: {
@@ -316,6 +365,55 @@ export class TranslationService {
           createError: "Failed to create department",
           updateSuccess: "Department updated successfully",
           updateError: "Failed to update department"
+        }
+      },
+      companies: {
+        listPage: {
+          title: "Companies",
+          addButton: "Add Company",
+          clearButton: "Clear",
+          searchPlaceholder: "Search companies",
+          headers: {
+            code: "Code",
+            name: "Name",
+            nameSE: "Name (SE)",
+            parentCompany: "Parent Company",
+            status: "Status",
+            createdDate: "Created Date",
+            actions: "Actions"
+          },
+          statuses: {
+            active: "Active",
+            inactive: "Inactive",
+            any: "Any"
+          },
+          emptyMessage: "No companies found.",
+          loadingMessage: "Loading companies data. Please wait."
+        },
+        formPage: {
+          addTitle: "Add Company",
+          editTitle: "Edit Company",
+          labels: {
+            code: "Code",
+            name: "Name",
+            nameSE: "Name (SE)",
+            organization: "Organization",
+            companyType: "Company Type",
+            parentCompany: "Parent Company"
+          },
+          placeholders: {
+            selectOrg: "Select Organization",
+            selectType: "Select Company Type",
+            selectParent: "Select Parent Company"
+          },
+          buttons: {
+            cancel: "Cancel",
+            save: "Save",
+            update: "Update"
+          },
+          validation: {
+            required: "This field is required"
+          }
         }
       }
     }
