@@ -20,12 +20,10 @@ export class AuthGuard implements CanActivate {
     // Check if user is logged in
     if (this.authService.isLoggedIn()) {
       return true;
-    }else{
-      return true;
     }
 
     // Check for excluded routes
-    const excludeRoutes = ["/epass/update"];
+    const excludeRoutes = ["/login"];
     if (excludeRoutes.some(excluded => state.url.includes(excluded))) {
       return true;
     }
