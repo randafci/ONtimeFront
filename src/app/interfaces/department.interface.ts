@@ -11,7 +11,7 @@ export interface Department {
   modificationDate: string | null;
   modifiedBy: string;
   createdBy: string;
-  departmentTypeId?: number | null;
+  departmentTypeLookupId?: number | null;
   parentName?: string;
   companyName?: string;
   organizationName?: string;
@@ -25,7 +25,7 @@ export interface CreateDepartment {
   parentId: number | null;
   organizationId: number;
   companyId: number | null;
-  departmentTypeId?: number | null;
+  departmentTypeLookupId?: number | null;
 }
 
 export interface EditDepartment {
@@ -36,5 +36,5 @@ export interface EditDepartment {
   parentId: number | null;
   organizationId: number;
   companyId: number | null;
-  departmentTypeId?: number | null;
+  departmentTypeLookupId?: number | null;
 }

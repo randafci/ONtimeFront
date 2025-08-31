@@ -11,7 +11,7 @@ import { MessageService } from 'primeng/api';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Employee, CreateEmployee, EditEmployee } from '@/interfaces/employee.interface';
 import { EmployeeService } from '../EmployeeService';
-import { ApiResponse } from '@/interfaces/apiResponse.interface';
+import { ApiResponse } from '@/core/models/api-response.model';
 
 @Component({
   selector: 'app-add-or-edit-employee',

@@ -19,7 +19,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { Employee } from '@/interfaces/employee.interface';
 import { EmployeeService } from '../EmployeeService';
-import { ApiResponse } from '@/interfaces/apiResponse.interface';
+import { ApiResponse } from '@/core/models/api-response.model';
 import { Router, RouterModule, NavigationEnd } from "@angular/router";
 import { DatePipe } from '@angular/common';
 import { filter } from 'rxjs/operators';
@@ -166,6 +166,11 @@ export class EmployeeListComponent implements OnInit {
 
   navigateToEdit(id: number) {
     this.router.navigate(['/employees/edit', id]);
+  }
+
+  navigateToEmployments(employee: Employee) {
+    const employeeName = this.getFullName(employee);
+    this.router.navigate(['/employees/employments', employee.id, employeeName]);
   }
 
   deleteEmployee(employee: Employee) {
