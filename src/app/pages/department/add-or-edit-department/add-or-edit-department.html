@@ -104,23 +104,23 @@
 
       <!-- Department Type Field -->
       <div class="field">
-        <label for="departmentTypeId">{{ 'departmentForm.labels.departmentType' | translate }} <span class="required-star">*</span></label>
+        <label for="departmentTypeLookupId">{{ 'departmentForm.labels.departmentType' | translate }} <span class="required-star">*</span></label>
         <p-select class="w-full"
-          id="departmentTypeId" 
-          formControlName="departmentTypeId" 
+          id="departmentTypeLookupId" 
+          formControlName="departmentTypeLookupId" 
           [options]="departmentTypes" 
           optionLabel="name" 
           optionValue="id"
           [placeholder]="'departmentForm.placeholders.selectDepartmentType' | translate"
           [ngClass]="{
             'field-error': 
-              (departmentForm.controls['departmentTypeId'].invalid && 
-              (departmentForm.controls['departmentTypeId'].dirty || departmentForm.controls['departmentTypeId'].touched || submitted))
+              (departmentForm.controls['departmentTypeLookupId'].invalid && 
+              (departmentForm.controls['departmentTypeLookupId'].dirty || departmentForm.controls['departmentTypeLookupId'].touched || submitted))
           }"
         ></p-select>
         <small 
-          *ngIf="departmentForm.controls['departmentTypeId'].invalid && 
-                (departmentForm.controls['departmentTypeId'].dirty || departmentForm.controls['departmentTypeId'].touched || submitted)" 
+          *ngIf="departmentForm.controls['departmentTypeLookupId'].invalid && 
+                (departmentForm.controls['departmentTypeLookupId'].dirty || departmentForm.controls['departmentTypeLookupId'].touched || submitted)" 
           class="p-error"
         >
           {{ 'departmentForm.validation.required' | translate }}
@@ -141,7 +141,7 @@
       </div>
 
       <!-- Parent Department Field -->
-      <div class="field" *ngIf="departmentForm.get('departmentTypeId')?.value === 2">
+      <div class="field" *ngIf="departmentForm.get('departmentTypeLookupId')?.value === 2">
         <label for="parentId">{{ 'departmentForm.labels.parentDepartment' | translate }}</label>
         <p-select class="w-full"
           id="parentId" 

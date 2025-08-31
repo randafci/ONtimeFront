@@ -12,7 +12,7 @@ export interface Company {
   modificationDate: string | null;
   modifiedBy: string;
   createdBy: string;
-  companyTypeId?: number | null;
+  companyTypeLookupId?: number | null;
   parent?: Company | null;
   children?: Company[];
   organization?: Organization | null;
@@ -27,7 +27,7 @@ export interface CreateCompany {
   nameSE: string;
   parentId: number | null;
   organizationId: number;
-  companyTypeId?: number | null;
+  companyTypeLookupId?: number | null;
 }
 
 export interface EditCompany {
@@ -37,5 +37,5 @@ export interface EditCompany {
   nameSE: string;
   parentId: number | null;
   organizationId: number;
-  companyTypeId?: number | null;
+  companyTypeLookupId?: number | null;
 }
