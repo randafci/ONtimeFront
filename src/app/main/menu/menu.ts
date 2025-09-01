@@ -1,4 +1,4 @@
-import { MegaMenuItem,MenuItem } from '@/interfaces/MenuItem';
+import { MegaMenuItem,MenuItem } from '../../interfaces/MenuItem';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';

@@ -1,10 +1,10 @@
 <div class="card">
   <!-- Header Section -->
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-semibold text-gray-800">{{ isEditMode ? 'Edit Employee' : 'Add Employee' }}</h1>
+    <h1 class="text-2xl font-semibold text-gray-800">{{ (isEditMode ? 'employees.formPage.titles.edit' : 'employees.formPage.titles.add') | translate }}</h1>
     <button 
       pButton 
-      label="Back" 
+      [label]="'employees.formPage.buttons.back' | translate"
       class="p-button-danger" 
       icon="pi pi-arrow-left"
       (click)="onBack()">
@@ -53,11 +53,11 @@
           class="hidden">
       </div>
       <div class="text-center">
-        <h3 class="text-xl font-semibold text-gray-900 mb-1">{{ fullName || 'Full Name' }}</h3>
-        <p class="text-gray-600 text-lg mb-2">{{ jobTitle || 'Job Title' }}</p>
+        <h3 class="text-xl font-semibold text-gray-900 mb-1">{{ fullName || ('employees.formPage.profile.fullName' | translate) }}</h3>
+        <p class="text-gray-600 text-lg mb-2">{{ jobTitle || ('employees.formPage.profile.jobTitle' | translate) }}</p>
         <div class="flex items-center justify-center gap-4">
-          <span class="text-sm text-gray-500">Employee ID: {{ employeeForm.get('employeeCode')?.value || 'N/A' }}</span>
-          <span class="text-sm text-gray-500">Status: {{ employeeForm.get('employeeStatus')?.value || 'Active' }}</span>
+          <span class="text-sm text-gray-500">{{ 'employees.formPage.profile.employeeId' | translate }}: {{ employeeForm.get('employeeCode')?.value || 'N/A' }}</span>
+          <span class="text-sm text-gray-500">{{ 'employees.formPage.profile.status' | translate }}: {{ employeeForm.get('employeeStatus')?.value || 'Active' }}</span>
         </div>
       </div>
     </div>
@@ -72,49 +72,49 @@
           [class.active]="activeTabIndex === 0"
           (click)="activeTabIndex = 0">
           <i class="pi pi-user mr-2"></i>
-          General
+          {{ 'employees.formPage.tabs.general' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 1"
           (click)="activeTabIndex = 1">
           <i class="pi pi-phone mr-2"></i>
-          Contact
+          {{ 'employees.formPage.tabs.contact' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 2"
           (click)="activeTabIndex = 2">
           <i class="pi pi-building mr-2"></i>
-          Organizational
+          {{ 'employees.formPage.tabs.organizational' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 3"
           (click)="activeTabIndex = 3">
           <i class="pi pi-file mr-2"></i>
-          Documents
+          {{ 'employees.formPage.tabs.documents' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 4"
           (click)="activeTabIndex = 4">
           <i class="pi pi-users mr-2"></i>
-          Report Managers
+          {{ 'employees.formPage.tabs.reportManagers' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 5"
           (click)="activeTabIndex = 5">
           <i class="pi pi-calendar mr-2"></i>
-          Assign Schedule
+          {{ 'employees.formPage.tabs.assignSchedule' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 6"
           (click)="activeTabIndex = 6">
           <i class="pi pi-shield mr-2"></i>
-          Policies
+          {{ 'employees.formPage.tabs.policies' | translate }}
         </button>
       </nav>
     </div>
@@ -125,15 +125,15 @@
     
     <!-- General Tab -->
     <div *ngIf="activeTabIndex === 0" class="tab-content">
-      <h3 class="text-lg font-medium mb-6 text-gray-900 text-center">General Information</h3>
+      <h3 class="text-lg font-medium mb-6 text-gray-900 text-center">{{ 'employees.formPage.general.title' | translate }}</h3>
       
       <!-- Employment Information Section -->
       <div class="mb-8">
-        <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">Employment Information</h4>
+        <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">{{ 'employees.formPage.general.employmentSection' | translate }}</h4>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="field">
             <label for="employeeCode" class="block text-sm font-medium mb-2 text-gray-700">
-              Employee ID <span class="text-red-500">*</span>
+              {{ 'employees.formPage.general.labels.employeeId' | translate }} <span class="text-red-500">*</span>
             </label>
             <input 
               id="employeeCode"
@@ -143,19 +143,19 @@
               class="w-full"
               [class.ng-invalid]="employeeForm.get('employeeCode')?.invalid && employeeForm.get('employeeCode')?.touched">
             <small class="text-red-500" *ngIf="employeeForm.get('employeeCode')?.invalid && employeeForm.get('employeeCode')?.touched">
-              Employee ID is required
+              {{ 'employees.formPage.validation.required' | translate }}
             </small>
           </div>
 
           <div class="field">
             <label for="employeeStatus" class="block text-sm font-medium mb-2 text-gray-700">
-              Employee Status
+              {{ 'employees.formPage.general.labels.employeeStatus' | translate }}
             </label>
             <p-select 
               id="employeeStatus"
               formControlName="employeeStatus"
               [options]="employeeStatusOptions"
-              placeholder="Select Employee Status"
+              [placeholder]="'employees.formPage.placeholders.selectStatus' | translate"
               optionLabel="label"
               optionValue="value"
               class="w-full">
