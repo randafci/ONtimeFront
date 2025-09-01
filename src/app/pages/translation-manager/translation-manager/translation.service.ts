@@ -211,6 +211,184 @@ export class TranslationService {
             required: "هذا الحقل مطلوب"
           }
         }
+      },
+      users: {
+        listPage: {
+          title: "المستخدمون",
+          addButton: "إضافة مستخدم",
+          clearButton: "مسح",
+          searchPlaceholder: "ابحث في المستخدمين",
+          headers: {
+            username: "اسم المستخدم",
+            email: "البريد الإلكتروني",
+            ldapUser: "مستخدم LDAP",
+            actions: "الإجراءات"
+          },
+          filters: {
+            searchByUsername: "بحث بالاسم",
+            searchByEmail: "بحث بالبريد",
+            any: "الكل"
+          },
+          messages: {
+            empty: "لم يتم العثور على مستخدمين.",
+            loading: "جاري تحميل بيانات المستخدمين...",
+            deleteConfirm: "هل أنت متأكد أنك تريد حذف المستخدم {name}؟",
+            deleteSuccess: "تم حذف المستخدم بنجاح",
+            deleteError: "فشل حذف المستخدم",
+            loadError: "فشل تحميل المستخدمين"
+          }
+        },
+        formPage: {
+          title: {
+            add: "إضافة مستخدم",
+            edit: "تعديل مستخدم"
+          },
+          labels: {
+            userName: "اسم المستخدم",
+            email: "البريد الإلكتروني",
+            password: "كلمة المرور",
+            isLdapUser: "مستخدم LDAP؟",
+            extraEmployeesView: "عرض الموظفين الإضافيين",
+            employee: "الموظف"
+          },
+          placeholders: {
+            selectEmployee: "اختر موظف"
+          },
+          buttons: {
+            cancel: "إلغاء",
+            save: "حفظ",
+            update: "تحديث"
+          },
+          validation: {
+            required: "هذا الحقل مطلوب"
+          }
+        },
+        common: {
+          yes: "نعم",
+          no: "لا",
+          success: "نجاح",
+          error: "خطأ",
+          confirmDelete: "تأكيد الحذف"
+        }
+      },
+      employees: {
+        listPage: {
+          title: "قائمة الموظفين",
+          createButton: "إنشاء",
+          clearButton: "مسح",
+          searchPlaceholder: "ابحث في الموظفين...",
+          headers: {
+            employeeId: "معرف الموظف",
+            employeeName: "اسم الموظف",
+            jobTitle: "المسمى الوظيفي",
+            department: "القسم",
+            status: "الحالة",
+            actions: "الإجراءات"
+          },
+          tooltips: {
+            edit: "تعديل الموظف",
+            delete: "حذف الموظف"
+          },
+          statuses: {
+            active: "نشط",
+            inactive: "غير نشط",
+            onLeave: "في إجازة",
+            terminated: "منتهية خدمته",
+            suspended: "موقوف",
+            probation: "تحت التجربة",
+            any: "الكل"
+          },
+          messages: {
+            empty: "لم يتم العثور على موظفين",
+            loading: "جاري تحميل الموظفين...",
+            deleteConfirm: "هل أنت متأكد أنك تريد حذف {name}؟",
+            deleteSuccess: "تم حذف الموظف {name} بنجاح.",
+            deleteError: "فشل حذف الموظف",
+            deleteCancelled: "تم إلغاء عملية الحذف"
+          }
+        },
+        formPage: {
+          titles: {
+            add: "إضافة موظف",
+            edit: "تعديل موظف"
+          },
+          buttons: {
+            back: "رجوع",
+            cancel: "إلغاء",
+            create: "إنشاء",
+            update: "تحديث"
+          },
+          profile: {
+            fullName: "الاسم الكامل",
+            jobTitle: "المسمى الوظيفي",
+            employeeId: "معرف الموظف",
+            status: "الحالة"
+          },
+          tabs: {
+            general: "عام",
+            contact: "اتصال",
+            organizational: "تنظيمي",
+            documents: "مستندات",
+            reportManagers: "المدراء المباشرون",
+            assignSchedule: "تعيين جدول",
+            policies: "السياسات"
+          },
+          general: {
+            title: "معلومات عامة",
+            employmentSection: "معلومات التوظيف",
+            personalSection: "معلومات شخصية",
+            displaySection: "إعدادات العرض",
+            labels: {
+              employeeId: "معرف الموظف",
+              employeeStatus: "حالة الموظف",
+              employeeType: "نوع الموظف",
+              firstName: "الاسم الأول",
+              familyName: "اسم العائلة",
+              gender: "الجنس",
+              nationality: "الجنسية",
+              religion: "الديانة",
+              specialNeeds: "احتياجات خاصة",
+              enableSpecialNeeds: "تمكين الاحتياجات الخاصة",
+              displayInReport: "عرض في التقرير",
+              showInReports: "إظهار في التقارير",
+              displayInDashboard: "عرض في لوحة المعلومات",
+              showInDashboard: "إظهار في لوحة المعلومات"
+            }
+          },
+          contact: {
+            title: "تفاصيل الاتصال",
+            personalSection: "جهة اتصال شخصية",
+            officialSection: "جهة اتصال رسمية",
+            addressSection: "معلومات العنوان",
+            labels: {
+                personalEmail: "البريد الإلكتروني الشخصي",
+                personalPhone: "الهاتف الشخصي",
+                personalMobile: "الجوال الشخصي",
+                officialEmail: "البريد الإلكتروني الرسمي",
+                officialPhone: "الهاتف الرسمي",
+                officialMobile: "الجوال الرسمي",
+                address: "العنوان",
+                city: "المدينة",
+                state: "المنطقة"
+            }
+          },
+          documents: {
+            title: "معلومات المستندات",
+            labels: {
+                passportNumber: "رقم جواز السفر",
+                visaNumber: "رقم التأشيرة",
+                passportExpiration: "تاريخ انتهاء جواز السفر",
+                visaExpiration: "تاريخ انتهاء التأشيرة"
+            }
+          },
+          placeholders: {
+            selectGender: "اختر الجنس",
+            selectStatus: "اختر الحالة"
+          },
+          validation: {
+            required: "هذا الحقل مطلوب"
+          }
+        }
       }
     },
     en: {
@@ -410,6 +588,184 @@ export class TranslationService {
             cancel: "Cancel",
             save: "Save",
             update: "Update"
+          },
+          validation: {
+            required: "This field is required"
+          }
+        }
+      },
+      users: {
+        listPage: {
+          title: "Users",
+          addButton: "Add User",
+          clearButton: "Clear",
+          searchPlaceholder: "Search users",
+          headers: {
+            username: "Username",
+            email: "Email",
+            ldapUser: "LDAP User",
+            actions: "Actions"
+          },
+          filters: {
+            searchByUsername: "Search by username",
+            searchByEmail: "Search by email",
+            any: "Any"
+          },
+          messages: {
+            empty: "No users found.",
+            loading: "Loading users data...",
+            deleteConfirm: "Are you sure you want to delete user {name}?",
+            deleteSuccess: "User deleted successfully",
+            deleteError: "Failed to delete user",
+            loadError: "Failed to load users"
+          }
+        },
+        formPage: {
+          title: {
+            add: "Add User",
+            edit: "Edit User"
+          },
+          labels: {
+            userName: "Username",
+            email: "Email",
+            password: "Password",
+            isLdapUser: "Is LDAP User?",
+            extraEmployeesView: "Extra Employees View",
+            employee: "Employee"
+          },
+          placeholders: {
+            selectEmployee: "Select Employee"
+          },
+          buttons: {
+            cancel: "Cancel",
+            save: "Save",
+            update: "Update"
+          },
+          validation: {
+            required: "This field is required"
+          }
+        },
+        common: {
+          yes: "Yes",
+          no: "No",
+          success: "Success",
+          error: "Error",
+          confirmDelete: "Confirm Deletion"
+        }
+      },
+      employees: {
+        listPage: {
+          title: "Employee List",
+          createButton: "Create",
+          clearButton: "Clear",
+          searchPlaceholder: "Search employees...",
+          headers: {
+            employeeId: "Employee ID",
+            employeeName: "Employee Name",
+            jobTitle: "Job Title",
+            department: "Department",
+            status: "Status",
+            actions: "Actions"
+          },
+          tooltips: {
+            edit: "Edit Employee",
+            delete: "Delete Employee"
+          },
+          statuses: {
+            active: "Active",
+            inactive: "Inactive",
+            onLeave: "On Leave",
+            terminated: "Terminated",
+            suspended: "Suspended",
+            probation: "Probation",
+            any: "Any"
+          },
+          messages: {
+            empty: "No employees found",
+            loading: "Loading employees...",
+            deleteConfirm: "Are you sure you want to delete {name}?",
+            deleteSuccess: "Employee {name} deleted successfully.",
+            deleteError: "Failed to delete employee",
+            deleteCancelled: "Delete operation cancelled"
+          }
+        },
+        formPage: {
+          titles: {
+            add: "Add Employee",
+            edit: "Edit Employee"
+          },
+          buttons: {
+            back: "Back",
+            cancel: "Cancel",
+            create: "Create",
+            update: "Update"
+          },
+          profile: {
+            fullName: "Full Name",
+            jobTitle: "Job Title",
+            employeeId: "Employee ID",
+            status: "Status"
+          },
+          tabs: {
+            general: "General",
+            contact: "Contact",
+            organizational: "Organizational",
+            documents: "Documents",
+            reportManagers: "Report Managers",
+            assignSchedule: "Assign Schedule",
+            policies: "Policies"
+          },
+          general: {
+            title: "General Information",
+            employmentSection: "Employment Information",
+            personalSection: "Personal Information",
+            displaySection: "Display Settings",
+            labels: {
+              employeeId: "Employee ID",
+              employeeStatus: "Employee Status",
+              employeeType: "Employee Type",
+              firstName: "First Name",
+              familyName: "Family Name",
+              gender: "Gender",
+              nationality: "Nationality",
+              religion: "Religion",
+              specialNeeds: "Special Needs",
+              enableSpecialNeeds: "Enable special needs",
+              displayInReport: "Display in Report",
+              showInReports: "Show in reports",
+              displayInDashboard: "Display in Reports Dashboard",
+              showInDashboard: "Show in dashboard"
+            }
+          },
+          contact: {
+            title: "Contact Details",
+            personalSection: "Personal Contact",
+            officialSection: "Official Contact",
+            addressSection: "Address Information",
+            labels: {
+                personalEmail: "Personal Email",
+                personalPhone: "Personal Phone",
+                personalMobile: "Personal Mobile Phone",
+                officialEmail: "Official Email",
+                officialPhone: "Official Phone",
+                officialMobile: "Official Mobile Phone",
+                address: "Address",
+                city: "City",
+                state: "State"
+            }
+          },
+          documents: {
+            title: "Document Information",
+            labels: {
+                passportNumber: "Passport Number",
+                visaNumber: "Visa Number",
+                passportExpiration: "Passport Expiration Date",
+                visaExpiration: "Visa Expiration Date"
+            }
+          },
+          placeholders: {
+            selectGender: "Select Gender",
+            selectStatus: "Select Employee Status"
           },
           validation: {
             required: "This field is required"

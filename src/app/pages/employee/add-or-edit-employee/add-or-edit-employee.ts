@@ -9,9 +9,11 @@ import { SelectModule } from 'primeng/select';
 
 import { MessageService } from 'primeng/api';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
-import { Employee, CreateEmployee, EditEmployee } from '@/interfaces/employee.interface';
+import { Employee, CreateEmployee, EditEmployee } from '../../../interfaces/employee.interface';
 import { EmployeeService } from '../EmployeeService';
-import { ApiResponse } from '@/interfaces/apiResponse.interface';
+import { ApiResponse } from '../../../core/models/api-response.model';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 
 @Component({
   selector: 'app-add-or-edit-employee',
@@ -25,7 +27,8 @@ import { ApiResponse } from '@/interfaces/apiResponse.interface';
     CardModule,
     ToastModule,
     SelectModule,
-    RouterModule
+    RouterModule,
+    TranslatePipe
   ],
   providers: [MessageService],
   templateUrl: './add-or-edit-employee.html',
@@ -41,36 +44,62 @@ export class AddEditEmployeeComponent implements OnInit {
   profileImageUrl: string | null = null;
 
   // Dropdown options
-  genderOptions = [
-    { label: 'Male', value: 'M' },
-    { label: 'Female', value: 'F' }
-  ];
+  // genderOptions = [
+  //   { label: 'Male', value: 'M' },
+  //   { label: 'Female', value: 'F' }
+  // ];
 
-  employeeStatusOptions = [
-    { label: 'Active', value: 'active' },
-    { label: 'Inactive', value: 'inactive' },
-    { label: 'On Leave', value: 'on leave' },
-    { label: 'Terminated', value: 'terminated' },
-    { label: 'Suspended', value: 'suspended' },
-    { label: 'Probation', value: 'probation' }
-  ];
+  // employeeStatusOptions = [
+  //   { label: 'Active', value: 'active' },
+  //   { label: 'Inactive', value: 'inactive' },
+  //   { label: 'On Leave', value: 'on leave' },
+  //   { label: 'Terminated', value: 'terminated' },
+  //   { label: 'Suspended', value: 'suspended' },
+  //   { label: 'Probation', value: 'probation' }
+  // ];
 
+  genderOptions: any[] = [];
+  employeeStatusOptions: any[] = [];
+  private translations: any = {};
   constructor(
     private fb: FormBuilder,
     private employeeService: EmployeeService,
     private messageService: MessageService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private translationService: TranslationService
   ) {
     this.employeeForm = this.createForm();
   }
 
   ngOnInit() {
+    this.translationService.translations$.subscribe(trans => {
+      this.translations = trans;
+      this.initializeDropdowns(); // Initialize dropdowns when translations load
+    });
     this.employeeId = this.route.snapshot.params['id'];
     this.isEditMode = !!this.employeeId;
 
     if (this.isEditMode && this.employeeId) {
       this.loadEmployee(this.employeeId);
+    }
+  }
+
+  initializeDropdowns(): void {
+    const genderTrans = this.translations.employees?.common;
+    const statusTrans = this.translations.employees?.listPage?.statuses;
+
+    this.genderOptions = [
+      { label: genderTrans?.male || 'Male', value: 'M' },
+      { label: genderTrans?.female || 'Female', value: 'F' }
+    ];
+
+    if (statusTrans) {
+      const statusKeys = ['active', 'inactive', 'onLeave', 'terminated', 'suspended', 'probation'];
+      this.employeeStatusOptions = statusKeys.map(key => ({
+        label: statusTrans[key] || key,
+        value: key
+      }));
     }
   }
 
