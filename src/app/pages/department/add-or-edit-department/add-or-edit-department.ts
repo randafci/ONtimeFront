@@ -66,7 +66,7 @@ export class AddOrEditDepartment implements OnInit {
       parentId: [null],
       organizationId: [null, Validators.required],
       companyId: [null],
-      departmentTypeId: [null, Validators.required]
+      departmentTypeLookupId: [null, Validators.required]
     });
   }
 
@@ -89,7 +89,7 @@ export class AddOrEditDepartment implements OnInit {
     });
 
     // Watch for department type changes
-    this.departmentForm.get('departmentTypeId')?.valueChanges.subscribe(departmentTypeId => {
+    this.departmentForm.get('departmentTypeLookupId')?.valueChanges.subscribe(departmentTypeId => {
       this.onDepartmentTypeChange(departmentTypeId);
     });
   }
@@ -148,8 +148,8 @@ export class AddOrEditDepartment implements OnInit {
   }
 
   updateMainDepartments(): void {
-    // Filter departments to show only Main Departments (departmentTypeId = 1)
-    this.mainDepartments = this.departments.filter(department => department.departmentTypeId === 1);
+    // Filter departments to show only Main Departments (departmentTypeLookupId = 1)
+    this.mainDepartments = this.departments.filter(department => department.departmentTypeLookupId === 1);
   }
 
   onDepartmentTypeChange(departmentTypeId: number): void {
@@ -175,9 +175,9 @@ export class AddOrEditDepartment implements OnInit {
             parentId: response.data.parentId,
             organizationId: response.data.organizationId,
             companyId: response.data.companyId,
-            departmentTypeId: response.data.departmentTypeId
+            departmentTypeLookupId: response.data.departmentTypeLookupId
           });
-          this.onDepartmentTypeChange(response.data.departmentTypeId || 0);
+          this.onDepartmentTypeChange(response.data.departmentTypeLookupId || 0);
         }
         this.loading = false;
       },
@@ -211,7 +211,7 @@ export class AddOrEditDepartment implements OnInit {
         parentId: formData.parentId,
         organizationId: formData.organizationId,
         companyId: formData.companyId,
-        departmentTypeId: formData.departmentTypeId
+        departmentTypeLookupId: formData.departmentTypeLookupId
       };
       this.updateDepartment(editData);
     } else {
@@ -222,7 +222,7 @@ export class AddOrEditDepartment implements OnInit {
         parentId: formData.parentId,
         organizationId: formData.organizationId,
         companyId: formData.companyId,
-        departmentTypeId: formData.departmentTypeId
+        departmentTypeLookupId: formData.departmentTypeLookupId
       };
       this.createDepartment(createData);
     }
