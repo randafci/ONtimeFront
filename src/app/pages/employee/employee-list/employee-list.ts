@@ -186,6 +186,11 @@ export class EmployeeListComponent implements OnInit {
     this.router.navigate(['/employees/edit', id]);
   }
 
+  navigateToEmployments(employee: Employee) {
+    const employeeName = this.getFullName(employee);
+    this.router.navigate(['/employees/employments', employee.id, employeeName]);
+  }
+
   deleteEmployee(employee: Employee) {
     const trans = this.translations.employees?.listPage?.messages;
     const commonTrans = this.translations.employees?.common;
