@@ -118,13 +118,8 @@
               pButton 
               icon="pi pi-pencil" 
               class="p-button-rounded p-button-text p-button-sm"
-<<<<<<< HEAD
-              (click)="navigateToEdit(employee.id)"
-              [pTooltip]="'employees.listPage.tooltips.edit' | translate"
-=======
               (click)="navigateToEdit(employee.id); $event.stopPropagation()"
-              pTooltip="Edit Employee"
->>>>>>> 9d1f547fed909b1ae6463ba067684d4cdba1d319
+              [pTooltip]="'employees.listPage.tooltips.edit' | translate"
               tooltipPosition="top"
             ></button>
             <button 
