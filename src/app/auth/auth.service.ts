@@ -20,6 +20,7 @@ export class AuthService {
   //public user = new BehaviorSubject<User>(null);
     private apiUrl = environment.apiUrl;
   private permissions: string[] = [];
+private claims: any = null;
 
   constructor(
     private router: Router,
@@ -352,6 +353,53 @@ getHeaders(): HttpHeaders {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   });
+}
+getDecodedToken(): any {
+  const userDataFromStorage = this.getUserDataFromLocalStorage();
+  if (!userDataFromStorage?.token) {
+    return null;
+  }
+  return this.decodeToken(userDataFromStorage.token);
+}
+getOrgId(): string | null {
+  const decoded = this.getDecodedToken();
+  return decoded ? decoded["OrgId"] ?? null : null;
+}
+
+
+setTokenAndClaims(token: string, refreshToken: string, expiresAt: string) {
+  localStorage.setItem("token", token);
+
+  const decoded = this.decodeToken(token);
+  this.claims = decoded;
+
+  const authData = {
+    _token: token,
+    refreshToken,
+    expireIn: expiresAt,
+    userName: decoded?.unique_name ?? "",
+    email: decoded?.email ?? "",
+    orgId: decoded?.OrgId ?? "",
+    role: decoded?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ?? "",
+    ...JSON.parse(localStorage.getItem("authData") ?? "{}"),
+  };
+
+  localStorage.setItem("authData", JSON.stringify(authData));
+}
+
+getClaims(): any {
+  if (!this.claims) {
+    const userData = this.getUserDataFromLocalStorage();
+    if (userData?.token) {
+      this.claims = this.decodeToken(userData.token);
+    }
+  }
+  return this.claims;
+}
+
+
+getRole(): string | null {
+  return this.getClaims()?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ?? null;
 }
 
   
