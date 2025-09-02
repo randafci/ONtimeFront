@@ -18,10 +18,11 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { Employee } from '../../../interfaces/employee.interface';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { SelectModule } from 'primeng/select';
+import { Organization } from '@/interfaces/organization.interface';
 
 @Component({
   selector: 'app-add-or-edit-user',
-    standalone: true, // since you're using 'imports' array in @Component
+  standalone: true, // since you're using 'imports' array in @Component
   imports: [CommonModule,
     ReactiveFormsModule,
     RouterModule,
@@ -34,7 +35,7 @@ import { SelectModule } from 'primeng/select';
 
     ToggleButtonModule, // <--- for p-toggleButton
     CheckboxModule,
-     SelectButtonModule,
+    SelectButtonModule,
     ToggleButtonModule,
     ButtonModule,
     InputTextModule,
@@ -56,7 +57,10 @@ export class AddOrEditUser implements OnInit {
   loading = false;
   submitted = false;
   employees: Employee[] = [];
-loadingEmployees= false;
+  organization: Organization[] = [];
+
+  loadingEmployees = false;
+  loadinOgrganiztions = false;
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -65,20 +69,22 @@ loadingEmployees= false;
     private messageService: MessageService
   ) {
     this.userForm = this.fb.group({
-     // userName: ['', Validators.required],
-     // email: ['', [Validators.required, Validators.email]],
-
-      password: [''],
+      userName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', this.isEditMode ? [] : [Validators.required]], // required only in create mode
       isLdapUser: [false],
       extraEmployeesView: [''],
-      employeeId: [null]
+      employeeId: [null],
+      organizationId: [null]   // ✅ added
+
     });
+
   }
 
   ngOnInit(): void {
 
-        this.loadEmployees();
-
+    this.loadEmployees();
+    this.loadOrganiztions();
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode = true;
@@ -86,10 +92,23 @@ loadingEmployees= false;
         this.loadUser(this.userId!);
       }
     });
+    this.userForm.get('isLdapUser')?.valueChanges.subscribe((isLdap: boolean) => {
+      if (isLdap) {
+        // Remove validators when LDAP user
+        this.userForm.get('userName')?.clearValidators();
+        this.userForm.get('email')?.clearValidators();
+      } else {
+        // Add validators back for non-LDAP user
+        this.userForm.get('userName')?.setValidators([Validators.required]);
+        this.userForm.get('email')?.setValidators([Validators.required, Validators.email]);
+      }
+      this.userForm.get('userName')?.updateValueAndValidity();
+      this.userForm.get('email')?.updateValueAndValidity();
+    });
+
   }
 
   loadUser(id: string): void {
-    this.loadEmployees();
 
 
     this.loading = true;
@@ -139,6 +158,32 @@ loadingEmployees= false;
     });
   }
 
+  loadOrganiztions(): void {
+    this.loadinOgrganiztions = true;
+    this.userService.getOrganizations().subscribe({
+      next: (response: ApiResponse<Organization[]>) => {
+        if (response.succeeded) {
+          this.organization = response.data || [];
+        } else {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Warning',
+            detail: 'Failed to load organizations list'
+          });
+        }
+        this.loadinOgrganiztions = false;
+      },
+      error: (error) => {
+        console.error('Error loading organizations:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load organizations'
+        });
+        this.loadinOgrganiztions = false;
+      }
+    });
+  }
   onSubmit(): void {
     this.submitted = true;
     if (this.userForm.invalid) {
@@ -169,6 +214,8 @@ loadingEmployees= false;
       });
     } else {
       const createDto: CreateUserDto = {
+        userName: formData.userName,
+        email: formData.email,
         password: formData.password,
         isLdapUser: formData.isLdapUser,
         extraEmployeesView: formData.extraEmployeesView,

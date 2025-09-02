@@ -5,90 +5,130 @@
   <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-      <!-- Username -->
-       <!-- 
-      <div class="field">
-        <label for="userName">{{ 'users.formPage.labels.userName' | translate }} <span class="required-star">*</span></label>
-        <input id="userName" type="text" pInputText class="w-full" formControlName="userName" 
-          [ngClass]="{'field-error': userForm.controls['userName'].invalid && (userForm.controls['userName'].touched || submitted)}"/>
-        <small *ngIf="userForm.controls['userName'].invalid && (userForm.controls['userName'].touched || submitted)" class="p-error">
-          {{ 'users.formPage.validation.required' | translate }}
-        </small>
-      </div>
--->
-      <!-- Email -->
-      <!-- <div class="field">
-        <label for="email">{{ 'users.formPage.labels.email' | translate }} <span class="required-star">*</span></label>
-        <input id="email" type="email" pInputText class="w-full" formControlName="email"
-          [ngClass]="{'field-error': userForm.controls['email'].invalid && (userForm.controls['email'].touched || submitted)}"/>
-        <small *ngIf="userForm.controls['email'].invalid && (userForm.controls['email'].touched || submitted)" class="p-error">
-          {{ 'users.formPage.validation.required' | translate }}
-        </small>
-      </div>
--->
-      <!-- Password -->
-      <div class="field" *ngIf="!isEditMode">
-        <label for="password">{{ 'users.formPage.labels.password' | translate }} <span class="required-star">*</span></label>
-        <input id="password" type="password" pInputText class="w-full" formControlName="password"
-          [ngClass]="{'field-error': userForm.controls['password'].invalid && (userForm.controls['password'].touched || submitted)}"/>
-        <small *ngIf="userForm.controls['password'].invalid && (userForm.controls['password'].touched || submitted)" class="p-error">
-          {{ 'users.formPage.validation.required' | translate }}
-        </small>
-      </div>
-
       <!-- isLdapUser -->
       <div class="field">
         <label for="isLdapUser">{{ 'users.formPage.labels.isLdapUser' | translate }}</label>
-        <p-toggleButton
-          id="isLdapUser"
-          formControlName="isLdapUser"
-          [onLabel]="'users.common.yes' | translate"
-          [offLabel]="'users.common.no' | translate"
-          offIcon="pi pi-times"
-        ></p-toggleButton>
+        <p-toggleButton id="isLdapUser" formControlName="isLdapUser" [onLabel]="'users.common.yes' | translate"
+          [offLabel]="'users.common.no' | translate" offIcon="pi pi-times"></p-toggleButton>
+      </div>
+      <div class="field">
+
+      </div>
+      <!-- Username -->
+      <div class="field" *ngIf="!userForm.get('isLdapUser')?.value">
+        <label for="userName">{{ 'users.formPage.labels.userName' | translate }} <span
+            class="required-star">*</span></label>
+        <input id="userName" type="text" pInputText class="w-full" formControlName="userName"
+          [ngClass]="{'field-error': userForm.controls['userName'].invalid && (userForm.controls['userName'].touched || submitted)}" />
+        <small *ngIf="userForm.controls['userName'].invalid && (userForm.controls['userName'].touched || submitted)"
+          class="p-error">
+          {{ 'users.formPage.validation.required' | translate }}
+        </small>
       </div>
 
-      <!-- Employee ID -->
-      <div class="field">
-        <label for="employeeId">{{ 'users.formPage.labels.employee' | translate }}</label>
-        <p-select
-          [options]="employees"
-          optionLabel="employeeCode"
-          optionValue="id"
-          formControlName="employeeId"
-          [placeholder]="'users.formPage.placeholders.selectEmployee' | translate"
-          [showClear]="true"
-          [filter]="true"
-          [loading]="loadingEmployees"
-        >
-          <ng-template let-employee pTemplate="item">
-            <div class="flex align-items-center">
-              <div>
-                <div>{{ employee.employeeCode }} - {{ employee.firstName }} {{ employee.lastName }}</div>
-                <div class="text-sm text-500">{{ employee.employeeType }} • {{ employee.employeeStatus }}</div>
-              </div>
-            </div>
-          </ng-template>
-          <ng-template let-employee pTemplate="value">
-            <div *ngIf="employee">
-              {{ employee.employeeCode }} - {{ employee.firstName }} {{ employee.lastName }}
-            </div>
-          </ng-template>
-        </p-select>
+      <!-- Email -->
+      <div class="field" *ngIf="!userForm.get('isLdapUser')?.value">
+        <label for="email">{{ 'users.formPage.labels.email' | translate }} <span class="required-star">*</span></label>
+        <input id="email" type="email" pInputText class="w-full" formControlName="email"
+          [ngClass]="{'field-error': userForm.controls['email'].invalid && (userForm.controls['email'].touched || submitted)}" />
+        <small *ngIf="userForm.controls['email'].invalid && (userForm.controls['email'].touched || submitted)"
+          class="p-error">
+          {{ 'users.formPage.validation.required' | translate }}
+        </small>
       </div>
+
+
+      <!-- Password -->
+      <div class="field" *ngIf="!isEditMode">
+        <label for="password">{{ 'users.formPage.labels.password' | translate }} <span
+            class="required-star">*</span></label>
+        <input id="password" type="password" pInputText class="w-full" formControlName="password"
+          [ngClass]="{'field-error': userForm.controls['password'].invalid && (userForm.controls['password'].touched || submitted)}" />
+        <small *ngIf="userForm.controls['password'].invalid && (userForm.controls['password'].touched || submitted)"
+          class="p-error">
+          {{ 'users.formPage.validation.required' | translate }}
+        </small>
+      </div>
+
+
+      <!-- Employee ID -->
+     <div class="field">
+  <label for="employeeId">{{ 'users.formPage.labels.employee' | translate }}</label>
+  <p-select 
+    class="w-full"
+    [options]="employees" 
+    optionLabel="employeeCode" 
+    optionValue="id" 
+    formControlName="employeeId"
+    [placeholder]="'users.formPage.placeholders.selectEmployee' | translate" 
+    [showClear]="true" 
+    [filter]="true"
+    [loading]="loadingEmployees">
+
+    <ng-template let-employee pTemplate="item">
+      <div class="flex align-items-center">
+        <div>
+          <div>{{ employee.employeeCode }} - {{ employee.firstName }} {{ employee.lastName }}</div>
+          <div class="text-sm text-500">{{ employee.employeeType }} • {{ employee.employeeStatus }}</div>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template let-employee pTemplate="value">
+      <div *ngIf="employee">
+        {{ employee.employeeCode }} - {{ employee.firstName }} {{ employee.lastName }}
+      </div>
+    </ng-template>
+  </p-select>
+</div>
+
+      <!-- organization ID -->
+
+  <div class="field">
+  <label for="organizationId">{{ 'users.formPage.labels.organization' | translate }}</label>
+  <p-select 
+    class="w-full"
+    [options]="organization" 
+    optionLabel="name" 
+    optionValue="id" 
+    formControlName="organizationId"
+    [placeholder]="'users.formPage.placeholders.selectOrganization' | translate" 
+    [showClear]="true" 
+    [filter]="true"
+    [loading]="loadinOgrganiztions">
+
+    <!-- dropdown items -->
+    <ng-template let-org pTemplate="item">
+      <div class="flex align-items-center">
+        <div>
+          <div>{{ org.name }}</div>
+          <div class="text-sm text-500">ID: {{ org.id }}</div>
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- selected value -->
+    <ng-template let-org pTemplate="value">
+      <div *ngIf="org">
+        {{ org.name }}
+      </div>
+    </ng-template>
+  </p-select>
+</div>
 
       <!-- Extra Employees View -->
       <div class="field col-span-2">
         <label for="extraEmployeesView">{{ 'users.formPage.labels.extraEmployeesView' | translate }}</label>
-        <input id="extraEmployeesView" type="text" pInputText class="w-full" formControlName="extraEmployeesView"/>
+        <input id="extraEmployeesView" type="text" pInputText class="w-full" formControlName="extraEmployeesView" />
       </div>
 
     </div>
 
     <!-- Buttons -->
     <div class="flex justify-content-start gap-2 mt-4">
-      <p-button type="button" [label]="'users.formPage.buttons.cancel' | translate" class="p-button-secondary" (onClick)="onCancel()" [disabled]="loading"></p-button>
-      <p-button type="submit" 
+      <p-button type="button" [label]="'users.formPage.buttons.cancel' | translate" class="p-button-secondary"
+        (onClick)="onCancel()" [disabled]="loading"></p-button>
+      <p-button type="submit"
         [label]="(isEditMode ? 'users.formPage.buttons.update' : 'users.formPage.buttons.save') | translate"
         [disabled]="userForm.invalid || loading">
       </p-button>
