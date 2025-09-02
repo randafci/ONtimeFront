@@ -103,23 +103,23 @@
 
       <!-- Company Type Field -->
       <div class="field">
-        <label for="companyTypeId">Company Type <span class="required-star">*</span></label>
+        <label for="companyTypeLookupId">Company Type <span class="required-star">*</span></label>
         <p-select class="w-full"
-          id="companyTypeId" 
-          formControlName="companyTypeId" 
+          id="companyTypeLookupId" 
+          formControlName="companyTypeLookupId" 
           [options]="companyTypes" 
           optionLabel="name" 
           optionValue="id"
           placeholder="Select Company Type"
           [ngClass]="{
             'field-error': 
-              (companyForm.controls['companyTypeId'].invalid && 
-              (companyForm.controls['companyTypeId'].dirty || companyForm.controls['companyTypeId'].touched || submitted))
+              (companyForm.controls['companyTypeLookupId'].invalid && 
+              (companyForm.controls['companyTypeLookupId'].dirty || companyForm.controls['companyTypeLookupId'].touched || submitted))
           }"
         ></p-select>
         <small 
-          *ngIf="companyForm.controls['companyTypeId'].invalid && 
-                (companyForm.controls['companyTypeId'].dirty || companyForm.controls['companyTypeId'].touched || submitted)" 
+          *ngIf="companyForm.controls['companyTypeLookupId'].invalid && 
+                (companyForm.controls['companyTypeLookupId'].dirty || companyForm.controls['companyTypeLookupId'].touched || submitted)" 
           class="p-error"
         >
           Company Type is required
@@ -127,7 +127,7 @@
       </div>
 
       <!-- Parent Company Field - Only shown for Sub Companies -->
-      <div class="field" *ngIf="companyForm.get('companyTypeId')?.value === 2">
+      <div class="field" *ngIf="companyForm.get('companyTypeLookupId')?.value === 2">
         <label for="parentId">Parent Company</label>
         <p-select class="w-full"
           id="parentId" 

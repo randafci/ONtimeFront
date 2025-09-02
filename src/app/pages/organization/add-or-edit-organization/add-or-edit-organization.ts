@@ -6,9 +6,10 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { LookupService } from '../OrganizationService';
-import { Organization, CreateOrganization, EditOrganization } from '@/interfaces/organization.interface';
+import { Organization, CreateOrganization, EditOrganization } from '../../../interfaces/organization.interface';
 import { CommonModule } from '@angular/common';
-import { ApiResponse } from '@/core/models/api-response.model';
+import { ApiResponse } from '../../../core/models/api-response.model';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-add-or-edit-organization',
@@ -20,6 +21,7 @@ import { ApiResponse } from '@/core/models/api-response.model';
     ButtonModule,
     InputTextModule,
     ToastModule,
+    TranslatePipe
   ],
   templateUrl: './add-or-edit-organization.html',
   styleUrl: './add-or-edit-organization.scss',

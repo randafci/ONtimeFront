@@ -1,10 +1,10 @@
 <div class="card">
   <!-- Header Section -->
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-semibold text-gray-800">{{ isEditMode ? 'Edit Employee' : 'Add Employee' }}</h1>
+    <h1 class="text-2xl font-semibold text-gray-800">{{ (isEditMode ? 'employees.formPage.titles.edit' : 'employees.formPage.titles.add') | translate }}</h1>
     <button 
       pButton 
-      label="Back" 
+      [label]="'employees.formPage.buttons.back' | translate"
       class="p-button-danger" 
       icon="pi pi-arrow-left"
       (click)="onBack()">
@@ -53,11 +53,11 @@
           class="hidden">
       </div>
       <div class="text-center">
-        <h3 class="text-xl font-semibold text-gray-900 mb-1">{{ fullName || 'Full Name' }}</h3>
-        <p class="text-gray-600 text-lg mb-2">{{ jobTitle || 'Job Title' }}</p>
+        <h3 class="text-xl font-semibold text-gray-900 mb-1">{{ fullName || ('employees.formPage.profile.fullName' | translate) }}</h3>
+        <p class="text-gray-600 text-lg mb-2">{{ jobTitle || ('employees.formPage.profile.jobTitle' | translate) }}</p>
         <div class="flex items-center justify-center gap-4">
-          <span class="text-sm text-gray-500">Employee ID: {{ employeeForm.get('employeeCode')?.value || 'N/A' }}</span>
-          <span class="text-sm text-gray-500">Status: {{ employeeForm.get('employeeStatus')?.value || 'Active' }}</span>
+          <span class="text-sm text-gray-500">{{ 'employees.formPage.profile.employeeId' | translate }}: {{ employeeForm.get('employeeCode')?.value || 'N/A' }}</span>
+          <span class="text-sm text-gray-500">{{ 'employees.formPage.profile.status' | translate }}: {{ employeeForm.get('employeeStatus')?.value || 'Active' }}</span>
         </div>
       </div>
     </div>
@@ -72,49 +72,49 @@
           [class.active]="activeTabIndex === 0"
           (click)="activeTabIndex = 0">
           <i class="pi pi-user mr-2"></i>
-          General
+          {{ 'employees.formPage.tabs.general' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 1"
           (click)="activeTabIndex = 1">
           <i class="pi pi-phone mr-2"></i>
-          Contact
+          {{ 'employees.formPage.tabs.contact' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 2"
           (click)="activeTabIndex = 2">
           <i class="pi pi-building mr-2"></i>
-          Organizational
+          {{ 'employees.formPage.tabs.organizational' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 3"
           (click)="activeTabIndex = 3">
           <i class="pi pi-file mr-2"></i>
-          Documents
+          {{ 'employees.formPage.tabs.documents' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 4"
           (click)="activeTabIndex = 4">
           <i class="pi pi-users mr-2"></i>
-          Report Managers
+          {{ 'employees.formPage.tabs.reportManagers' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 5"
           (click)="activeTabIndex = 5">
           <i class="pi pi-calendar mr-2"></i>
-          Assign Schedule
+          {{ 'employees.formPage.tabs.assignSchedule' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 6"
           (click)="activeTabIndex = 6">
           <i class="pi pi-shield mr-2"></i>
-          Policies
+          {{ 'employees.formPage.tabs.policies' | translate }}
         </button>
       </nav>
     </div>
@@ -125,15 +125,15 @@
     
     <!-- General Tab -->
     <div *ngIf="activeTabIndex === 0" class="tab-content">
-      <h3 class="text-lg font-medium mb-6 text-gray-900 text-center">General Information</h3>
+      <h3 class="text-lg font-medium mb-6 text-gray-900 text-center">{{ 'employees.formPage.general.title' | translate }}</h3>
       
       <!-- Employment Information Section -->
       <div class="mb-8">
-        <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">Employment Information</h4>
+        <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">{{ 'employees.formPage.general.employmentSection' | translate }}</h4>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="field">
             <label for="employeeCode" class="block text-sm font-medium mb-2 text-gray-700">
-              Employee ID <span class="text-red-500">*</span>
+              {{ 'employees.formPage.general.labels.employeeId' | translate }} <span class="text-red-500">*</span>
             </label>
             <input 
               id="employeeCode"
@@ -143,19 +143,19 @@
               class="w-full"
               [class.ng-invalid]="employeeForm.get('employeeCode')?.invalid && employeeForm.get('employeeCode')?.touched">
             <small class="text-red-500" *ngIf="employeeForm.get('employeeCode')?.invalid && employeeForm.get('employeeCode')?.touched">
-              Employee ID is required
+              {{ 'employees.formPage.validation.required' | translate }}
             </small>
           </div>
 
           <div class="field">
             <label for="employeeStatus" class="block text-sm font-medium mb-2 text-gray-700">
-              Employee Status
+              {{ 'employees.formPage.general.labels.employeeStatus' | translate }}
             </label>
             <p-select 
               id="employeeStatus"
               formControlName="employeeStatus"
               [options]="employeeStatusOptions"
-              placeholder="Select Employee Status"
+              [placeholder]="'employees.formPage.placeholders.selectStatus' | translate"
               optionLabel="label"
               optionValue="value"
               class="w-full">
@@ -164,8 +164,8 @@
 
           <div class="field">
             <label for="employeeType" class="block text-sm font-medium mb-2 text-gray-700">
-              Employee Type
-            </label>
+              {{ 'employees.formPage.general.labels.employeeType' | translate }}</label>
+          
             <input 
               id="employeeType"
               pInputText 
@@ -178,11 +178,11 @@
 
       <!-- Personal Information Section -->
       <div class="mb-8">
-        <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">Personal Information</h4>
+        <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">{{ 'employees.formPage.general.personalSection' | translate }}</h4>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="field">
             <label for="firstName" class="block text-sm font-medium mb-2 text-gray-700">
-              First Name <span class="text-red-500">*</span>
+              {{ 'employees.formPage.general.labels.firstName' | translate }} <span class="text-red-500">*</span>
             </label>
             <input 
               id="firstName"
@@ -192,13 +192,13 @@
               class="w-full"
               [class.ng-invalid]="employeeForm.get('firstName')?.invalid && employeeForm.get('firstName')?.touched">
             <small class="text-red-500" *ngIf="employeeForm.get('firstName')?.invalid && employeeForm.get('firstName')?.touched">
-              First Name is required
+              {{ 'employees.formPage.validation.required' | translate }}
             </small>
           </div>
 
           <div class="field">
             <label for="lastName" class="block text-sm font-medium mb-2 text-gray-700">
-              Family Name <span class="text-red-500">*</span>
+              {{ 'employees.formPage.general.labels.familyName' | translate }} <span class="text-red-500">*</span>
             </label>
             <input 
               id="lastName"
@@ -208,13 +208,13 @@
               class="w-full"
               [class.ng-invalid]="employeeForm.get('lastName')?.invalid && employeeForm.get('lastName')?.touched">
             <small class="text-red-500" *ngIf="employeeForm.get('lastName')?.invalid && employeeForm.get('lastName')?.touched">
-              Family Name is required
+              {{ 'employees.formPage.validation.required' | translate }}
             </small>
           </div>
 
           <div class="field">
             <label for="gender" class="block text-sm font-medium mb-2 text-gray-700">
-              Gender <span class="text-red-500">*</span>
+              {{ 'employees.formPage.general.labels.gender' | translate }} <span class="text-red-500">*</span>
             </label>
             <p-select 
               id="gender"
@@ -222,18 +222,18 @@
               [options]="genderOptions" 
               optionLabel="label" 
               optionValue="value"
-              placeholder="Select Gender"
+              [placeholder]="'employees.formPage.placeholders.selectGender' | translate"
               class="w-full"
               [class.ng-invalid]="employeeForm.get('gender')?.invalid && employeeForm.get('gender')?.touched">
             </p-select>
             <small class="text-red-500" *ngIf="employeeForm.get('gender')?.invalid && employeeForm.get('gender')?.touched">
-              Gender is required
+              {{ 'employees.formPage.validation.required' | translate }}
             </small>
           </div>
 
           <div class="field">
             <label for="nationality" class="block text-sm font-medium mb-2 text-gray-700">
-              Nationality
+              {{ 'employees.formPage.general.labels.nationality' | translate }}
             </label>
             <input 
               id="nationality"
@@ -245,7 +245,7 @@
 
           <div class="field">
             <label for="religionType" class="block text-sm font-medium mb-2 text-gray-700">
-              Religion
+              {{ 'employees.formPage.general.labels.religion' | translate }}
             </label>
             <input 
               id="religionType"
@@ -257,7 +257,7 @@
 
           <div class="field">
             <label for="isSpecialNeeds" class="block text-sm font-medium mb-2 text-gray-700">
-              Special Needs
+              {{ 'employees.formPage.general.labels.specialNeeds' | translate }}
             </label>
             <div class="flex items-center">
               <input 
@@ -265,7 +265,7 @@
                 id="isSpecialNeeds"
                 formControlName="isSpecialNeeds"
                 class="mr-3 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
-              <label for="isSpecialNeeds" class="text-sm text-gray-700">Enable special needs</label>
+              <label for="isSpecialNeeds" class="text-sm text-gray-700">{{ 'employees.formPage.general.labels.enableSpecialNeeds' | translate }}</label>
             </div>
           </div>
         </div>
@@ -273,11 +273,11 @@
 
       <!-- Display Settings Section -->
       <div>
-        <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">Display Settings</h4>
+        <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">{{ 'employees.formPage.general.displaySection' | translate }}</h4>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="field">
             <label for="displayInReport" class="block text-sm font-medium mb-2 text-gray-700">
-              Display in Report
+              {{ 'employees.formPage.general.labels.displayInReport' | translate }}
             </label>
             <div class="flex items-center">
               <input 
@@ -285,13 +285,13 @@
                 id="displayInReport"
                 formControlName="displayInReport"
                 class="mr-3 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
-              <label for="displayInReport" class="text-sm text-gray-700">Show in reports</label>
+              <label for="displayInReport" class="text-sm text-gray-700">{{ 'employees.formPage.general.labels.showInReports' | translate }}</label>
             </div>
           </div>
 
           <div class="field">
             <label for="displayInReportsDashboard" class="block text-sm font-medium mb-2 text-gray-700">
-              Display in Reports Dashboard
+              {{ 'employees.formPage.general.labels.displayInDashboard' | translate }}
             </label>
             <div class="flex items-center">
               <input 
@@ -299,7 +299,7 @@
                 id="displayInReportsDashboard"
                 formControlName="displayInReportsDashboard"
                 class="mr-3 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
-              <label for="displayInReportsDashboard" class="text-sm text-gray-700">Show in dashboard</label>
+              <label for="displayInReportsDashboard" class="text-sm text-gray-700">{{ 'employees.formPage.general.labels.showInDashboard' | translate }}</label>
             </div>
           </div>
         </div>
@@ -311,18 +311,18 @@
       <div class="mb-6">
         <!-- Contact Details Section -->
         <div class="text-center mb-8">
-          <h3 class="text-lg font-medium text-gray-900">Contact Details</h3>
+          <h3 class="text-lg font-medium text-gray-900">{{ 'employees.formPage.contact.title' | translate }}</h3>
         </div>
 
                  <!-- Personal Contact Information -->
          <div class="mb-8">
-           <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">Personal Contact</h4>
+           <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">{{ 'employees.formPage.contact.personalSection' | translate }}</h4>
            <div formGroupName="contact" class="grid grid-cols-1 md:grid-cols-3 gap-8">
              
              <!-- Personal Email -->
              <div class="field">
                <label for="personalEmail" class="block text-sm font-medium mb-2 text-gray-700">
-                 Personal Email
+                 {{ 'employees.formPage.contact.labels.personalEmail' | translate }}
                </label>
                <input 
                  id="personalEmail"
@@ -335,7 +335,7 @@
              <!-- Personal Phone -->
              <div class="field">
                <label for="personalPhone" class="block text-sm font-medium mb-2 text-gray-700">
-                 Personal Phone
+                 {{ 'employees.formPage.contact.labels.personalPhone' | translate }}
                </label>
                <input 
                  id="personalPhone"
@@ -348,7 +348,7 @@
              <!-- Personal Mobile -->
              <div class="field">
                <label for="personalMobile" class="block text-sm font-medium mb-2 text-gray-700">
-                 Personal Mobile Phone
+                 {{ 'employees.formPage.contact.labels.personalMobile' | translate }}
                </label>
                <input 
                  id="personalMobile"
@@ -362,13 +362,13 @@
 
                  <!-- Official Contact Information -->
          <div class="mb-8">
-           <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">Official Contact</h4>
+           <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">{{ 'employees.formPage.contact.officialSection' | translate }}</h4>
            <div formGroupName="contact" class="grid grid-cols-1 md:grid-cols-3 gap-8">
              
              <!-- Official Email -->
              <div class="field">
                <label for="officialEmail" class="block text-sm font-medium mb-2 text-gray-700">
-                 Official Email
+                 {{ 'employees.formPage.contact.labels.officialEmail' | translate }}
                </label>
                <input 
                  id="officialEmail"
@@ -381,7 +381,7 @@
              <!-- Official Phone -->
              <div class="field">
                <label for="officialPhone" class="block text-sm font-medium mb-2 text-gray-700">
-                 Official Phone
+                 {{ 'employees.formPage.contact.labels.officialPhone' | translate }}
                </label>
                <input 
                  id="officialPhone"
@@ -394,7 +394,7 @@
              <!-- Official Mobile -->
              <div class="field">
                <label for="officialMobile" class="block text-sm font-medium mb-2 text-gray-700">
-                 Official Mobile Phone
+                 {{ 'employees.formPage.contact.labels.officialMobile' | translate }}
                </label>
                <input 
                  id="officialMobile"
@@ -408,13 +408,13 @@
 
                  <!-- Address Information -->
          <div class="mb-8">
-           <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">Address Information</h4>
+           <h4 class="text-md font-semibold mb-4 text-gray-800 border-b pb-2">{{ 'employees.formPage.contact.addressSection' | translate }}</h4>
            <div formGroupName="contact" class="grid grid-cols-1 md:grid-cols-3 gap-8">
              
              <!-- Address -->
              <div class="field md:col-span-3">
                <label for="address" class="block text-sm font-medium mb-2 text-gray-700">
-                 Address
+                 {{ 'employees.formPage.contact.labels.address' | translate }}
                </label>
                <input 
                  id="address"
@@ -427,7 +427,7 @@
              <!-- City -->
              <div class="field">
                <label for="city" class="block text-sm font-medium mb-2 text-gray-700">
-                 City
+                 {{ 'employees.formPage.contact.labels.city' | translate }}
                </label>
                <input 
                  id="city"
@@ -440,7 +440,7 @@
              <!-- State -->
              <div class="field">
                <label for="state" class="block text-sm font-medium mb-2 text-gray-700">
-                 State
+                 {{ 'employees.formPage.contact.labels.state' | translate }}
                </label>
                <input 
                  id="state"
@@ -460,19 +460,19 @@
         <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <i class="pi pi-building text-2xl text-gray-400"></i>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Organizational Information</h3>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ 'employees.formPage.tabs.organizational' | translate }}</h3>
         <p class="text-gray-500">Organizational settings will be available soon</p>
       </div>
     </div>
 
          <!-- Documents Tab -->
      <div *ngIf="activeTabIndex === 3" class="tab-content">
-       <h3 class="text-lg font-medium mb-6 text-gray-900">Document Information</h3>
+       <h3 class="text-lg font-medium mb-6 text-gray-900">{{ 'employees.formPage.documents.title' | translate }}</h3>
        <div formGroupName="document" class="grid grid-cols-1 md:grid-cols-2 gap-8">
          
          <div class="field">
            <label for="passportNumber" class="block text-sm font-medium mb-2 text-gray-700">
-             Passport Number
+             {{ 'employees.formPage.documents.labels.passportNumber' | translate }}
            </label>
            <input 
              id="passportNumber"
@@ -484,7 +484,7 @@
 
          <div class="field">
            <label for="visaNumber" class="block text-sm font-medium mb-2 text-gray-700">
-             Visa Number
+             {{ 'employees.formPage.documents.labels.visaNumber' | translate }}
            </label>
            <input 
              id="visaNumber"
@@ -496,7 +496,7 @@
 
          <div class="field">
            <label for="passportExpirationDate" class="block text-sm font-medium mb-2 text-gray-700">
-             Passport Expiration Date
+             {{ 'employees.formPage.documents.labels.passportExpiration' | translate }}
            </label>
            <input 
              id="passportExpirationDate"
@@ -507,7 +507,7 @@
 
          <div class="field">
            <label for="visaExpirationDate" class="block text-sm font-medium mb-2 text-gray-700">
-             Visa Expiration Date
+             {{ 'employees.formPage.documents.labels.visaExpiration' | translate }}
            </label>
            <input 
              id="visaExpirationDate"
@@ -524,7 +524,7 @@
         <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <i class="pi pi-users text-2xl text-gray-400"></i>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Report Managers</h3>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ 'employees.formPage.tabs.reportManagers' | translate }}</h3>
         <p class="text-gray-500">Report Managers configuration will be added here</p>
       </div>
     </div>
@@ -535,7 +535,7 @@
         <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <i class="pi pi-calendar text-2xl text-gray-400"></i>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Assign Schedule</h3>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ 'employees.formPage.tabs.assignSchedule' | translate }}</h3>
         <p class="text-gray-500">Schedule assignment configuration will be added here</p>
       </div>
     </div>
@@ -546,7 +546,7 @@
         <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <i class="pi pi-shield text-2xl text-gray-400"></i>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Policies</h3>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ 'employees.formPage.tabs.policies' | translate }}</h3>
         <p class="text-gray-500">Policies configuration will be added here</p>
       </div>
     </div>
@@ -555,13 +555,13 @@
     <div class="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
       <button 
         pButton 
-        label="Cancel" 
+        [label]="'employees.formPage.buttons.cancel' | translate" 
         class="p-button-secondary" 
         (click)="onBack()">
       </button>
       <button 
         pButton 
-        label="{{ isEditMode ? 'Update' : 'Create' }}" 
+        [label]="(isEditMode ? 'employees.formPage.buttons.update' : 'employees.formPage.buttons.create') | translate"
         class="p-button-danger" 
         [loading]="loading"
         type="submit">

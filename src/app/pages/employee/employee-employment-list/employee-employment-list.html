@@ -1,0 +1,325 @@
+<div class="card">
+  <div class="flex flex-col justify-between items-center mb-4 lg:flex-row">
+    <div class="flex items-center gap-3">
+      <button 
+        pButton 
+        label="Back to Employees" 
+        icon="pi pi-arrow-left" 
+        class="p-button-outlined p-button-sm"
+        (click)="navigateBack()"
+      ></button>
+    
+    </div>
+    <h2>({{ employeeName }}) Employments</h2>
+    <button 
+      pButton 
+      label="Create Employment" 
+      icon="pi pi-plus" 
+      class="p-button-sm h-fit"
+      (click)="openCreateDialog()"
+    ></button>
+  </div>
+  
+  <p-table
+    #dt
+    [value]="employments"
+    dataKey="id"
+    [rows]="10"
+    [loading]="loading"
+    [rowHover]="true"
+    [showGridlines]="true"
+    [paginator]="true"
+    [globalFilterFields]="['companyName', 'departmentName', 'joinDate']"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex justify-between items-center flex-column sm:flex-row">
+        <button 
+          pButton 
+          label="Clear" 
+          class="p-button-outlined mb-2" 
+          icon="pi pi-filter-slash" 
+          (click)="clear(dt)"
+        ></button>
+        <p-iconfield iconPosition="left" class="ml-auto">
+          <p-inputicon>
+            <i class="pi pi-search"></i>
+          </p-inputicon>
+          <input 
+            pInputText 
+            type="text" 
+            #filter
+            (input)="onGlobalFilter(dt, $event)" 
+            placeholder="Search employments..." 
+          />
+        </p-iconfield>
+      </div>
+    </ng-template>
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="min-width: 12rem">
+          <div class="flex justify-between items-center">
+            Company
+            <p-columnFilter type="text" field="companyName" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 12rem">
+          <div class="flex justify-between items-center">
+            Department
+            <p-columnFilter type="text" field="departmentName" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 10rem">
+          <div class="flex justify-between items-center">
+            Join Date
+            <p-columnFilter type="date" field="joinDate" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 10rem">
+          <div class="flex justify-between items-center">
+            Relieve Date
+            <p-columnFilter type="date" field="relieveDate" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 8rem">
+          <div class="flex justify-between items-center">
+            Status
+            <p-columnFilter field="isCurrent" matchMode="equals" display="menu">
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                <p-select 
+                  [ngModel]="value" 
+                  [options]="statusOptions" 
+                  (onChange)="filter($event.value)" 
+                  placeholder="Any" 
+                  [style]="{ 'min-width': '12rem' }"
+                >
+                  <ng-template let-option pTemplate="item">
+                    <p-tag 
+                      [value]="option.label" 
+                      [severity]="getSeverity(option.value)"
+                    ></p-tag>
+                  </ng-template>
+                </p-select>
+              </ng-template>
+            </p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 8rem">Actions</th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-employment>
+      <tr>
+        <td>{{ employment.companyName || 'N/A' }}</td>
+        <td>{{ employment.departmentName || 'N/A' }}</td>
+        <td>{{ employment.joinDate ? (employment.joinDate | date:'shortDate') : 'N/A' }}</td>
+        <td>{{ employment.relieveDate ? (employment.relieveDate | date:'shortDate') : 'N/A' }}</td>
+        <td>
+          <p-tag 
+            [value]="getStatusLabel(employment.isCurrent)" 
+            [severity]="getSeverity(employment.isCurrent)"
+          ></p-tag>
+        </td>
+        <td>
+          <div class="action-buttons">
+            <button 
+              pButton 
+              icon="pi pi-pencil" 
+              class="p-button-rounded p-button-text p-button-sm"
+              (click)="openEditDialog(employment)"
+              pTooltip="Edit Employment"
+              tooltipPosition="top"
+            ></button>
+            <button 
+              pButton 
+              icon="pi pi-trash" 
+              class="p-button-rounded p-button-text p-button-danger p-button-sm"
+              (click)="deleteEmployment(employment)"
+              pTooltip="Delete Employment"
+              tooltipPosition="top"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6">No employments found</td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="loadingbody">
+      <tr>
+        <td colspan="6">Loading employments...</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Create/Edit Dialog -->
+<p-dialog 
+  [(visible)]="dialogVisible" 
+  [header]="isEditMode ? 'Edit Employment' : 'Create Employment'"
+  [modal]="true" 
+  [style]="{width: '50vw'}"
+  [draggable]="false" 
+  [resizable]="false"
+>
+  <form [formGroup]="employmentForm" (ngSubmit)="onSubmit()">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <div class="field">
+        <label for="companyId" class="block text-sm font-medium mb-2">
+          Company <span class="text-red-500">*</span>
+        </label>
+        <p-select 
+          id="companyId"
+          formControlName="companyId"
+          placeholder="Select Company"
+          [options]="companies"
+          optionLabel="name"
+          optionValue="id"
+          (onChange)="onCompanyChange($event.value)"
+          class="w-full"
+          [class.ng-invalid]="employmentForm.get('companyId')?.invalid && employmentForm.get('companyId')?.touched">
+        </p-select>
+        <small class="text-red-500" *ngIf="employmentForm.get('companyId')?.invalid && employmentForm.get('companyId')?.touched">
+          Company is required
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="departmentId" class="block text-sm font-medium mb-2">
+          Department <span class="text-red-500">*</span>
+        </label>
+        <p-select 
+          id="departmentId"
+          formControlName="departmentId"
+          placeholder="Select Department"
+          [options]="departments"
+          optionLabel="name"
+          optionValue="id"
+          [disabled]="!employmentForm.get('companyId')?.value"
+          class="w-full"
+          [class.ng-invalid]="employmentForm.get('departmentId')?.invalid && employmentForm.get('departmentId')?.touched">
+        </p-select>
+        <small class="text-red-500" *ngIf="employmentForm.get('departmentId')?.invalid && employmentForm.get('departmentId')?.touched">
+          Department is required
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="sectionId" class="block text-sm font-medium mb-2">
+          Section ID
+        </label>
+        <input 
+          id="sectionId"
+          pInputText 
+          type="number"
+          formControlName="sectionId"
+          placeholder="Section ID"
+          class="w-full">
+      </div>
+
+      <div class="field">
+        <label for="designationId" class="block text-sm font-medium mb-2">
+          Designation ID
+        </label>
+        <input 
+          id="designationId"
+          pInputText 
+          type="number"
+          formControlName="designationId"
+          placeholder="Designation ID"
+          class="w-full">
+      </div>
+
+      <div class="field">
+        <label for="gradeId" class="block text-sm font-medium mb-2">
+          Grade ID
+        </label>
+        <input 
+          id="gradeId"
+          pInputText 
+          type="number"
+          formControlName="gradeId"
+          placeholder="Grade ID"
+          class="w-full">
+      </div>
+
+      <div class="field">
+        <label for="joinDate" class="block text-sm font-medium mb-2">
+          Join Date
+        </label>
+        <input 
+          id="joinDate"
+          type="date"
+          formControlName="joinDate"
+          class="w-full p-3 border border-gray-300 rounded-md">
+      </div>
+
+      <div class="field">
+        <label for="relieveDate" class="block text-sm font-medium mb-2">
+          Relieve Date
+        </label>
+        <input 
+          id="relieveDate"
+          type="date"
+          formControlName="relieveDate"
+          class="w-full p-3 border border-gray-300 rounded-md">
+      </div>
+
+      <div class="field md:col-span-2">
+        <div class="flex items-center gap-4">
+          <div class="flex items-center">
+            <input 
+              type="checkbox"
+              id="isSpecialNeeds"
+              formControlName="isSpecialNeeds"
+              class="mr-3 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+            <label for="isSpecialNeeds" class="text-sm text-gray-700">Special Needs</label>
+          </div>
+
+          <div class="flex items-center">
+            <input 
+              type="checkbox"
+              id="showInReport"
+              formControlName="showInReport"
+              class="mr-3 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+            <label for="showInReport" class="text-sm text-gray-700">Show in Report</label>
+          </div>
+
+          <div class="flex items-center">
+            <input 
+              type="checkbox"
+              id="showInDashboard"
+              formControlName="showInDashboard"
+              class="mr-3 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+            <label for="showInDashboard" class="text-sm text-gray-700">Show in Dashboard</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+      <button 
+        pButton 
+        label="Cancel" 
+        class="p-button-secondary" 
+        type="button"
+        (click)="closeDialog()">
+      </button>
+      <button 
+        pButton 
+        label="{{ isEditMode ? 'Update' : 'Create' }}" 
+        class="p-button-danger" 
+        [loading]="loading"
+        type="submit">
+      </button>
+    </div>
+  </form>
+</p-dialog>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

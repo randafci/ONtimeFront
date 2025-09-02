@@ -1,13 +1,13 @@
-import { User } from '@/auth/user.model';
+import { User } from '../../../auth/user.model';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { UserService } from '../userService';
-import { TranslatePipe } from '@/core/pipes/translate.pipe';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { CommonModule, DatePipe } from '@angular/common';
-import { ApiResponse } from '@/core/models/api-response.model';
-import { UserDto, UpdateUserDto, CreateUserDto } from '@/interfaces/user.interface';
+import { ApiResponse } from '../../../core/models/api-response.model';
+import { UserDto, UpdateUserDto, CreateUserDto } from '../../../interfaces/user.interface';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Toast, ToastModule } from "primeng/toast";
 import { ButtonModule } from 'primeng/button';
@@ -15,7 +15,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { CheckboxModule } from 'primeng/checkbox';
-import { Employee } from '@/interfaces/employee.interface';
+import { Employee } from '../../../interfaces/employee.interface';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { SelectModule } from 'primeng/select';
 

@@ -78,6 +78,7 @@ export class Login {
       localStorage.setItem('token', token);
 
       const tokenInfo = this.authService.decodeToken(token);
+      this.authService.setTokenAndClaims(token, refreshToken, expiresAt);
 
       this.authService.getAuthUserInfo().subscribe({
         next: (info: any) => {

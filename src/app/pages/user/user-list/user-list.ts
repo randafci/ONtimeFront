@@ -1,5 +1,5 @@
-import { User } from '@/auth/user.model';
-import { TranslatePipe } from '@/core/pipes/translate.pipe';
+import { User } from '../../../auth/user.model';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
@@ -14,11 +14,11 @@ import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { SelectModule } from 'primeng/select';
-import { UserDto } from '@/interfaces/user.interface';
-import { TranslationService } from '@/pages/translation-manager/translation-manager/translation.service';
+import { UserDto } from '../../../interfaces/user.interface';
+import { TranslationService } from '../../../pages/translation-manager/translation-manager/translation.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiResponse } from '@/core/models/api-response.model';
+import { ApiResponse } from '../../../core/models/api-response.model';
 
 @Component({
   selector: 'app-user-list',
