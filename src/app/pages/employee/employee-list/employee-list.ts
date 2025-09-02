@@ -17,12 +17,14 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService, ConfirmationService } from 'primeng/api';
-import { Employee } from '@/interfaces/employee.interface';
+import { Employee } from '../../../interfaces/employee.interface';
 import { EmployeeService } from '../EmployeeService';
-import { ApiResponse } from '@/core/models/api-response.model';
 import { Router, RouterModule, NavigationEnd } from "@angular/router";
 import { DatePipe } from '@angular/common';
 import { filter } from 'rxjs/operators';
+import { ApiResponse } from '../../../core/models/api-response.model';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 
 
 @Component({
@@ -45,7 +47,8 @@ import { filter } from 'rxjs/operators';
     ToastModule,
     RouterModule,
     ConfirmDialogModule,
-    TooltipModule
+    TooltipModule,
+    TranslatePipe
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './employee-list.html',
@@ -54,14 +57,17 @@ import { filter } from 'rxjs/operators';
 export class EmployeeListComponent implements OnInit {
   employees: Employee[] = [];
   loading: boolean = true;
-  statuses: any[] = [
-    { label: 'Active', value: 'active' },
-    { label: 'Inactive', value: 'inactive' },
-    { label: 'On Leave', value: 'on leave' },
-    { label: 'Terminated', value: 'terminated' },
-    { label: 'Suspended', value: 'suspended' },
-    { label: 'Probation', value: 'probation' }
-  ];
+  // statuses: any[] = [
+  //   { label: 'Active', value: 'active' },
+  //   { label: 'Inactive', value: 'inactive' },
+  //   { label: 'On Leave', value: 'on leave' },
+  //   { label: 'Terminated', value: 'terminated' },
+  //   { label: 'Suspended', value: 'suspended' },
+  //   { label: 'Probation', value: 'probation' }
+  // ];
+
+  statuses: any[] = [];
+  private translations: any = {}; // Store translations
 
   activityValues: number[] = [0, 100];
 
@@ -72,10 +78,15 @@ export class EmployeeListComponent implements OnInit {
     private employeeService: EmployeeService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private router: Router
+    private router: Router,
+    private translationService: TranslationService
   ) {}
 
   ngOnInit() {
+    this.translationService.translations$.subscribe(trans => {
+      this.translations = trans;
+      this.initializeStatuses(); // Initialize statuses when translations load
+    });
     this.loadEmployees();
     
     // Reload employees when navigating back to this component
@@ -88,6 +99,13 @@ export class EmployeeListComponent implements OnInit {
         this.loadEmployees();
       }
     });
+  }
+  initializeStatuses(): void {
+    const statusKeys = ['active', 'inactive', 'onLeave', 'terminated', 'suspended', 'probation'];
+    this.statuses = statusKeys.map(key => ({
+      label: this.translations.employees?.listPage?.statuses?.[key] || key,
+      value: key
+    }));
   }
 
   loadEmployees() {
@@ -174,12 +192,16 @@ export class EmployeeListComponent implements OnInit {
   }
 
   deleteEmployee(employee: Employee) {
+    const trans = this.translations.employees?.listPage?.messages;
+    const commonTrans = this.translations.employees?.common;
+
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete ${this.getFullName(employee)}?`,
-      header: 'Confirm Deletion',
+      message: (trans?.deleteConfirm || 'Are you sure you want to delete {name}?')
+               .replace('{name}', this.getFullName(employee)),
+      header: commonTrans?.confirmDelete || 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Yes, Delete',
-      rejectLabel: 'Cancel',
+      acceptLabel: commonTrans?.yes || 'Yes',
+      rejectLabel: commonTrans?.no || 'No',
       accept: () => {
         this.employeeService.deleteEmployee(employee.id).subscribe({
           next: (response: ApiResponse<boolean>) => {
@@ -212,8 +234,8 @@ export class EmployeeListComponent implements OnInit {
         // User cancelled the deletion
         this.messageService.add({
           severity: 'info',
-          summary: 'Cancelled',
-          detail: 'Delete operation cancelled'
+          summary: commonTrans?.cancelled || 'Cancelled',
+          detail: trans?.deleteCancelled || 'Delete operation cancelled'
         });
       }
     });
