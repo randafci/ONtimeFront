@@ -22,22 +22,46 @@ export class TranslationService {
         dim: "ضبابي",
         dark: "مظلم",
       },
-      organizationList: {
-        title: "المستخدمين المسؤولين",
-        clearButton: "مسح",
-        searchPlaceholder: "بحث...",
-        headers: {
-          fullName: "الاسم الكامل",
-          email: "البريد الإلكتروني",
-          phone: "رقم الهاتف", // <-- ADDED
-          status: "الحالة" // <-- ADDED
+      organizations: {
+        listPage: {
+          title: "المنظمات",
+          addButton: "إضافة منظمة",
+          clearButton: "مسح",
+          searchPlaceholder: "ابحث في المنظمات",
+          paginatorReport: "عرض {first} إلى {last} من أصل {totalRecords} إدخالات",
+          headers: {
+            name: "الاسم",
+            nameSE: "الاسم (SE)",
+            status: "الحالة",
+            createdDate: "تاريخ الإنشاء",
+            actions: "الإجراءات"
+          },
+          statusValues: {
+            active: "نشط",
+            inactive: "غير نشط"
+          },
+          anyOption: "الكل",
+          emptyMessage: "لم يتم العثور على منظمات.",
+          loadingMessage: "جاري تحميل المنظمات...",
+          deleteConfirm: "هل أنت متأكد أنك تريد حذف {name}؟",
+          deleteSuccess: "تم حذف المنظمة بنجاح",
+          deleteError: "فشل حذف المنظمة"
         },
-        paginatorReport: "عرض {first} إلى {last} من أصل {totalRecords} إدخالات", // <-- ADDED
-        emptyMessage: "لم يتم العثور على مستخدمين مسؤولين", // <-- ADDED
-        loadingMessage: "جاري تحميل المستخدمين المسؤولين...", // <-- ADDED
-        statusValues: { // <-- ADDED
-          active: "نشط",
-          inactive: "غير نشط"
+        formPage: {
+          addTitle: "إضافة منظمة",
+          editTitle: "تعديل منظمة",
+          labels: {
+            name: "الاسم",
+            nameSE: "الاسم (SE)"
+          },
+          buttons: {
+            cancel: "إلغاء",
+            save: "حفظ",
+            update: "تحديث"
+          },
+          validation: {
+            required: "هذا الحقل مطلوب"
+          }
         }
       },
       rolesList: { // <-- ADD THIS NEW SECTION
@@ -404,22 +428,46 @@ export class TranslationService {
         dim: "Dim",
         dark: "Dark",
       },
-      organizationList: {
-        title: "Admin Users",
-        clearButton: "Clear",
-        searchPlaceholder: "Search...",
-        headers: {
-          fullName: "Full Name",
-          email: "Email",
-          phone: "Phone", // <-- ADDED
-          status: "Status" // <-- ADDED
+      organizations: {
+        listPage: {
+          title: "Organizations",
+          addButton: "Add Organization",
+          clearButton: "Clear",
+          searchPlaceholder: "Search organizations",
+          paginatorReport: "Showing {first} to {last} of {totalRecords} entries",
+          headers: {
+            name: "Name",
+            nameSE: "Name (SE)",
+            status: "Status",
+            createdDate: "Created Date",
+            actions: "Actions"
+          },
+          statusValues: {
+            active: "Active",
+            inactive: "Inactive"
+          },
+          anyOption: "Any",
+          emptyMessage: "No organizations found.",
+          loadingMessage: "Loading organizations...",
+          deleteConfirm: "Are you sure you want to delete {name}?",
+          deleteSuccess: "Organization deleted successfully",
+          deleteError: "Failed to delete organization"
         },
-        paginatorReport: "Showing {first} to {last} of {totalRecords} entries", // <-- ADDED
-        emptyMessage: "No admin users found", // <-- ADDED
-        loadingMessage: "Loading admin users...", // <-- ADDED
-        statusValues: { // <-- ADDED
-          active: "Active",
-          inactive: "Inactive"
+        formPage: {
+          addTitle: "Add Organization",
+          editTitle: "Edit Organization",
+          labels: {
+            name: "Name",
+            nameSE: "Name (SE)"
+          },
+          buttons: {
+            cancel: "Cancel",
+            save: "Save",
+            update: "Update"
+          },
+          validation: {
+            required: "This field is required"
+          }
         }
       },
       rolesList: { // <-- ADD THIS NEW SECTION
