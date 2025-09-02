@@ -9,11 +9,12 @@ import { ToastModule } from 'primeng/toast';
 import { CompanyService } from '../CompanyService';
 import { CompanyTypeService } from '../CompanyTypeService';
 import { LookupService } from '../../organization/OrganizationService';
-import { Company, CreateCompany, EditCompany } from '@/interfaces/company.interface';
-import { CompanyType } from '@/interfaces/company-type.interface';
-import { Organization } from '@/interfaces/organization.interface';
+import { Company, CreateCompany, EditCompany } from '../../../interfaces/company.interface';
+import { CompanyType } from '../../../interfaces/company-type.interface';
+import { Organization } from '../../../interfaces/organization.interface';
 import { CommonModule } from '@angular/common';
-import { ApiResponse } from '@/core/models/api-response.model';
+import { ApiResponse } from '../../../core/models/api-response.model';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-add-or-edit-company',
@@ -26,6 +27,7 @@ import { ApiResponse } from '@/core/models/api-response.model';
     InputTextModule,
     SelectModule,
     ToastModule,
+    TranslatePipe,
   ],
   templateUrl: './add-or-edit-company.html',
   styleUrl: './add-or-edit-company.scss',

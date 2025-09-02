@@ -3,10 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_CONFIG } from '../../core/config/api.config';
 import { ApiResponse } from '../../core/models/api-response.model';
-import { CreateUserDto, UpdateUserDto, UserDto } from '@/interfaces/user.interface';
-import { User } from '@/auth/user.model';
-import { Employee } from '@/interfaces/employee.interface';
-import { AuthService } from '@/auth/auth.service';
+import { CreateUserDto, UpdateUserDto, UserDto } from '../../interfaces/user.interface';
+import { User } from '../../auth/user.model';
+import { Employee } from '../../interfaces/employee.interface';
+import { AuthService } from '../../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'

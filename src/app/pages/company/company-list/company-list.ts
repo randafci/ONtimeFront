@@ -14,11 +14,12 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { Company } from '@/interfaces/company.interface';
+import { Company } from '../../../interfaces/company.interface';
 import { CompanyService } from '../CompanyService';
 import { Router, RouterModule } from "@angular/router";
 import { DatePipe } from '@angular/common';
-import { ApiResponse } from '@/core/models/api-response.model';
+import { ApiResponse } from '../../../core/models/api-response.model';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-company-list',
@@ -38,7 +39,8 @@ import { ApiResponse } from '@/core/models/api-response.model';
     SelectModule,
     ToastModule,
     RouterModule,
-    DatePipe
+    DatePipe,
+    TranslatePipe
   ],
   providers: [MessageService],
   templateUrl: './company-list.html',
