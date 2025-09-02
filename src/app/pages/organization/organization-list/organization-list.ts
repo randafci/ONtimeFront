@@ -14,13 +14,14 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
-import { Organization } from '@/interfaces/organization.interface';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { Organization } from '../../../interfaces/organization.interface';
 import { LookupService } from '../OrganizationService';
 import { Router, RouterModule } from "@angular/router";
 import { DatePipe } from '@angular/common';
-import { TranslatePipe } from '@/core/pipes/translate.pipe';
-import { ApiResponse } from '@/core/models/api-response.model';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+import { ApiResponse } from '../../../core/models/api-response.model';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 
 @Component({
   selector: 'app-organization-list',
@@ -44,17 +45,19 @@ import { ApiResponse } from '@/core/models/api-response.model';
     TranslatePipe
 
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './organization-list.html',
   styleUrl: './organization-list.scss'
 })
 export class OrganizationListComponent implements OnInit {
   organizations: Organization[] = [];
   loading: boolean = true;
-  statuses: any[] = [
-    { label: 'Active', value: 'active' },
-    { label: 'Inactive', value: 'inactive' }
-  ];
+  // statuses: any[] = [
+  //   { label: 'Active', value: 'active' },
+  //   { label: 'Inactive', value: 'inactive' }
+  // ];
+  statuses: any[] = [];
+  private translations: any = {};
 
   activityValues: number[] = [0, 100];
 
@@ -64,12 +67,27 @@ export class OrganizationListComponent implements OnInit {
   constructor(
     private lookupService: LookupService,
     private messageService: MessageService,
-    private router: Router
+    private router: Router,
+    private confirmationService: ConfirmationService, 
+    private translationService: TranslationService  
   ) {}
 
   ngOnInit() {
+    this.translationService.translations$.subscribe(trans => {
+      this.translations = trans;
+      this.initializeStatuses(); 
+    });
     this.loadOrganizations();
   }
+
+  initializeStatuses(): void {
+    const statusTrans = this.translations.organizations?.listPage?.statusValues;
+    this.statuses = [
+      { label: statusTrans?.active || 'Active', value: 'active' },
+      { label: statusTrans?.inactive || 'Inactive', value: 'inactive' }
+    ];
+  }
+
 
   loadOrganizations() {
     this.loading = true;
@@ -124,13 +142,22 @@ export class OrganizationListComponent implements OnInit {
   }
 
   deleteOrganization(organization: Organization) {
-    // Implement delete logic here
-    console.log('Deleting organization:', organization);
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Delete',
-      detail: `Are you sure you want to delete ${organization.name}?`,
-      life: 3000
+    const trans = this.translations.organizations?.listPage;
+    const commonTrans = this.translations.common;
+
+    this.confirmationService.confirm({
+      message: (trans?.deleteConfirm || 'Are you sure you want to delete {name}?').replace('{name}', organization.name),
+      header: commonTrans?.confirmDelete || 'Confirm Deletion',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        
+        console.log('Deleting organization:', organization);
+        this.messageService.add({
+          severity: 'success',
+          summary: commonTrans?.success || 'Success',
+          detail: trans?.deleteSuccess || 'Organization deleted successfully'
+        });
+      }
     });
   }
 
