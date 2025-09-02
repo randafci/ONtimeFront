@@ -30,7 +30,8 @@ export class MenuComponent {
                 label: 'Organization',
                 items: [
                     { label: 'Company', icon: 'pi pi-fw pi-building', routerLink: ['/companies/list'] },
-                    { label: 'Department', icon: 'pi pi-fw pi-sitemap', routerLink: ['/departments/list'] }
+                    { label: 'Department', icon: 'pi pi-fw pi-sitemap', routerLink: ['/departments/list'] },
+                    { label: 'Section', icon: 'pi pi-fw pi-sitemap', routerLink: ['/sections/list'] }
                 ]
             },
             {
