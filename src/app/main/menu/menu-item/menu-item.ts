@@ -1,5 +1,5 @@
-import { MegaMenuItem, MenuItem } from '@/interfaces/MenuItem';
-import { LayoutService } from '@/layout/service/layout.service';
+import { MegaMenuItem, MenuItem } from '../../../interfaces/MenuItem';
+import { LayoutService } from '../../../layout/service/layout.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { EmployeeListComponent } from './employee-list/employee-list';
 import { AddEditEmployeeComponent } from './add-or-edit-employee/add-or-edit-employee';
+import { EmployeeEmploymentListComponent } from './employee-employment-list/employee-employment-list';
 
 export const EMPLOYEE_ROUTES: Routes = [
     {
@@ -14,5 +15,9 @@ export const EMPLOYEE_ROUTES: Routes = [
     {
         path: 'edit/:id',
         component: AddEditEmployeeComponent
+    },
+    {
+        path: 'employments/:employeeId/:employeeName',
+        component: EmployeeEmploymentListComponent
     }
 ];

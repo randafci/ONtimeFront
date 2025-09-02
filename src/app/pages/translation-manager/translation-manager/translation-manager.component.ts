@@ -3,7 +3,7 @@ import { JsonEditorComponent, JsonEditorOptions } from 'ang-jsoneditor';
 import { CommonModule } from '@angular/common'; // Often needed for directives
 
 import { finalize } from 'rxjs';
-import { TranslatePipe } from '@/core/pipes/translate.pipe';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { ActivatedRoute } from '@angular/router';
 import { TranslationService } from './translation.service';
 

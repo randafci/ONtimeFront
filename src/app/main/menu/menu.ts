@@ -1,4 +1,4 @@
-import { MegaMenuItem,MenuItem } from '@/interfaces/MenuItem';
+import { MegaMenuItem,MenuItem } from '../../interfaces/MenuItem';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
@@ -20,27 +20,27 @@ export class MenuComponent {
                 label: 'Home',
                 items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }]
             },
-             {
+            {
+                label: 'Superadmin',
+                items: [
+                    { label: 'Organization', icon: 'pi pi-fw pi-home', routerLink: ['/organizations/list'] }
+                ]
+            },
+            {
                 label: 'Organization',
-                items: [{ label: 'Organization', icon: 'pi pi-fw pi-home', routerLink: ['/organizations/list'] }]
+                items: [
+                    { label: 'Company', icon: 'pi pi-fw pi-building', routerLink: ['/companies/list'] },
+                    { label: 'Department', icon: 'pi pi-fw pi-sitemap', routerLink: ['/departments/list'] }
+                ]
             },
-            {
-                label: 'Company',
-                items: [{ label: 'Company', icon: 'pi pi-fw pi-building', routerLink: ['/companies/list'] }]
-            },
-            {
-                label: 'Department',
-                items: [{ label: 'Department', icon: 'pi pi-fw pi-sitemap', routerLink: ['/departments/list'] }]
-            },  
             {
                 label: 'Users',
-                items: [{ label: 'User', icon: 'pi pi-fw pi-sitemap', routerLink: ['/users/list'] }]
-            },
-            {
-                label: 'Employee',
-                items: [{ label: 'Employee', icon: 'pi pi-fw pi-users', routerLink: ['/employees'] }]
-            },
-
+                items: [
+                    { label: 'User', icon: 'pi pi-fw pi-sitemap', routerLink: ['/users/list'] },
+                    { label: 'Role', icon: 'pi pi-fw pi-key', routerLink: ['/roles'] }, // Added Role item
+                    { label: 'Employee', icon: 'pi pi-fw pi-users', routerLink: ['/employees'] }
+                ]
+            }
         ];
     }
 }

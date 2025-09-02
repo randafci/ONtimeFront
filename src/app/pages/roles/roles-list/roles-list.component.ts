@@ -11,12 +11,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 
 // Import our custom TranslatePipe
-import { TranslatePipe } from '@/core/pipes/translate.pipe';
+
 import { Router, RouterLink } from '@angular/router';
 import { RoleDto, RoleService } from '../role.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { PagedListRequest } from '@/core/models/api-response.model';
+import { PagedListRequest } from '../../../core/models/api-response.model';
 import { ToastModule } from 'primeng/toast';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 // Define an interface for our mock data
 export interface IRole {
