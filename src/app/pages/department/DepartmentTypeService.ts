@@ -9,7 +9,7 @@ import { ApiResponse } from '@/core/models/api-response.model';
   providedIn: 'root'
 })
 export class DepartmentTypeService {
-  private apiUrl = 'https://localhost:7148/api';
+  private apiUrl = 'https://localhost:44369/api';
 
   constructor(private http: HttpClient) { }
 

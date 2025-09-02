@@ -19,7 +19,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { Employee } from '@/interfaces/employee.interface';
 import { EmployeeService } from '../EmployeeService';
-import { ApiResponse } from '@/interfaces/apiResponse.interface';
+import { ApiResponse } from '@/core/models/api-response.model';
 import { Router, RouterModule, NavigationEnd } from "@angular/router";
 import { DatePipe } from '@angular/common';
 import { filter } from 'rxjs/operators';

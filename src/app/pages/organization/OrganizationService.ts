@@ -8,14 +8,17 @@ import { ApiResponse } from '@/core/models/api-response.model';
 
 
 
+import { AppConfigService } from '@/pages/service/app-config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LookupService {
-  private apiUrl = 'https://localhost:7148/api';
+   public apiUrl : string;
+  constructor(private http: HttpClient,private appConfig: AppConfigService){
+      this.apiUrl = this.appConfig.apiUrl+'/api';
+  }
 
-  constructor(private http: HttpClient) { }
 
   getAllOrganizations(): Observable<ApiResponse<Organization[]>> {
     return this.http.get<ApiResponse<Organization[]>>(`${this.apiUrl}/Lookup/Organization`);

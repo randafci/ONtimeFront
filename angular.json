@@ -3,7 +3,7 @@
     "version": 1,
     "newProjectRoot": "projects",
     "projects": {
-        "sakai-ng": {
+        "ONtimeFront": {
             "projectType": "application",
             "schematics": {
                 "@schematics/angular:component": {
@@ -17,7 +17,7 @@
                 "build": {
                     "builder": "@angular-devkit/build-angular:application",
                     "options": {
-                        "outputPath": "dist/sakai-ng",
+                        "outputPath": "dist/ONtimeFront",
                         "index": "src/index.html",
                         "browser": "src/main.ts",
                         "polyfills": [
@@ -52,7 +52,26 @@
                         "development": {
                             "optimization": false,
                             "extractLicenses": false,
-                            "sourceMap": true
+                            "sourceMap": true,
+                            
+             "assets": [
+                "src/web.config",
+                {
+                  "glob": "**/*",
+                  "input": "src/assets",
+                  "output": "public"
+                },
+                {
+                  "glob": "**/*.json",
+                  "input": "src/assets/i18n",
+                  "output": "assets/i18n"
+                },
+                {
+                  "glob": "config.development.json",
+                  "input": "src/config",
+                  "output": ""
+                }
+              ]
                         }
                     },
                     "defaultConfiguration": "production"
@@ -61,10 +80,10 @@
                     "builder": "@angular-devkit/build-angular:dev-server",
                     "configurations": {
                         "production": {
-                            "buildTarget": "sakai-ng:build:production"
+                            "buildTarget": "ONtimeFront:build:production"
                         },
                         "development": {
-                            "buildTarget": "sakai-ng:build:development"
+                            "buildTarget": "ONtimeFront:build:development"
                         }
                     },
                     "defaultConfiguration": "development"
