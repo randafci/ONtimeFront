@@ -18,23 +18,15 @@ import { environment } from "environments/environment";
 export class AuthService {
   private authorizations: string[] = [];
   //public user = new BehaviorSubject<User>(null);
-    private apiUrl = environment.apiUrl;
   private permissions: string[] = [];
 private claims: any = null;
 
-  constructor(
-    private router: Router,
-    private http: HttpClient,
-    private appConfig: AppConfigService
-  ) {
+  public apiUrl: string;
+  constructor(   private router: Router,private http: HttpClient, private appConfig: AppConfigService) {
+    this.apiUrl = this.appConfig.apiUrl ;
+        this.loadPermissions();
 
-        console.log('[AuthService] constructor() - apiUrl =', this.apiUrl);
-
-  
-
-    this.loadPermissions();
   }
-
   isLoggedIn() {
     const authDataFromStorage = this.getUserDataFromLocalStorage();
     if (authDataFromStorage && authDataFromStorage.token) {

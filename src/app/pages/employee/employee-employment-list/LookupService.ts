@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '@/core/models/api-response.model';
+import { AppConfigService } from '@/pages/service/app-config.service';
 
 export interface LookupItem {
   id: number;
@@ -14,9 +15,10 @@ export interface LookupItem {
   providedIn: 'root'
 })
 export class LookupService {
-  private apiUrl = 'https://localhost:7148/api';
-
-  constructor(private http: HttpClient) { }
+    public apiUrl: string;
+    constructor(private http: HttpClient, private appConfig: AppConfigService) {
+      this.apiUrl = this.appConfig.apiUrl + '/api';
+    }
 
   getAllCompanies(): Observable<ApiResponse<LookupItem[]>> {
     return this.http.get<ApiResponse<LookupItem[]>>(`${this.apiUrl}/Lookup/Company`);
