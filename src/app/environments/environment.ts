@@ -3,5 +3,6 @@ export const environment = {
     production: false,
     domain: "epass.hmc.qa",
     defaultLanguage: "en",
-    apiUrl: "https://localhost:7148"
+    apiUrl: "https://localhost:44369"
+    
 };
