@@ -22,7 +22,7 @@ import { Subscription } from 'rxjs';
             </button>
             <a class="layout-topbar-logo" routerLink="/">
                 <!-- logo svg -->
-                <span>SAKAI</span>
+                <span>On Time</span>
             </a>
         </div>
 

@@ -4,21 +4,21 @@ import { Observable } from 'rxjs';
 import { CreateCompany, EditCompany, Company } from '@/interfaces/company.interface';
 import { AuthService } from '@/auth/auth.service';
 import { ApiResponse } from '@/core/models/api-response.model';
+import { AppConfigService } from '../service/app-config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CompanyService {
-  private apiUrl = 'https://localhost:7148/api';
-
-  constructor(private http: HttpClient ,
-    private authService :AuthService
-  ) { }
-
+  public apiUrl: string;
+  constructor(private http: HttpClient, private appConfig: AppConfigService,
+    private authService: AuthService) {
+    this.apiUrl = this.appConfig.apiUrl + '/api';
+  }
   getAllCompanies(): Observable<ApiResponse<Company[]>> {
-      const headers = this.authService.getHeaders();
+    const headers = this.authService.getHeaders();
 
-    return this.http.get<ApiResponse<Company[]>>(`${this.apiUrl}/Lookup/Company` , { headers });
+    return this.http.get<ApiResponse<Company[]>>(`${this.apiUrl}/Lookup/Company`, { headers });
   }
 
   createCompany(data: CreateCompany): Observable<ApiResponse<Company>> {
@@ -31,7 +31,7 @@ export class CompanyService {
 
   updateCompany(data: EditCompany): Observable<ApiResponse<Company>> {
     return this.http.put<ApiResponse<Company>>(
-      `${this.apiUrl}/Lookup/Company/${data.id}`, 
+      `${this.apiUrl}/Lookup/Company/${data.id}`,
       { name: data.name, nameSE: data.nameSE }
     );
   }

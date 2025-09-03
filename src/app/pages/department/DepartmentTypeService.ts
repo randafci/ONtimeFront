@@ -9,9 +9,10 @@ import { ApiResponse } from '@/core/models/api-response.model';
   providedIn: 'root'
 })
 export class DepartmentTypeService {
-  private apiUrl = 'https://localhost:44369/api';
-
-  constructor(private http: HttpClient) { }
+    public apiUrl: string;
+    constructor(private http: HttpClient, private appConfig: AppConfigService) {
+      this.apiUrl = this.appConfig.apiUrl + '/api';
+    }
 
   getAllDepartmentTypes(): Observable<ApiResponse<DepartmentType[]>> {
     return this.http.get<ApiResponse<DepartmentType[]>>(`${this.apiUrl}/Lookup/DepartmentType`);
