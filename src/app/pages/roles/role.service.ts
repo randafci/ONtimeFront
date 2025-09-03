@@ -5,6 +5,7 @@ import { environment } from '@/environments/environment';
 
 // Import the new models
 import { APIOperationResponse, PaginatedList, PagedListRequest } from '@/core/models/api-response.model';
+import { AppConfigService } from '../service/app-config.service';
 
 // Use the DTO structure from the backend
 export interface RoleDto {
@@ -18,9 +19,11 @@ export interface RoleDto {
   providedIn: 'root'
 })
 export class RoleService {
-  private readonly apiUrl = `${environment.apiUrl}/api/Roles`; // e.g., http://localhost:5001/api/Roles
 
-  constructor(private http: HttpClient) { }
+  public apiUrl: string;
+  constructor(private http: HttpClient, private appConfig: AppConfigService) {
+    this.apiUrl = this.appConfig.apiUrl + '/api/Roles';
+  }
 
   getRolesWithPagination(request: PagedListRequest): Observable<APIOperationResponse<PaginatedList<RoleDto>>> {
     return this.http.post<APIOperationResponse<PaginatedList<RoleDto>>>(`${this.apiUrl}/GetRolesWithPagination`, request);

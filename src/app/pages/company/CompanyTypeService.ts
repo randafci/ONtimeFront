@@ -9,9 +9,11 @@ import { ApiResponse } from '@/core/models/api-response.model';
   providedIn: 'root'
 })
 export class CompanyTypeService {
-    private apiUrl = 'https://localhost:7148/api';
 
-  constructor(private http: HttpClient) { }
+  public apiUrl: string;
+  constructor(private http: HttpClient, private appConfig: AppConfigService) {
+    this.apiUrl = this.appConfig.apiUrl + '/api';
+  }
 
   getAllCompanyTypes(): Observable<ApiResponse<CompanyType[]>> {
     return this.http.get<ApiResponse<CompanyType[]>>(`${this.apiUrl}/Lookup/CompanyType`);

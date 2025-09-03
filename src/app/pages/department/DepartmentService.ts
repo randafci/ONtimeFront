@@ -3,14 +3,16 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CreateDepartment, EditDepartment, Department } from '@/interfaces/department.interface';
 import { ApiResponse } from '@/core/models/api-response.model';
+import { AppConfigService } from '../service/app-config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DepartmentService {
-  private apiUrl = 'https://localhost:44369/api';
-
-  constructor(private http: HttpClient) { }
+  public apiUrl: string;
+  constructor(private http: HttpClient, private appConfig: AppConfigService) {
+    this.apiUrl = this.appConfig.apiUrl + '/api';
+  }
 
   getAllDepartments(): Observable<ApiResponse<Department[]>> {
     return this.http.get<ApiResponse<Department[]>>(`${this.apiUrl}/Lookup/Department`);
@@ -26,7 +28,7 @@ export class DepartmentService {
 
   updateDepartment(data: EditDepartment): Observable<ApiResponse<Department>> {
     return this.http.put<ApiResponse<Department>>(
-      `${this.apiUrl}/Lookup/Department/${data.id}`, 
+      `${this.apiUrl}/Lookup/Department/${data.id}`,
       { name: data.name, nameSE: data.nameSE, companyId: data.companyId }
     );
   }
