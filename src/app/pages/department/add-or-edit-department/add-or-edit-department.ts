@@ -18,6 +18,7 @@ import { CommonModule } from '@angular/common';
 import { TranslationService } from '@/pages/translation-manager/translation-manager/translation.service';
 import { TranslatePipe } from '@/core/pipes/translate.pipe';
 import { ApiResponse } from '@/core/models/api-response.model';
+import { AuthService } from '@/auth/auth.service';
 
 @Component({
   selector: 'app-add-or-edit-department',
@@ -47,6 +48,7 @@ export class AddOrEditDepartment implements OnInit {
   departments: Department[] = [];
   departmentTypes: DepartmentType[] = [];
   mainDepartments: Department[] = [];
+  isSuperAdmin = false;
   private translations: any = {}; // Store current translations
   constructor(
     private fb: FormBuilder,
@@ -57,7 +59,8 @@ export class AddOrEditDepartment implements OnInit {
     private companyService: CompanyService,
     private organizationService: LookupService,
     private messageService: MessageService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private authService: AuthService
   ) {
     this.departmentForm = this.fb.group({
       code: ['', Validators.required],
@@ -71,6 +74,17 @@ export class AddOrEditDepartment implements OnInit {
   }
 
   ngOnInit(): void {
+    // Check if user is super admin
+    this.isSuperAdmin = this.checkIsSuperAdmin();
+    
+    // Set organization ID from token for regular users
+    if (!this.isSuperAdmin) {
+      const orgId = this.authService.getOrgId();
+      if (orgId) {
+        this.departmentForm.patchValue({ organizationId: +orgId });
+      }
+    }
+
     // Subscribe to translation changes
     this.translationService.translations$.subscribe(translations => {
       this.translations = translations;
@@ -92,6 +106,11 @@ export class AddOrEditDepartment implements OnInit {
     this.departmentForm.get('departmentTypeLookupId')?.valueChanges.subscribe(departmentTypeId => {
       this.onDepartmentTypeChange(departmentTypeId);
     });
+  }
+
+  private checkIsSuperAdmin(): boolean {
+    const claims = this.authService.getClaims();
+    return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
   }
 
   loadOrganizations(): void {
