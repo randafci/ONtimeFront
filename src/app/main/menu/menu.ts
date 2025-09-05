@@ -16,32 +16,40 @@ export class MenuComponent {
 
     ngOnInit() {
         this.model = [
-            {
-                label: 'Home',
-                items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }]
-            },
-            {
-                label: 'Superadmin',
-                items: [
-                    { label: 'Organization', icon: 'pi pi-fw pi-home', routerLink: ['/organizations/list'] }
-                ]
-            },
-            {
-                label: 'Organization',
-                items: [
-                    { label: 'Company', icon: 'pi pi-fw pi-building', routerLink: ['/companies/list'] },
-                    { label: 'Department', icon: 'pi pi-fw pi-sitemap', routerLink: ['/departments/list'] },
-                    { label: 'Section', icon: 'pi pi-fw pi-sitemap', routerLink: ['/sections/list'] }
-                ]
-            },
-            {
-                label: 'Users',
-                items: [
-                    { label: 'User', icon: 'pi pi-fw pi-sitemap', routerLink: ['/users/list'] },
-                    { label: 'Role', icon: 'pi pi-fw pi-key', routerLink: ['/roles'] }, // Added Role item
-                    { label: 'Employee', icon: 'pi pi-fw pi-users', routerLink: ['/employees'] }
-                ]
-            }
-        ];
+    {
+      label: 'OnTime',   // fake root
+      items: [
+        {
+          label: 'Home',
+          items: [
+            { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }
+          ]
+        },
+        {
+          label: 'Superadmin',
+          items: [
+            { label: 'Organization', icon: 'pi pi-fw pi-building', routerLink: ['/organizations/list'] }
+          ]
+        },
+        {
+          label: 'Organization',
+          items: [
+            { label: 'Company', icon: 'pi pi-fw pi-building', routerLink: ['/companies/list'] },
+            { label: 'Department', icon: 'pi pi-fw pi-sitemap', routerLink: ['/departments/list'] },
+            { label: 'Section', icon: 'pi pi-fw pi-sitemap', routerLink: ['/sections/list'] }
+          ]
+        },
+        {
+          label: 'Users',
+          items: [
+            { label: 'User', icon: 'pi pi-fw pi-sitemap', routerLink: ['/users/list'] },
+            { label: 'Role', icon: 'pi pi-fw pi-key', routerLink: ['/roles'] },
+            { label: 'Employee', icon: 'pi pi-fw pi-users', routerLink: ['/employees'] }
+          ]
+        }
+      ]
     }
+  ];
+}
+
 }

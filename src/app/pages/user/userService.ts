@@ -7,17 +7,21 @@ import { CreateUserDto, UpdateUserDto, UserDto } from '../../interfaces/user.int
 import { User } from '../../auth/user.model';
 import { Employee } from '../../interfaces/employee.interface';
 import { AuthService } from '../../auth/auth.service';
+import { AppConfigService } from '../service/app-config.service';
+import { Organization } from '@/interfaces/organization.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = `${API_CONFIG.baseUrl}/users`;
+  public apiUrl: string;
+  public baseApiUrl: string;
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService
-  ) {}
+  constructor(private http: HttpClient, private appConfig: AppConfigService, private authService: AuthService) {
+    this.apiUrl = this.appConfig.apiUrl + '/api/users';
+    this.baseApiUrl = this.appConfig.apiUrl + '/api';
+
+  }
 
   /** helper to get headers dynamically */
   private get headers() {
@@ -56,6 +60,11 @@ export class UserService {
 
   // Get employees
   getEmployees(): Observable<ApiResponse<Employee[]>> {
-    return this.http.get<ApiResponse<Employee[]>>(`${API_CONFIG.baseUrl}/Employee`, this.headers);
+    return this.http.get<ApiResponse<Employee[]>>(`${this.baseApiUrl}/Employee`, this.headers);
   }
+
+  getOrganizations(): Observable<ApiResponse<Organization[]>> {
+    return this.http.get<ApiResponse<Organization[]>>(`${this.baseApiUrl}/Lookup/Organization`);
+  }
+
 }

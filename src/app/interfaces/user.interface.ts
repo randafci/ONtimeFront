@@ -9,6 +9,8 @@ export interface UserDto {
 
 export interface CreateUserDto {
   password: string;
+  userName: string;
+  email: string;
   isLdapUser: boolean;
   extraEmployeesView: string;
   employeeId?: number;
