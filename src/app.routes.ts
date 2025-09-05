@@ -56,6 +56,13 @@ export const appRoutes: Routes = [
             (m) => m.DEPARTMENT_ROUTES
           )
       },
+      {
+        path: 'sections',
+        loadChildren: () =>
+          import('./app/pages/section/section.routes').then(
+            (m) => m.SECTION_ROUTES
+          )
+      },
        {
         path: 'users',
         loadChildren: () =>

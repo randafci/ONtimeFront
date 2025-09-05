@@ -10,7 +10,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { AppConfigService } from "@/pages/service/app-config.service";
 import { User } from "./user.model";
 import { AdminLoginCommand, CreateSignupCommand } from "@/interfaces/userLoginCommand.interface";
-import { environment } from "environments/environment";
+// import { environment } from "environments/environment";
 
 @Injectable({
   providedIn: "root",

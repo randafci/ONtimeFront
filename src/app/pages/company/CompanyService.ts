@@ -32,7 +32,14 @@ export class CompanyService {
   updateCompany(data: EditCompany): Observable<ApiResponse<Company>> {
     return this.http.put<ApiResponse<Company>>(
       `${this.apiUrl}/Lookup/Company/${data.id}`,
-      { name: data.name, nameSE: data.nameSE }
+      {
+        code: data?.code,
+        name: data?.name,
+        nameSE: data?.nameSE,
+        parentId: data?.parentId,
+        organizationId: data?.organizationId,
+        companyTypeLookupId: data?.companyTypeLookupId
+      }
     );
   }
 }
