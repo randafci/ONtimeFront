@@ -15,6 +15,7 @@ import { Organization } from '../../../interfaces/organization.interface';
 import { CommonModule } from '@angular/common';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+import { AuthService } from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-add-or-edit-company',
@@ -43,6 +44,7 @@ export class AddOrEditCompany implements OnInit {
   companies: Company[] = [];
   companyTypes: CompanyType[] = [];
   mainCompanies: Company[] = [];
+  isSuperAdmin = false;
 
   constructor(
     private fb: FormBuilder,
@@ -51,7 +53,8 @@ export class AddOrEditCompany implements OnInit {
     private companyService: CompanyService,
     private companyTypeService: CompanyTypeService,
     private organizationService: LookupService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private authService: AuthService
   ) {
     this.companyForm = this.fb.group({
       code: ['', Validators.required],
@@ -64,6 +67,13 @@ export class AddOrEditCompany implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isSuperAdmin = this.checkIsSuperAdmin();
+    
+    if (!this.isSuperAdmin) {
+      const orgId = this.authService.getOrgId();
+      if (orgId) this.companyForm.patchValue({ organizationId: +orgId });
+    }
+
     this.loadOrganizations();
     this.loadCompanies();
     this.loadCompanyTypes();
@@ -79,6 +89,11 @@ export class AddOrEditCompany implements OnInit {
     this.companyForm.get('companyTypeLookupId')?.valueChanges.subscribe(companyTypeId => {
       this.onCompanyTypeChange(companyTypeId);
     });
+  }
+
+  private checkIsSuperAdmin(): boolean {
+    const claims = this.authService.getClaims();
+    return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
   }
 
   loadOrganizations(): void {

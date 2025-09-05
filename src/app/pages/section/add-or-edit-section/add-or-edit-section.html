@@ -77,8 +77,7 @@
         </small>
       </div>
 
-      <!-- Organization Field -->
-      <div class="field">
+      <div class="field" *ngIf="isSuperAdmin">
         <label for="organizationId">Organization <span class="required-star">*</span></label>
         <p-select class="w-full"
           id="organizationId" 

@@ -14,6 +14,7 @@ import { SectionType } from '@/interfaces/section-type.interface';
 import { Organization } from '@/interfaces/organization.interface';
 import { CommonModule } from '@angular/common';
 import { ApiResponse } from '@/core/models/api-response.model';
+import { AuthService } from '@/auth/auth.service';
 
 @Component({
   selector: 'app-add-or-edit-section',
@@ -41,6 +42,7 @@ export class AddOrEditSection implements OnInit {
   sections: Section[] = [];
   sectionTypes: SectionType[] = [];
   mainSections: Section[] = [];
+  isSuperAdmin = false;
 
   constructor(
     private fb: FormBuilder,
@@ -49,7 +51,8 @@ export class AddOrEditSection implements OnInit {
     private sectionService: SectionService,
     private sectionTypeService: SectionTypeService,
     private organizationService: LookupService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private authService: AuthService
   ) {
     this.sectionForm = this.fb.group({
       code: ['', Validators.required],
@@ -62,6 +65,13 @@ export class AddOrEditSection implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isSuperAdmin = this.checkIsSuperAdmin();
+    
+    if (!this.isSuperAdmin) {
+      const orgId = this.authService.getOrgId();
+      if (orgId) this.sectionForm.patchValue({ organizationId: +orgId });
+    }
+
     this.loadOrganizations();
     this.loadSections();
     this.loadSectionTypes();
@@ -77,6 +87,11 @@ export class AddOrEditSection implements OnInit {
     this.sectionForm.get('sectionTypeLookupId')?.valueChanges.subscribe(sectionTypeId => {
       this.onSectionTypeChange(sectionTypeId);
     });
+  }
+
+  private checkIsSuperAdmin(): boolean {
+    const claims = this.authService.getClaims();
+    return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
   }
 
   loadOrganizations(): void {
