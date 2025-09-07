@@ -10,10 +10,12 @@ import { TranslationService } from '@/pages/translation-manager/translation-mana
 import { Subscription } from 'rxjs';
 import { AppSettingsPanel } from "@/main/settings-panel.component";
 
+
 @Component({
     selector: 'app-topbar',
     standalone: true,
     imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, TooltipModule, AppSettingsPanel],
+
     template: `
     <div class="layout-topbar">
 
@@ -97,6 +99,7 @@ import { AppSettingsPanel } from "@/main/settings-panel.component";
                     </button>
                     <button type="button" class="layout-topbar-action"  (click)="LogOut()">
                         <i class="pi pi-sign-out"></i>
+
                         <span>logout</span>
                     </button>
                 </div>
@@ -109,6 +112,7 @@ export class AppTopbar implements OnInit, OnDestroy {
     currentLang: string = 'ar';
     private langSubscription!: Subscription;
     constructor(public layoutService: LayoutService, private router: Router, private translationService: TranslationService) { }
+
     ngOnInit(): void {
         // Subscribe to the current language from the service
         this.langSubscription = this.translationService.currentLang$.subscribe(lang => {
@@ -136,12 +140,12 @@ export class AppTopbar implements OnInit, OnDestroy {
 
     }
 
+
     ngOnDestroy(): void {
         // Unsubscribe to prevent memory leaks
         if (this.langSubscription) {
             this.langSubscription.unsubscribe();
         }
     }
-
 
 }

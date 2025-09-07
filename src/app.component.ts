@@ -3,6 +3,7 @@ import { LayoutService } from '@/service/layout.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { APP_INITIALIZER, Component, OnInit } from '@angular/core';
+
 import { RouterModule } from '@angular/router';
 
 export function initializeApp(appConfig: AppConfigService) {

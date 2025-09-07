@@ -4,6 +4,7 @@
 
   <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
       <!-- isLdapUser -->
       <div class="field">
         <label for="isLdapUser">{{ 'users.formPage.labels.isLdapUser' | translate }}</label>
@@ -13,6 +14,7 @@
       
       <div class="field">
       </div>
+
 
       <!-- Username -->
       <div class="field" *ngIf="!userForm.get('isLdapUser')?.value">
