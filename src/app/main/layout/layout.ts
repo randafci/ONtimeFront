@@ -8,13 +8,13 @@ import { AppSidebar } from '../sidebar/sidebar';
 import { AppTopbar as AppTopbar } from "@/layout/component/app.topbar";
 
 @Component({
-  selector: 'app-layoutAdmin',
-  imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter],
-  templateUrl: './layout.html',
-  styleUrl: './layout.scss'
+    selector: 'app-layoutAdmin',
+    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter],
+    templateUrl: './layout.html',
+    styleUrl: './layout.scss'
 })
 export class Layout {
-overlayMenuOpenSubscription: Subscription;
+    overlayMenuOpenSubscription: Subscription;
 
     menuOutsideClickListener: any;
 
@@ -88,7 +88,9 @@ overlayMenuOpenSubscription: Subscription;
             'layout-mobile-active': this.layoutService.layoutState().staticMenuMobileActive
         };
     }
-
+    switchDir() {
+        this.layoutService.toggleDirection();
+    }
     ngOnDestroy() {
         if (this.overlayMenuOpenSubscription) {
             this.overlayMenuOpenSubscription.unsubscribe();

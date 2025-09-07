@@ -1,19 +1,19 @@
 <div class="card p-fluid max-w-[600px] mx-auto">
 
-  <h2>{{ (isEditMode ? 'users.formPage.title.edit' : 'users.formPage.title.add') | translate }}</h2>
+  <h2>{{(isEditMode? 'users.formPage.title.edit' : 'users.formPage.title.add') | translate }}</h2>
 
   <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
       <!-- isLdapUser -->
       <div class="field">
         <label for="isLdapUser">{{ 'users.formPage.labels.isLdapUser' | translate }}</label>
         <p-toggleButton id="isLdapUser" formControlName="isLdapUser" [onLabel]="'users.common.yes' | translate"
           [offLabel]="'users.common.no' | translate" offIcon="pi pi-times"></p-toggleButton>
       </div>
+      
       <div class="field">
-
       </div>
+
       <!-- Username -->
       <div class="field" *ngIf="!userForm.get('isLdapUser')?.value">
         <label for="userName">{{ 'users.formPage.labels.userName' | translate }} <span
