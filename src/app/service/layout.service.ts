@@ -10,6 +10,8 @@ export interface LayoutConfig {
   darkTheme?: boolean;
   menuMode?: string;
   direction?: 'ltr' | 'rtl';
+  header?: boolean;
+  navigation?: 'side' | 'top';
 }
 
 interface LayoutState {
@@ -35,7 +37,9 @@ export class LayoutService {
     surface: null,
     darkTheme: false,
     menuMode: 'static',
-    direction: 'ltr'
+    direction: 'ltr',
+    header: true,
+    navigation: 'side',
   };
 
   private _state: LayoutState = {
@@ -231,5 +235,36 @@ applyDirection(direction: 'ltr'|'rtl') {
   this.layoutConfig.update((cfg) => ({ ...cfg, direction }));
   document.documentElement.setAttribute('dir', direction);
 }
+
+applyConfig() {
+  const config = this.layoutConfig();
+
+  // 1. Apply dark theme
+  this.toggleDarkMode(config);
+
+  // 2. Apply direction
+  if (config.direction) {
+    document.documentElement.setAttribute('dir', config.direction);
+  }
+
+  // 3. Apply preset/theme class (optional if you use themeMap)
+  const themeMap: Record<string, string> = {
+    Aura: 'theme-aura',
+    Lara: 'theme-lara',
+    Saga: 'theme-saga',
+    Vela: 'theme-vela'
+  };
+  // remove old theme classes
+  Object.values(themeMap).forEach(cls => document.body.classList.remove(cls));
+  // add current theme class
+  const themeClass = themeMap[config.preset ?? 'Aura'];
+  if (themeClass) {
+    document.body.classList.add(themeClass);
+  }
+
+  // 4. Notify listeners
+  this.onConfigUpdate();
+}
+
 
 }
