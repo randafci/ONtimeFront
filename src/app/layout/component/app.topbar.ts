@@ -36,10 +36,11 @@ import { AppSettingsPanel } from "@/main/settings-panel.component";
                     <i class="pi pi-globe p-text-secondary" style="font-size: 1.5rem"></i>
                 </button>
             <div class="layout-config-menu">
-                <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
+              <!--   <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
                     <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
-                </button>
-            <!--     <div class="relative">
+                </button> -->
+
+               <!--   <div class="relative">
                     <button
                         class="layout-topbar-action layout-topbar-action-highlight"
                         pStyleClass="@next"
@@ -52,7 +53,7 @@ import { AppSettingsPanel } from "@/main/settings-panel.component";
                         <i class="pi pi-palette"></i>
                     </button>
                     <app-configurator />
-                </div> -->
+                </div>  -->
             </div>
 
             <div class="relative">
@@ -67,9 +68,7 @@ import { AppSettingsPanel } from "@/main/settings-panel.component";
   >
     <i class="pi pi-cog"></i>
   </button>
-  <div class="hidden absolute right-0 mt-2 z-50">
     <app-settings-panel/>
-  </div>
 </div>
 
             <button class="layout-topbar-menu-button layout-topbar-action"
@@ -97,7 +96,7 @@ import { AppSettingsPanel } from "@/main/settings-panel.component";
                         <span>Profile</span>
                     </button>
                     <button type="button" class="layout-topbar-action"  (click)="LogOut()">
-                        <i class="pi pi-user"></i>
+                        <i class="pi pi-sign-out"></i>
                         <span>logout</span>
                     </button>
                 </div>

@@ -146,33 +146,10 @@ type SurfacesType = {
             </div>
         </div>
     `,
-    styles: [`
-        :host {
-            display: block;
-            position: absolute;
-            top: 3.25rem;
-            right: 0;
-            width: 18rem;
-            padding: 1rem;
-            background-color: var(--surface-0);
-            border: 1px solid var(--surface-border);
-            border-radius: var(--border-radius);
-            box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.02), 0px 0px 2px rgba(0, 0, 0, 0.05), 0px 1px 4px rgba(0, 0, 0, 0.08);
-            z-index: 1000;
-        }
-        
-        .text-muted-color {
-            color: var(--text-color-secondary);
-        }
-        
-        .outline-primary {
-            outline: 2px solid var(--primary-color);
-        }
-        
-        .rounded-border {
-            border-radius: var(--border-radius);
-        }
-    `]
+    host: {
+        class: 'hidden absolute top-13 right-0 w-72 p-4 bg-surface-0 dark:bg-surface-900 border border-surface rounded-border origin-top shadow-[0px_3px_5px_rgba(0,0,0,0.02),0px_0px_2px_rgba(0,0,0,0.05),0px_1px_4px_rgba(0,0,0,0.08)]'
+    }
+   
 })
 export class AppSettingsPanel {
     router = inject(Router);
