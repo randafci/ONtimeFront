@@ -218,7 +218,7 @@ export class Configurator {
 
     primaryColors = computed<SurfacesType[]>(() => {
         const presetPalette = presets[this.layoutService.layoutConfig().preset as KeyOfType<typeof presets>].primitive;
-        const colors = ['#020617' ,'emerald', 'green', 'lime', 'orange', 'amber', 'yellow', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'];
+        const colors = [ '#020617' ,'emerald', 'green', 'lime', 'orange', 'amber', 'yellow', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'];
         const palettes: SurfacesType[] = [{ name: 'noir', palette: {} }];
 
         colors.forEach((color) => {
@@ -389,4 +389,9 @@ export class Configurator {
     onMenuModeChange(event: string) {
         this.layoutService.layoutConfig.update((prev) => ({ ...prev, menuMode: event }));
     }
+    onDirectionChange(direction: 'ltr' | 'rtl') {
+    this.layoutService.layoutConfig.update((state) => ({ ...state, direction }));
+    this.layoutService.applyDirection(direction); // 👈 call LayoutService helper
+}
+
 }

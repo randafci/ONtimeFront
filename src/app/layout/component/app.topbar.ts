@@ -27,6 +27,7 @@ import { Subscription } from 'rxjs';
         </div>
 
         <div class="layout-topbar-actions">
+         <button (click)="switchDir()">Toggle RTL/LTR</button>
 
         <button type="button" class="layout-topbar-action"
                         (click)="switchLanguage()"
@@ -104,9 +105,15 @@ export class AppTopbar implements OnInit, OnDestroy {
     }
 
 
-    toggleDarkMode() {
-        this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
-    }
+   toggleDarkMode() {
+  this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
+}
+
+switchDir() {
+  const newDir = this.layoutService.layoutConfig().direction === 'rtl' ? 'ltr' : 'rtl';
+  this.layoutService.layoutConfig.update((state) => ({ ...state, direction: newDir }));
+}
+
      LogOut() {
     // redirect to login
     this.router.navigate(['/login']);
@@ -119,5 +126,6 @@ export class AppTopbar implements OnInit, OnDestroy {
             this.langSubscription.unsubscribe();
         }
     }
+
 
 }

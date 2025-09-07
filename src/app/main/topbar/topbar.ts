@@ -21,4 +21,7 @@ export class AppTopbar {
     toggleDarkMode() {
         this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
     }
+    switchDir() {
+  this.layoutService.toggleDirection();
+}
 }

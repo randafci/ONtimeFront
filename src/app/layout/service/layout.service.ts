@@ -7,6 +7,7 @@ export interface layoutConfig {
     surface?: string | undefined | null;
     darkTheme?: boolean;
     menuMode?: string;
+    direction?: 'ltr' | 'rtl';   // 👈 added
 }
 
 interface LayoutState {
@@ -31,7 +32,8 @@ export class LayoutService {
         primary: 'emerald',
         surface: null,
         darkTheme: false,
-        menuMode: 'static'
+        menuMode: 'static',
+        direction: 'rtl'
     };
 
     _state: LayoutState = {
@@ -75,16 +77,20 @@ export class LayoutService {
     isOverlay = computed(() => this.layoutConfig().menuMode === 'overlay');
 
     transitionComplete = signal<boolean>(false);
+    isRTL = computed(() => this.layoutConfig().direction === 'rtl');
+
 
     private initialized = false;
 
     constructor() {
-        effect(() => {
-            const config = this.layoutConfig();
-            if (config) {
-                this.onConfigUpdate();
-            }
-        });
+       effect(() => {
+    const config = this.layoutConfig();
+    if (config) {
+        this.onConfigUpdate();
+        this.applyConfig();  // 👈 keep UI consistent
+    }
+});
+
 
         effect(() => {
             const config = this.layoutConfig();
@@ -116,7 +122,7 @@ export class LayoutService {
             .then(() => {
                 this.onTransitionEnd();
             })
-            .catch(() => {});
+            .catch(() => { });
     }
 
     toggleDarkMode(config?: layoutConfig): void {
@@ -162,12 +168,17 @@ export class LayoutService {
     isMobile() {
         return !this.isDesktop();
     }
+    toggleDirection() {
+        const newDir = this.layoutConfig().direction === 'rtl' ? 'ltr' : 'rtl';
+        this.layoutConfig.update(prev => ({ ...prev, direction: newDir }));
+    }
 
     onConfigUpdate() {
         this._config = { ...this.layoutConfig() };
         this.configUpdate.next(this.layoutConfig());
-    }
 
+    }
+  
     onMenuStateChange(event: MenuChangeEvent) {
         this.menuSource.next(event);
     }
@@ -175,4 +186,19 @@ export class LayoutService {
     reset() {
         this.resetSource.next(true);
     }
+    applyDirection(direction: 'ltr' | 'rtl') {
+    document.documentElement.setAttribute('dir', direction);
+}
+applyConfig() {
+    const config = this.layoutConfig();
+
+    // Apply direction
+    this.applyDirection(config.direction ?? 'ltr');
+
+    // Apply dark theme
+    this.toggleDarkMode(config);
+
+    
+  }
+
 }
