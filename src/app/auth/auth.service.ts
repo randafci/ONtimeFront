@@ -7,10 +7,10 @@ import { BehaviorSubject, catchError, Observable, tap, throwError } from "rxjs";
 //import { SignalRService } from "../shared/custom/services/signalR/signalR.service";
 //import { SharedSettings } from "../shared/custom/shared.settings";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { AppConfigService } from "@/pages/service/app-config.service";
+import { AppConfigService } from "../pages/service/app-config.service";
 import { User } from "./user.model";
-import { AdminLoginCommand, CreateSignupCommand } from "@/interfaces/userLoginCommand.interface";
-// import { environment } from "environments/environment";
+import { AdminLoginCommand, CreateSignupCommand } from "../interfaces/userLoginCommand.interface";
+// import { environment } from "../environments/environment";
 
 @Injectable({
   providedIn: "root",

@@ -6,7 +6,7 @@ import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
 import { TooltipModule } from 'primeng/tooltip';
-import { TranslationService } from '@/pages/translation-manager/translation-manager/translation.service';
+import { TranslationService } from '../../pages/translation-manager/translation-manager/translation.service';
 import { Subscription } from 'rxjs';
 import { AppSettingsPanel } from "@/main/settings-panel.component";
 

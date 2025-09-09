@@ -1,5 +1,5 @@
-import { AppConfigService } from '@/pages/service/app-config.service';
-import { LayoutService } from '@/service/layout.service';
+import { AppConfigService } from './app/pages/service/app-config.service';
+import { LayoutService } from './app/service/layout.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { APP_INITIALIZER, Component, OnInit } from '@angular/core';
