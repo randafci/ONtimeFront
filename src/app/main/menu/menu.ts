@@ -49,6 +49,7 @@ export class MenuComponent implements OnInit {
            label: 'Organization',
            items: [
              { label: 'Company', icon: 'pi pi-fw pi-building', routerLink: ['/companies/list'] },
+             { label: 'Designation', icon: 'pi pi-fw pi-briefcase', routerLink: ['/designations/list'] },
              { label: 'Department', icon: 'pi pi-fw pi-sitemap', routerLink: ['/departments/list'] },
              { label: 'Section', icon: 'pi pi-fw pi-sitemap', routerLink: ['/sections/list'] }
            ]
