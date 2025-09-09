@@ -14,6 +14,8 @@ import { environment } from 'environments/environment';
 import { User } from '../user.model';
 import { ReactiveFormsModule } from '@angular/forms';   
 import { AppConfigService } from '@/pages/service/app-config.service';
+import { LayoutService } from '@/service/layout.service';
+
 
 @Component({
   selector: 'app-login',
@@ -42,7 +44,11 @@ export class Login {
     private authService: AuthService,
     private router: Router,
     private messageService: MessageService,
+   private appConfig: AppConfigService,
+   private layoutService:LayoutService
+
    private appConfig: AppConfigService
+
 
   ) { 
       this.userForm = new FormGroup({
@@ -79,6 +85,8 @@ export class Login {
 
       const tokenInfo = this.authService.decodeToken(token);
       this.authService.setTokenAndClaims(token, refreshToken, expiresAt);
+     this.layoutService.initFromApi(2); // 👈 load settings for org
+
 
       this.authService.getAuthUserInfo().subscribe({
         next: (info: any) => {

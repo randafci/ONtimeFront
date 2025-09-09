@@ -1,21 +1,20 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DepartmentType } from '@/interfaces/department-type.interface';
+import { SectionType } from '@/interfaces/section-type.interface';
 import { AppConfigService } from '@/pages/service/app-config.service';
 import { ApiResponse } from '@/core/models/api-response.model';
-import { environment } from '@/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
-export class DepartmentTypeService {
+export class SectionTypeService {
   public apiUrl: string;
   constructor(private http: HttpClient, private appConfig: AppConfigService) {
     this.apiUrl = this.appConfig.apiUrl + '/api';
   }
 
-  getAllDepartmentTypes(): Observable<ApiResponse<DepartmentType[]>> {
-    return this.http.get<ApiResponse<DepartmentType[]>>(`${this.apiUrl}/Lookup/DepartmentType`);
+  getAllSectionTypes(): Observable<ApiResponse<SectionType[]>> {
+    return this.http.get<ApiResponse<SectionType[]>>(`${this.apiUrl}/Lookup/SectionType`);
   }
 }

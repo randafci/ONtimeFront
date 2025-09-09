@@ -8,11 +8,14 @@ import { LayoutService } from '../service/layout.service';
 import { TooltipModule } from 'primeng/tooltip';
 import { TranslationService } from '../../pages/translation-manager/translation-manager/translation.service';
 import { Subscription } from 'rxjs';
+import { AppSettingsPanel } from "@/main/settings-panel.component";
+
 
 @Component({
     selector: 'app-topbar',
     standalone: true,
-    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, TooltipModule],
+    imports: [RouterModule, CommonModule, StyleClassModule, AppConfigurator, TooltipModule, AppSettingsPanel],
+
     template: `
     <div class="layout-topbar">
 
@@ -35,10 +38,11 @@ import { Subscription } from 'rxjs';
                     <i class="pi pi-globe p-text-secondary" style="font-size: 1.5rem"></i>
                 </button>
             <div class="layout-config-menu">
-                <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
+              <!--   <button type="button" class="layout-topbar-action" (click)="toggleDarkMode()">
                     <i [ngClass]="{ 'pi ': true, 'pi-moon': layoutService.isDarkTheme(), 'pi-sun': !layoutService.isDarkTheme() }"></i>
-                </button>
-                <div class="relative">
+                </button> -->
+
+               <!--   <div class="relative">
                     <button
                         class="layout-topbar-action layout-topbar-action-highlight"
                         pStyleClass="@next"
@@ -51,8 +55,23 @@ import { Subscription } from 'rxjs';
                         <i class="pi pi-palette"></i>
                     </button>
                     <app-configurator />
-                </div>
+                </div>  -->
             </div>
+
+            <div class="relative">
+  <button
+      class="layout-topbar-action layout-topbar-action-highlight"
+      pStyleClass="@next"
+      enterFromClass="hidden"
+      enterActiveClass="animate-scalein"
+      leaveToClass="hidden"
+      leaveActiveClass="animate-fadeout"
+      [hideOnOutsideClick]="true"
+  >
+    <i class="pi pi-cog"></i>
+  </button>
+    <app-settings-panel/>
+</div>
 
             <button class="layout-topbar-menu-button layout-topbar-action"
                 pStyleClass="@next"
@@ -79,7 +98,8 @@ import { Subscription } from 'rxjs';
                         <span>Profile</span>
                     </button>
                     <button type="button" class="layout-topbar-action"  (click)="LogOut()">
-                        <i class="pi pi-user"></i>
+                        <i class="pi pi-sign-out"></i>
+
                         <span>logout</span>
                     </button>
                 </div>
@@ -91,7 +111,8 @@ export class AppTopbar implements OnInit, OnDestroy {
     items!: MenuItem[];
     currentLang: string = 'ar';
     private langSubscription!: Subscription;
-    constructor(public layoutService: LayoutService, private router: Router ,private translationService: TranslationService) {}
+    constructor(public layoutService: LayoutService, private router: Router, private translationService: TranslationService) { }
+
     ngOnInit(): void {
         // Subscribe to the current language from the service
         this.langSubscription = this.translationService.currentLang$.subscribe(lang => {
@@ -107,11 +128,18 @@ export class AppTopbar implements OnInit, OnDestroy {
     toggleDarkMode() {
         this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
     }
-     LogOut() {
-    // redirect to login
-    this.router.navigate(['/login']);
-  
-}
+
+    switchDir() {
+        const newDir = this.layoutService.layoutConfig().direction === 'rtl' ? 'ltr' : 'rtl';
+        this.layoutService.layoutConfig.update((state) => ({ ...state, direction: newDir }));
+    }
+
+    LogOut() {
+        // redirect to login
+        this.router.navigate(['/login']);
+
+    }
+
 
     ngOnDestroy(): void {
         // Unsubscribe to prevent memory leaks

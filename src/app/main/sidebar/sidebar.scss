@@ -1,0 +1,10 @@
+.layout-sidebar {
+  left: 0;
+  right: auto;
+
+  // RTL override
+  [dir="rtl"] & {
+    right: 0;
+    left: auto;
+  }
+}

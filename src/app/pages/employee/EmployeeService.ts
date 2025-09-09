@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CreateEmployee, EditEmployee, Employee } from '@/interfaces/employee.interface';
 import { ApiResponse } from '@/core/models/api-response.model';
-import { AppConfigService } from '../service/app-config.service';
+import { AppConfigService } from '@/pages/service/app-config.service';
 
 @Injectable({
   providedIn: 'root'

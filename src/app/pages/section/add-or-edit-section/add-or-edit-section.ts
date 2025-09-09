@@ -6,19 +6,18 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
-import { CompanyService } from '../CompanyService';
-import { CompanyTypeService } from '../CompanyTypeService';
+import { SectionService } from '../SectionService';
+import { SectionTypeService } from '../SectionTypeService';
 import { LookupService } from '../../organization/OrganizationService';
-import { Company, CreateCompany, EditCompany } from '../../../interfaces/company.interface';
-import { CompanyType } from '../../../interfaces/company-type.interface';
-import { Organization } from '../../../interfaces/organization.interface';
+import { Section, CreateSection, EditSection } from '@/interfaces/section.interface';
+import { SectionType } from '@/interfaces/section-type.interface';
+import { Organization } from '@/interfaces/organization.interface';
 import { CommonModule } from '@angular/common';
-import { ApiResponse } from '../../../core/models/api-response.model';
-import { TranslatePipe } from '../../../core/pipes/translate.pipe';
-import { AuthService } from '../../../auth/auth.service';
+import { ApiResponse } from '@/core/models/api-response.model';
+import { AuthService } from '@/auth/auth.service';
 
 @Component({
-  selector: 'app-add-or-edit-company',
+  selector: 'app-add-or-edit-section',
   standalone: true,
   imports: [
     CommonModule,
@@ -27,42 +26,41 @@ import { AuthService } from '../../../auth/auth.service';
     ButtonModule,
     InputTextModule,
     SelectModule,
-    ToastModule,
-    TranslatePipe,
+    ToastModule
   ],
-  templateUrl: './add-or-edit-company.html',
-  styleUrl: './add-or-edit-company.scss',
+  templateUrl: './add-or-edit-section.html',
+  styleUrl: './add-or-edit-section.scss',
   providers: [MessageService]
 })
-export class AddOrEditCompany implements OnInit {
-  companyForm: FormGroup;
+export class AddOrEditSection implements OnInit {
+  sectionForm: FormGroup;
   isEditMode = false;
-  companyId: number | null = null;
+  sectionId: number | null = null;
   loading = false;
   submitted = false;
   organizations: Organization[] = [];
-  companies: Company[] = [];
-  companyTypes: CompanyType[] = [];
-  mainCompanies: Company[] = [];
+  sections: Section[] = [];
+  sectionTypes: SectionType[] = [];
+  mainSections: Section[] = [];
   isSuperAdmin = false;
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private companyService: CompanyService,
-    private companyTypeService: CompanyTypeService,
+    private sectionService: SectionService,
+    private sectionTypeService: SectionTypeService,
     private organizationService: LookupService,
     private messageService: MessageService,
     private authService: AuthService
   ) {
-    this.companyForm = this.fb.group({
+    this.sectionForm = this.fb.group({
       code: ['', Validators.required],
       name: ['', Validators.required],
       nameSE: ['', Validators.required],
       parentId: [null],
       organizationId: [null, Validators.required],
-      companyTypeLookupId: [null, Validators.required]
+      sectionTypeLookupId: [null, Validators.required]
     });
   }
 
@@ -71,23 +69,23 @@ export class AddOrEditCompany implements OnInit {
     
     if (!this.isSuperAdmin) {
       const orgId = this.authService.getOrgId();
-      if (orgId) this.companyForm.patchValue({ organizationId: +orgId });
+      if (orgId) this.sectionForm.patchValue({ organizationId: +orgId });
     }
 
     this.loadOrganizations();
-    this.loadCompanies();
-    this.loadCompanyTypes();
+    this.loadSections();
+    this.loadSectionTypes();
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode = true;
-        this.companyId = +params['id'];
-        this.loadCompany(this.companyId);
+        this.sectionId = +params['id'];
+        this.loadSection(this.sectionId);
       }
     });
 
-    // Watch for company type changes
-    this.companyForm.get('companyTypeLookupId')?.valueChanges.subscribe(companyTypeId => {
-      this.onCompanyTypeChange(companyTypeId);
+    // Watch for section type changes
+    this.sectionForm.get('sectionTypeLookupId')?.valueChanges.subscribe(sectionTypeId => {
+      this.onSectionTypeChange(sectionTypeId);
     });
   }
 
@@ -100,7 +98,7 @@ export class AddOrEditCompany implements OnInit {
     this.organizationService.getAllOrganizations().subscribe({
       next: (response: ApiResponse<Organization[]>) => {
         if (response.succeeded) {
-          this.organizations = response.data;
+          this.organizations = response.data||[];
         }
       },
       error: (error) => {
@@ -109,63 +107,63 @@ export class AddOrEditCompany implements OnInit {
     });
   }
 
-  loadCompanies(): void {
-    this.companyService.getAllCompanies().subscribe({
-      next: (response: ApiResponse<Company[]>) => {
+  loadSections(): void {
+    this.sectionService.getAllSections().subscribe({
+      next: (response: ApiResponse<Section[]>) => {
         if (response.succeeded) {
-          this.companies = response.data;
-          this.updateMainCompanies();
+          this.sections = response.data||[];
+          this.updateMainSections();
         }
       },
       error: (error) => {
-        console.error('Error loading companies:', error);
+        console.error('Error loading sections:', error);
       }
     });
   }
 
-  loadCompanyTypes(): void {
-    this.companyTypeService.getAllCompanyTypes().subscribe({
-      next: (response: ApiResponse<CompanyType[]>) => {
+  loadSectionTypes(): void {
+    this.sectionTypeService.getAllSectionTypes().subscribe({
+      next: (response: ApiResponse<SectionType[]>) => {
         if (response.succeeded) {
-          this.companyTypes = response.data;
+          this.sectionTypes = response.data;
         }
       },
       error: (error) => {
-        console.error('Error loading company types:', error);
+        console.error('Error loading section types:', error);
       }
     });
   }
 
-  updateMainCompanies(): void {
-    // Filter companies to show only Main Companies (companyTypeLookupId = 1)
-    this.mainCompanies = this.companies.filter(company => company.companyTypeLookupId === 1);
+  updateMainSections(): void {
+    // Filter sections to show only Main Sections (sectionTypeLookupId = 1)
+    this.mainSections = this.sections.filter(section => section.sectionTypeLookupId === 1);
   }
 
-  onCompanyTypeChange(companyTypeLookupId: number): void {
-    if (companyTypeLookupId === 1) { // Main Company
-      // Hide parent company selection
-      this.companyForm.get('parentId')?.setValue(null);
-      this.companyForm.get('parentId')?.disable();
-    } else if (companyTypeLookupId === 2) { // Sub Company
-      // Show parent company selection with only main companies
-      this.companyForm.get('parentId')?.enable();
+  onSectionTypeChange(sectionTypeId: number): void {
+    if (sectionTypeId === 1) { // Main Section
+      // Hide parent section selection
+      this.sectionForm.get('parentId')?.setValue(null);
+      this.sectionForm.get('parentId')?.disable();
+    } else if (sectionTypeId === 2) { // Sub Section
+      // Show parent section selection with only main sections
+      this.sectionForm.get('parentId')?.enable();
     }
   }
 
-  loadCompany(id: number): void {
+  loadSection(id: number): void {
     this.loading = true;
-    this.companyService.getCompanyById(id).subscribe({
-      next: (response: ApiResponse<Company>) => {
+    this.sectionService.getSectionById(id).subscribe({
+      next: (response: ApiResponse<Section>) => {
         if (response.succeeded && response.data) {
-          this.companyForm.patchValue({
+          this.sectionForm.patchValue({
             code: response.data.code,
             name: response.data.name,
             nameSE: response.data.nameSE,
             parentId: response.data.parentId,
             organizationId: response.data.organizationId,
-            companyTypeLookupId: response.data.companyTypeLookupId
+            sectionTypeLookupId: response.data.sectionTypeLookupId
           });
-          this.onCompanyTypeChange(response.data.companyTypeLookupId || 0); 
+          this.onSectionTypeChange(response.data.sectionTypeLookupId || 0);
         }
         this.loading = false;
       },
@@ -173,7 +171,7 @@ export class AddOrEditCompany implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to load company data'
+          detail: 'Failed to load section data'
         });
         this.loading = false;
       }
@@ -181,74 +179,74 @@ export class AddOrEditCompany implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.companyForm.invalid) {
-      this.markFormGroupTouched(this.companyForm);
+    if (this.sectionForm.invalid) {
+      this.markFormGroupTouched(this.sectionForm);
       return;
     }
 
     this.loading = true;
-    const formData = this.companyForm.value;
+    const formData = this.sectionForm.value;
 
-    if (this.isEditMode && this.companyId) {
-      const editData: EditCompany = {
-        id: this.companyId,
+    if (this.isEditMode && this.sectionId) {
+      const editData: EditSection = {
+        id: this.sectionId,
         code: formData.code,
         name: formData.name,
         nameSE: formData.nameSE,
         parentId: formData.parentId,
         organizationId: formData.organizationId,
-        companyTypeLookupId: formData.companyTypeLookupId
+        sectionTypeLookupId: formData.sectionTypeLookupId
       };
-      this.updateCompany(editData);
+      this.updateSection(editData);
     } else {
-      const createData: CreateCompany = {
+      const createData: CreateSection = {
         code: formData.code,
         name: formData.name,
         nameSE: formData.nameSE,
         parentId: formData.parentId,
         organizationId: formData.organizationId,
-        companyTypeLookupId: formData.companyTypeLookupId
+        sectionTypeLookupId: formData.sectionTypeLookupId
       };
-      this.createCompany(createData);
+      this.createSection(createData);
     }
   }
 
-  createCompany(data: CreateCompany): void {
-    this.companyService.createCompany(data).subscribe({
-      next: (response: ApiResponse<Company>) => {
+  createSection(data: CreateSection): void {
+    this.sectionService.createSection(data).subscribe({
+      next: (response: ApiResponse<Section>) => {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Company created successfully'
+          detail: 'Section created successfully'
         });
-        this.router.navigate(['/companies']);
+        this.router.navigate(['/sections']);
       },
       error: (error) => {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to create company'
+          detail: 'Failed to create section'
         });
         this.loading = false;
       }
     });
   }
 
-  updateCompany(data: EditCompany): void {
-    this.companyService.updateCompany(data).subscribe({
-      next: (response: ApiResponse<Company>) => {
+  updateSection(data: EditSection): void {
+    this.sectionService.updateSection(data).subscribe({
+      next: (response: ApiResponse<Section>) => {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Company updated successfully'
+          detail: 'Section updated successfully'
         });
-        this.router.navigate(['/companies']);
+        this.router.navigate(['/sections']);
       },
       error: (error) => {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to update company'
+          detail: 'Failed to update section'
         });
         this.loading = false;
       }
@@ -266,6 +264,6 @@ export class AddOrEditCompany implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/companies']);
+    this.router.navigate(['/sections']);
   }
 }

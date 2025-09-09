@@ -9,6 +9,7 @@ import { Layout } from './app/main/layout/layout';
 import { Login } from './app/auth/login/login';
 import { AuthGuard } from './app/auth/gurads/auth.guard';
 import { LoginGuard } from './app/auth/gurads/login.guard';
+import { SuperAdminGuard } from './app/auth/gurads/super-admin.guard';
 
 import { RolesListComponent } from './app/pages/roles/roles-list/roles-list.component';
 import { AddEditRoleComponent } from './app/pages/roles/add-role/add-edit-role.component';
@@ -30,7 +31,8 @@ export const appRoutes: Routes = [
         loadChildren: () =>
           import('./app/pages/organization/oraganization.routes').then(
             (m) => m.ORGANIZATION_ROUTES
-          )
+          ),
+        canActivate: [SuperAdminGuard]
       },
        {
         path: 'users',
@@ -39,9 +41,21 @@ export const appRoutes: Routes = [
             (m) => m.USER_ROUTES
           )
       },
-      { path: 'roles', component: RolesListComponent },
-      { path: 'roles/add', component: AddEditRoleComponent },
-      { path: 'roles/edit/:id', component: AddEditRoleComponent },
+      { 
+        path: 'roles', 
+        component: RolesListComponent,
+        canActivate: [SuperAdminGuard]
+      },
+      { 
+        path: 'roles/add', 
+        component: AddEditRoleComponent,
+        canActivate: [SuperAdminGuard]
+      },
+      { 
+        path: 'roles/edit/:id', 
+        component: AddEditRoleComponent,
+        canActivate: [SuperAdminGuard]
+      },
       {
         path: 'companies',
         loadChildren: () =>
@@ -54,6 +68,13 @@ export const appRoutes: Routes = [
         loadChildren: () =>
           import('./app/pages/department/department.routes').then(
             (m) => m.DEPARTMENT_ROUTES
+          )
+      },
+      {
+        path: 'sections',
+        loadChildren: () =>
+          import('./app/pages/section/section.routes').then(
+            (m) => m.SECTION_ROUTES
           )
       },
        {

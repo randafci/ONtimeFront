@@ -1,11 +1,13 @@
 <div class="card p-fluid max-w-[800px] mx-auto">
-  <h2>{{ isEditMode ? 'Edit' : 'Add' }} Company</h2>
+
+  <h2>{{ isEditMode ? 'Edit Section' : 'Add Section' }}</h2>
   
-  <form [formGroup]="companyForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+  <form [formGroup]="sectionForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
     <!-- Vertical Grid Layout -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Code Field -->
       <div class="field">
+
         <label for="code">Code <span class="required-star">*</span></label>
         <input 
           id="code" 
@@ -15,20 +17,19 @@
           formControlName="code" 
           [ngClass]="{
             'field-error': 
-              (companyForm.controls['code'].invalid && 
-              (companyForm.controls['code'].dirty || companyForm.controls['code'].touched || submitted))
+              (sectionForm.controls['code'].invalid && 
+              (sectionForm.controls['code'].dirty || sectionForm.controls['code'].touched || submitted))
           }"
         />
+        <!-- 3. Translated Validation Message -->
         <small 
-          *ngIf="companyForm.controls['code'].invalid && 
-                (companyForm.controls['code'].dirty || companyForm.controls['code'].touched || submitted)" 
+          *ngIf="sectionForm.controls['code'].invalid && 
+                (sectionForm.controls['code'].dirty || sectionForm.controls['code'].touched || submitted)" 
           class="p-error"
         >
           Code is required
         </small>
       </div>
-
-
 
       <!-- Name Field -->
       <div class="field">
@@ -40,13 +41,13 @@
           formControlName="name" 
           [ngClass]="{
             'field-error': 
-              (companyForm.controls['name'].invalid && 
-              (companyForm.controls['name'].dirty || companyForm.controls['name'].touched || submitted))
+              (sectionForm.controls['name'].invalid && 
+              (sectionForm.controls['name'].dirty || sectionForm.controls['name'].touched || submitted))
           }"
         />
         <small 
-          *ngIf="companyForm.controls['name'].invalid && 
-                (companyForm.controls['name'].dirty || companyForm.controls['name'].touched || submitted)" 
+          *ngIf="sectionForm.controls['name'].invalid && 
+                (sectionForm.controls['name'].dirty || sectionForm.controls['name'].touched || submitted)" 
           class="p-error"
         >
           Name is required
@@ -63,13 +64,13 @@
           formControlName="nameSE" 
           [ngClass]="{
             'field-error': 
-              (companyForm.controls['nameSE'].invalid && 
-              (companyForm.controls['nameSE'].dirty || companyForm.controls['nameSE'].touched || submitted))
+              (sectionForm.controls['nameSE'].invalid && 
+              (sectionForm.controls['nameSE'].dirty || sectionForm.controls['nameSE'].touched || submitted))
           }"
         />
         <small 
-          *ngIf="companyForm.controls['nameSE'].invalid && 
-                (companyForm.controls['nameSE'].dirty || companyForm.controls['nameSE'].touched || submitted)" 
+          *ngIf="sectionForm.controls['nameSE'].invalid && 
+                (sectionForm.controls['nameSE'].dirty || sectionForm.controls['nameSE'].touched || submitted)" 
           class="p-error"
         >
           Name (SE) is required
@@ -87,62 +88,61 @@
           placeholder="Select Organization"
           [ngClass]="{
             'field-error': 
-              (companyForm.controls['organizationId'].invalid && 
-              (companyForm.controls['organizationId'].dirty || companyForm.controls['organizationId'].touched || submitted))
+              (sectionForm.controls['organizationId'].invalid && 
+              (sectionForm.controls['organizationId'].dirty || sectionForm.controls['organizationId'].touched || submitted))
           }"
         ></p-select>
         <small 
-          *ngIf="companyForm.controls['organizationId'].invalid && 
-                (companyForm.controls['organizationId'].dirty || companyForm.controls['organizationId'].touched || submitted)" 
+          *ngIf="sectionForm.controls['organizationId'].invalid && 
+                (sectionForm.controls['organizationId'].dirty || sectionForm.controls['organizationId'].touched || submitted)" 
           class="p-error"
         >
           Organization is required
         </small>
       </div>
 
-      <!-- Company Type Field -->
+      <!-- Section Type Field -->
       <div class="field">
-        <label for="companyTypeLookupId">Company Type <span class="required-star">*</span></label>
+        <label for="sectionTypeLookupId">Section Type <span class="required-star">*</span></label>
         <p-select class="w-full"
-          id="companyTypeLookupId" 
-          formControlName="companyTypeLookupId" 
-          [options]="companyTypes" 
+          id="sectionTypeLookupId" 
+          formControlName="sectionTypeLookupId" 
+          [options]="sectionTypes" 
           optionLabel="name" 
           optionValue="id"
-          placeholder="Select Company Type"
+          placeholder="Select Section Type"
           [ngClass]="{
             'field-error': 
-              (companyForm.controls['companyTypeLookupId'].invalid && 
-              (companyForm.controls['companyTypeLookupId'].dirty || companyForm.controls['companyTypeLookupId'].touched || submitted))
+              (sectionForm.controls['sectionTypeLookupId'].invalid && 
+              (sectionForm.controls['sectionTypeLookupId'].dirty || sectionForm.controls['sectionTypeLookupId'].touched || submitted))
           }"
         ></p-select>
         <small 
-          *ngIf="companyForm.controls['companyTypeLookupId'].invalid && 
-                (companyForm.controls['companyTypeLookupId'].dirty || companyForm.controls['companyTypeLookupId'].touched || submitted)" 
+          *ngIf="sectionForm.controls['sectionTypeLookupId'].invalid && 
+                (sectionForm.controls['sectionTypeLookupId'].dirty || sectionForm.controls['sectionTypeLookupId'].touched || submitted)" 
           class="p-error"
         >
-          Company Type is required
+          Section Type is required
         </small>
       </div>
 
-      <!-- Parent Company Field - Only shown for Sub Companies -->
-      <div class="field" *ngIf="companyForm.get('companyTypeLookupId')?.value === 2">
-        <label for="parentId">Parent Company</label>
+      <!-- Parent Section Field -->
+      <div class="field" *ngIf="sectionForm.get('sectionTypeLookupId')?.value === 2">
+        <label for="parentId">Parent Section</label>
         <p-select class="w-full"
           id="parentId" 
           formControlName="parentId" 
-          [options]="mainCompanies" 
+          [options]="mainSections" 
           optionLabel="name" 
           optionValue="id"
-          placeholder="Select Parent Company"
+          placeholder="Select Parent Section"
         ></p-select>
       </div>
-
-
     </div>
 
-    <!-- Submit Button Row -->
+    <!-- Buttons -->
     <div class="flex justify-content-start gap-2 mt-4">
+      <!-- 4. Translated Buttons -->
       <button 
         pButton 
         type="button" 
@@ -154,8 +154,8 @@
       <button 
         pButton 
         type="submit" 
-        label="{{ isEditMode ? 'Update' : 'Save' }}" 
-        [disabled]="companyForm.invalid || loading"
+        [label]="(isEditMode ? 'Update' : 'Save')" 
+        [disabled]="sectionForm.invalid || loading"
       ></button>
     </div>
   </form>
