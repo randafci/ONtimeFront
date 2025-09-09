@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SharedAppSettings } from '../../shared/shared-app-settings';
-import { environment } from 'environments/environment';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'

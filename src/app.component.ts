@@ -1,4 +1,4 @@
-import { AppConfigService } from '@/pages/service/app-config.service';
+import { AppConfigService } from './app/pages/service/app-config.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { APP_INITIALIZER, Component } from '@angular/core';

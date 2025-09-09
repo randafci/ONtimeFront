@@ -2,13 +2,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CreateOrganization, EditOrganization, Organization } from '@/interfaces/organization.interface';
-import { ApiResponse } from '@/core/models/api-response.model';
+import { CreateOrganization, EditOrganization, Organization } from '../../interfaces/organization.interface';
+import { ApiResponse } from '../../core/models/api-response.model';
 
 
 
 
-import { AppConfigService } from '@/pages/service/app-config.service';
+import { AppConfigService } from '../../pages/service/app-config.service';
 
 @Injectable({
   providedIn: 'root'

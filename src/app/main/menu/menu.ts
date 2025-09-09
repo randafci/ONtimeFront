@@ -45,6 +45,13 @@ export class MenuComponent {
             { label: 'Role', icon: 'pi pi-fw pi-key', routerLink: ['/roles'] },
             { label: 'Employee', icon: 'pi pi-fw pi-users', routerLink: ['/employees'] }
           ]
+        },
+        {
+          label: 'Settings',
+          items: [
+            { label: 'English Translation', icon: 'pi pi-fw pi-globe', routerLink: ['/translations/en'] },
+            { label: 'Arabic Translation', icon: 'pi pi-fw pi-globe', routerLink: ['/translations/ar'] }
+          ]
         }
       ]
     }

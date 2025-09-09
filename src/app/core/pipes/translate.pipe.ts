@@ -1,4 +1,4 @@
-import { TranslationService } from '@/pages/translation-manager/translation-manager/translation.service';
+import { TranslationService } from '../../pages/translation-manager/translation-manager/translation.service';
 import { Pipe, PipeTransform, OnDestroy } from '@angular/core';
 
 import { Subscription } from 'rxjs';

@@ -41,22 +41,22 @@ export class TranslationManagerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // This part correctly handles loading the data
     this.route.paramMap.subscribe(params => {
       const langParam = params.get('lang');
       if (langParam) {
         this.lang = langParam;
-        this.isLoading = true; // Set loading state before fetching
+        this.isLoading = true;
         this.updateStatus = null;
-        this.translationService.loadTranslations(this.lang);
+        this.translationService.loadTranslations(this.lang).subscribe();
         this.setTitle();
       }
     });
 
+
     this.translationService.translations$.subscribe(data => {
         this.initialData = data;
         this.visibleData = data;
-        this.isLoading = false; // Turn off loading state when data arrives
+        this.isLoading = false;
     });
   }
 
@@ -70,20 +70,6 @@ export class TranslationManagerComponent implements OnInit {
     }
   }
 
-  // --- REMOVE THIS ENTIRE METHOD ---
-  // This method was calling the old getTranslations() and is no longer needed.
-  /*
-  loadTranslations(): void {
-    this.isLoading = true;
-    this.updateStatus = null;
-    this.translationService.getTranslations(this.lang).subscribe(data => { // <--- THIS LINE CAUSED THE ERROR
-      this.initialData = data;
-      this.visibleData = data;
-      this.isLoading = false;
-    });
-  }
-  */
-  // --- END OF SECTION TO REMOVE ---
 
   onDataChange(event: any) {
     this.visibleData = event;
