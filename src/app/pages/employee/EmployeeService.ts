@@ -3,16 +3,17 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CreateEmployee, EditEmployee, Employee } from '@/interfaces/employee.interface';
 import { ApiResponse } from '@/core/models/api-response.model';
-import { AppConfigService } from '../service/app-config.service';
+import { environment } from '@/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmployeeService {
-  public apiUrl: string;
-  constructor(private http: HttpClient, private appConfig: AppConfigService) {
-    this.apiUrl = this.appConfig.apiUrl + '/api';
-  }
+  // private apiUrl = 'https://localhost:44369/api';
+  private apiUrl = environment.apiUrl;
+
+
+  constructor(private http: HttpClient) { }
 
   getAllEmployees(): Observable<ApiResponse<Employee[]>> {
     return this.http.get<ApiResponse<Employee[]>>(`${this.apiUrl}/Employee`);
