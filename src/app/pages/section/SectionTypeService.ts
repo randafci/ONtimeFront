@@ -4,15 +4,15 @@ import { Observable } from 'rxjs';
 import { SectionType } from '@/interfaces/section-type.interface';
 import { AppConfigService } from '@/pages/service/app-config.service';
 import { ApiResponse } from '@/core/models/api-response.model';
-import { environment } from '@/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SectionTypeService {
-  private apiUrl = environment.apiUrl;
-
-  constructor(private http: HttpClient) { }
+  public apiUrl: string;
+  constructor(private http: HttpClient, private appConfig: AppConfigService) {
+    this.apiUrl = this.appConfig.apiUrl + '/api';
+  }
 
   getAllSectionTypes(): Observable<ApiResponse<SectionType[]>> {
     return this.http.get<ApiResponse<SectionType[]>>(`${this.apiUrl}/Lookup/SectionType`);
