@@ -47,8 +47,6 @@ export class Login {
    private appConfig: AppConfigService,
    private layoutService:LayoutService
 
-   private appConfig: AppConfigService
-
 
   ) { 
       this.userForm = new FormGroup({

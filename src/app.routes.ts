@@ -64,6 +64,13 @@ export const appRoutes: Routes = [
           )
       },
       {
+        path: 'designations',
+        loadChildren: () =>
+          import('./app/pages/designation/designation.routes').then(
+            (m) => m.DESIGNATION_ROUTES
+          )
+      },
+      {
         path: 'departments',
         loadChildren: () =>
           import('./app/pages/department/department.routes').then(
