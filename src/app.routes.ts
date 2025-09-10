@@ -84,6 +84,13 @@ export const appRoutes: Routes = [
             (m) => m.SECTION_ROUTES
           )
       },
+      {
+        path: 'events',
+        loadChildren: () =>
+          import('./app/pages/events/events.routes').then(
+            (m) => m.EVENTS_ROUTES
+          )
+      },
        {
         path: 'users',
         loadChildren: () =>
