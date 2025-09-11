@@ -34,25 +34,25 @@ export const appRoutes: Routes = [
           ),
         canActivate: [SuperAdminGuard]
       },
-       {
+      {
         path: 'users',
         loadChildren: () =>
           import('./app/pages/user/user.routs').then(
             (m) => m.USER_ROUTES
           )
       },
-      { 
-        path: 'roles', 
+      {
+        path: 'roles',
         component: RolesListComponent,
         canActivate: [SuperAdminGuard]
       },
-      { 
-        path: 'roles/add', 
+      {
+        path: 'roles/add',
         component: AddEditRoleComponent,
         canActivate: [SuperAdminGuard]
       },
-      { 
-        path: 'roles/edit/:id', 
+      {
+        path: 'roles/edit/:id',
         component: AddEditRoleComponent,
         canActivate: [SuperAdminGuard]
       },
@@ -84,19 +84,26 @@ export const appRoutes: Routes = [
             (m) => m.SECTION_ROUTES
           )
       },
-       {
+      {
         path: 'users',
         loadChildren: () =>
           import('./app/pages/user/user.routs').then(
             (m) => m.USER_ROUTES
           )
       },
-        { 
-        path: 'employees', 
+      {
+        path: 'employees',
         loadChildren: () => import('./app/pages/employee/employee.routes').then
-            (m => m.EMPLOYEE_ROUTES)
-        },
+          (m => m.EMPLOYEE_ROUTES)
+      },
       { path: 'documentation', component: Documentation },
+      {
+        path: 'locations',
+        loadChildren: () =>
+          import('./app/pages/location/location.routes').then(
+            (m) => m.LOCATION_ROUTES
+          )
+      },
       { path: 'test', component: Layout },
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
     ]
