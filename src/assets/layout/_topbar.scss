@@ -76,6 +76,19 @@
         margin-right: 0.5rem;
     }
 
+    /* RTL Support for topbar */
+    html[dir="rtl"] & {
+        .layout-menu-button {
+            margin-right: 0;
+            margin-left: 0.5rem;
+        }
+
+        .layout-topbar-actions {
+            margin-left: 0;
+            margin-right: auto;
+        }
+    }
+
     .layout-topbar-menu-button {
         display: none;
     }
@@ -108,6 +121,14 @@
         .layout-menu-button {
             margin-left: 0;
             margin-right: 0.5rem;
+        }
+
+        /* RTL Support for mobile topbar */
+        html[dir="rtl"] & {
+            .layout-menu-button {
+                margin-left: 0.5rem;
+                margin-right: 0;
+            }
         }
 
         .layout-topbar-menu-button {
