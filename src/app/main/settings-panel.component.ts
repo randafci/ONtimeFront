@@ -147,7 +147,7 @@ type SurfacesType = {
         </div>
     `,
     host: {
-        class: 'hidden absolute top-13 right-0 w-72 p-4 bg-surface-0 dark:bg-surface-900 border border-surface rounded-border origin-top shadow-[0px_3px_5px_rgba(0,0,0,0.02),0px_0px_2px_rgba(0,0,0,0.05),0px_1px_4px_rgba(0,0,0,0.08)]'
+        '[class]': 'panelPosition()'
     }
    
 })
@@ -157,7 +157,12 @@ export class AppSettingsPanel {
     layoutService = inject(LayoutService);
     primeng = inject(PrimeNG);
 
-    // Options
+    panelPosition = computed(() => {
+        const direction = this.layoutService.layoutConfig().direction;
+        const baseClass = 'hidden absolute top-13 w-72 p-4 bg-surface-0 dark:bg-surface-900 border border-surface rounded-border origin-top shadow-[0px_3px_5px_rgba(0,0,0,0.02),0px_0px_2px_rgba(0,0,0,0.05),0px_1px_4px_rgba(0,0,0,0.08)]';
+        return direction === 'rtl' ? `${baseClass} left-0` : `${baseClass} right-0`;
+    });
+
     themeOptions = [
         { label: 'Light', value: false },
         { label: 'Dark', value: true }
@@ -365,6 +370,106 @@ export class AppSettingsPanel {
 
     switchDir(value: 'rtl' | 'ltr') {
         this.layoutService.layoutConfig.update((s) => ({ ...s, direction: value }));
+        document.documentElement.setAttribute('dir', value);
+        
+        const sidebar = document.querySelector('.layout-sidebar') as HTMLElement;
+        const mainContainer = document.querySelector('.layout-main-container') as HTMLElement;
+        
+        if (value === 'rtl') {
+            if (sidebar) {
+                sidebar.style.left = 'auto';
+                sidebar.style.right = '2rem';
+            }
+            if (mainContainer) {
+                mainContainer.style.marginLeft = '0';
+                mainContainer.style.marginRight = '24rem';
+            }
+            
+            this.applyRTLFormStyles();
+        } else {
+            if (sidebar) {
+                sidebar.style.left = '2rem';
+                sidebar.style.right = 'auto';
+            }
+            if (mainContainer) {
+                mainContainer.style.marginLeft = '22rem';
+                mainContainer.style.marginRight = '0';
+            }
+            
+            this.applyLTRFormStyles();
+        }
+    }
+    
+    private applyRTLFormStyles() {
+        const flexElements = document.querySelectorAll('.flex.justify-between');
+        flexElements.forEach((element) => {
+            (element as HTMLElement).style.flexDirection = 'row-reverse';
+        });
+        
+        const mlAutoElements = document.querySelectorAll('.ml-auto');
+        mlAutoElements.forEach((element) => {
+            (element as HTMLElement).style.marginLeft = '0';
+            (element as HTMLElement).style.marginRight = 'auto';
+        });
+        
+        const mrAutoElements = document.querySelectorAll('.mr-auto');
+        mrAutoElements.forEach((element) => {
+            (element as HTMLElement).style.marginRight = '0';
+            (element as HTMLElement).style.marginLeft = 'auto';
+        });
+        
+        const iconFields = document.querySelectorAll('.p-iconfield[iconPosition="left"]');
+        iconFields.forEach((field) => {
+            const icon = field.querySelector('.p-inputicon') as HTMLElement;
+            const input = field.querySelector('input') as HTMLElement;
+            
+            if (icon) {
+                icon.style.left = 'auto';
+                icon.style.right = '0.75rem';
+            }
+            
+            if (input) {
+                input.style.paddingLeft = '0.75rem';
+                input.style.paddingRight = '2.5rem';
+                input.style.textAlign = 'right';
+            }
+        });
+    }
+    
+    private applyLTRFormStyles() {
+        const flexElements = document.querySelectorAll('.flex.justify-between');
+        flexElements.forEach((element) => {
+            (element as HTMLElement).style.flexDirection = 'row';
+        });
+        
+        const mlAutoElements = document.querySelectorAll('.ml-auto');
+        mlAutoElements.forEach((element) => {
+            (element as HTMLElement).style.marginLeft = 'auto';
+            (element as HTMLElement).style.marginRight = '0';
+        });
+        
+        const mrAutoElements = document.querySelectorAll('.mr-auto');
+        mrAutoElements.forEach((element) => {
+            (element as HTMLElement).style.marginRight = 'auto';
+            (element as HTMLElement).style.marginLeft = '0';
+        });
+        
+        const iconFields = document.querySelectorAll('.p-iconfield[iconPosition="left"]');
+        iconFields.forEach((field) => {
+            const icon = field.querySelector('.p-inputicon') as HTMLElement;
+            const input = field.querySelector('input') as HTMLElement;
+            
+            if (icon) {
+                icon.style.left = '0.75rem';
+                icon.style.right = 'auto';
+            }
+            
+            if (input) {
+                input.style.paddingLeft = '2.5rem';
+                input.style.paddingRight = '0.75rem';
+                input.style.textAlign = 'left';
+            }
+        });
     }
 
     updateColors(event: any, type: string, color: any) {

@@ -3,3 +3,79 @@
 @use './layout/layout.scss';
 @use 'primeicons/primeicons.css';
 @use './demo/demo.scss';
+
+/* RTL Support - Direct styles to ensure they're applied */
+html[dir="rtl"] .layout-sidebar {
+    left: auto !important;
+    right: 2rem !important;
+}
+
+html[dir="rtl"] .layout-main-container {
+    margin-left: 0 !important;
+    margin-right: 24rem !important;
+}
+
+/* RTL Support for form layouts */
+html[dir="rtl"] .flex.justify-between {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .ml-auto {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+}
+
+html[dir="rtl"] .mr-auto {
+    margin-right: 0 !important;
+    margin-left: auto !important;
+}
+
+/* RTL Support for input field icons */
+html[dir="rtl"] .p-iconfield[iconPosition="left"] {
+    direction: rtl;
+}
+
+html[dir="rtl"] .p-iconfield[iconPosition="left"] .p-inputicon {
+    left: auto;
+    right: 0.75rem;
+}
+
+html[dir="rtl"] .p-iconfield[iconPosition="left"] input {
+    padding-left: 0.75rem;
+    padding-right: 2.5rem;
+    text-align: right;
+}
+
+/* RTL Support for buttons with icons */
+html[dir="rtl"] .p-button .p-button-icon-left {
+    margin-left: 0.5rem;
+    margin-right: 0;
+}
+
+html[dir="rtl"] .p-button .p-button-icon-right {
+    margin-right: 0.5rem;
+    margin-left: 0;
+}
+
+/* RTL Support for form labels and fields */
+html[dir="rtl"] .field label {
+    text-align: right;
+}
+
+html[dir="rtl"] .p-inputtext {
+    text-align: right;
+}
+
+html[dir="rtl"] .p-dropdown {
+    text-align: right;
+}
+
+/* RTL Support for table headers */
+html[dir="rtl"] .p-datatable .p-datatable-thead > tr > th {
+    text-align: right;
+}
+
+/* RTL Support for pagination */
+html[dir="rtl"] .p-paginator {
+    direction: rtl;
+}
