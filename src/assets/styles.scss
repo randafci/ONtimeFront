@@ -79,3 +79,17 @@ html[dir="rtl"] .p-datatable .p-datatable-thead > tr > th {
 html[dir="rtl"] .p-paginator {
     direction: rtl;
 }
+
+/* Navigation Mode Styles */
+.navigation-top .layout-sidebar {
+    display: none !important;
+}
+
+.navigation-top .layout-main-container {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.navigation-side .layout-sidebar {
+    display: block !important;
+}
