@@ -7,24 +7,25 @@ import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-menu1',
-  standalone: true,  
+  standalone: true,
   imports: [CommonModule, MenuItemComponent, RouterModule],
   templateUrl: './menu.html',
   styleUrl: './menu.css'
 })
 export class MenuComponent implements OnInit {
- model: MenuItem[] = [];
+  model: MenuItem[] = [];
 
- constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
- private isSuperAdmin(): boolean {
-   const claims = this.authService.getClaims();
-   return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
- }
+  private isSuperAdmin(): boolean {
+    const claims = this.authService.getClaims();
+    return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
+  }
 
- ngOnInit() {
-   this.buildMenu();
- }
+  ngOnInit() {
+    this.buildMenu();
+  }
+
 
  private buildMenu() {
    const isSuperAdmin = this.isSuperAdmin();
@@ -70,6 +71,14 @@ export class MenuComponent implements OnInit {
             { label: 'Arabic Translation', icon: 'pi pi-fw pi-globe', routerLink: ['/translations/ar'] }
           ]
         }
+         ,
+          {
+            label: 'Device management',
+            items: [
+              { label: 'Location', icon: 'pi pi-fw pi-map-marker', routerLink: ['/locations/list'] },
+              ...(isSuperAdmin ? [{ label: 'Role', icon: 'pi pi-fw pi-key', routerLink: ['/roles'] }] : []),
+            ]
+          }
        ]
      }
    ];
