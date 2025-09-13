@@ -361,11 +361,21 @@ export class AppSettingsPanel {
     }
 
     toggleHeader(value: boolean) {
-        this.layoutService.layoutConfig.update((s) => ({ ...s, header: value }));
+        this.layoutService.layoutConfig.update((config) => ({ ...config, header: value }));
     }
 
     changeNavigation(value: 'side' | 'top') {
         this.layoutService.layoutConfig.update((s) => ({ ...s, navigation: value }));
+        
+        // Apply navigation mode directly
+        const body = document.body;
+        if (value === 'top') {
+            body.classList.add('navigation-top');
+            body.classList.remove('navigation-side');
+        } else {
+            body.classList.add('navigation-side');
+            body.classList.remove('navigation-top');
+        }
     }
 
     switchDir(value: 'rtl' | 'ltr') {

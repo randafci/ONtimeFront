@@ -6,10 +6,11 @@ import { AppFooter } from '../footer/footer';
 import { CommonModule } from '@angular/common';
 import { AppSidebar } from '../sidebar/sidebar';
 import { AppTopbar as AppTopbar } from "@/layout/component/app.topbar";
+import { AppFloatingSettings } from "@/layout/component/app.floating-settings";
 
 @Component({
     selector: 'app-layoutAdmin',
-    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter],
+    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter, AppFloatingSettings],
     templateUrl: './layout.html',
     styleUrl: './layout.scss'
 })
