@@ -34,4 +34,12 @@ export class LookupService {
   getDepartmentsByCompanyId(companyId: number): Observable<ApiResponse<LookupItem[]>> {
     return this.http.get<ApiResponse<LookupItem[]>>(`${this.apiUrl}/Lookup/Department/LookupItemsByParentId/${companyId}`,this.headers);
   }
+
+  getAllSections(): Observable<ApiResponse<LookupItem[]>> {
+    return this.http.get<ApiResponse<LookupItem[]>>(`${this.apiUrl}/Lookup/Section`,this.headers);
+  }
+
+  getAllDesignations(): Observable<ApiResponse<LookupItem[]>> {
+    return this.http.get<ApiResponse<LookupItem[]>>(`${this.apiUrl}/Lookup/Designations`,this.headers);
+  }
 }
