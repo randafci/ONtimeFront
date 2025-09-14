@@ -44,9 +44,13 @@ export class UserService {
   }
 
   // Update an existing user
-  update(dto: UpdateUserDto): Observable<ApiResponse<User>> {
-    return this.http.put<ApiResponse<User>>(this.apiUrl, dto, this.headers);
-  }
+ update(dto: UpdateUserDto): Observable<ApiResponse<User>> {
+  return this.http.put<ApiResponse<User>>(
+    `${this.apiUrl}/${dto.id}`, // append id to URL
+    dto,
+   this.headers   // wrap headers correctly
+  );
+}
 
   // Delete a user by id
   delete(id: string): Observable<ApiResponse<boolean>> {

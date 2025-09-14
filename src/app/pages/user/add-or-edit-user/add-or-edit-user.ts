@@ -125,7 +125,8 @@ this.isSuperAdmin = true;
             email: response.data.email,
             isLdapUser: response.data.isLdapUser,
             extraEmployeesView: response.data.extraEmployeesView,
-            employeeId: response.data.employeeId
+            employeeId: response.data.employeeId,
+            organizationId:response.data.organizationId
           });
           // Hide password on edit
           this.userForm.get('password')?.clearValidators();

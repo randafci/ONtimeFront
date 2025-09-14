@@ -129,4 +129,8 @@ export class Login {
     this.loading = false;
     this.disableSubmit = false;
   }
+  goToForgotPassword() {
+  this.router.navigate(['/forgetPassword']);
+}
+
 }

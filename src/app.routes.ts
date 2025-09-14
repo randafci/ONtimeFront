@@ -14,6 +14,8 @@ import { SuperAdminGuard } from './app/auth/gurads/super-admin.guard';
 import { RolesListComponent } from './app/pages/roles/roles-list/roles-list.component';
 import { AddEditRoleComponent } from './app/pages/roles/add-role/add-edit-role.component';
 import { TranslationManagerComponent } from './app/pages/translation-manager/translation-manager/translation-manager.component';
+import { ForgetPassword } from '@/auth/forget-password/forget-password';
+import { ChangePassowrd } from '@/auth/change-passowrd/change-passowrd';
 
 export const appRoutes: Routes = [
   {
@@ -130,6 +132,14 @@ export const appRoutes: Routes = [
     path: 'login',
     component: Login,
     canActivate: [LoginGuard] // Prevent logged-in users from accessing login
+  },
+  {
+    path: 'forgetPassword',
+    component: ForgetPassword
+  },
+  {
+    path: 'resetPassword',
+    component: ChangePassowrd
   },
   {
     path: 'auth',
