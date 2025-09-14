@@ -124,6 +124,14 @@
             ></button>
             <button 
               pButton 
+              icon="pi pi-briefcase" 
+              class="p-button-rounded p-button-text p-button-info p-button-sm"
+              (click)="navigateToEmployments(employee); $event.stopPropagation()"
+              [pTooltip]="('employees.listPage.tooltips.employments' | translate) || 'Manage Employments'"
+              tooltipPosition="top"
+            ></button>
+            <button 
+              pButton 
               icon="pi pi-trash" 
               class="p-button-rounded p-button-text p-button-danger p-button-sm"
               (click)="deleteEmployee(employee); $event.stopPropagation()"
