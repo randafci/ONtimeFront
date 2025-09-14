@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '@/core/models/api-response.model';
 import { AppConfigService } from '@/pages/service/app-config.service';
-
+import { AuthService } from '@/auth/auth.service';
 export interface LookupItem {
   id: number;
   name: string;
@@ -16,19 +16,22 @@ export interface LookupItem {
 })
 export class LookupService {
     public apiUrl: string;
-    constructor(private http: HttpClient, private appConfig: AppConfigService) {
+    constructor(private http: HttpClient, private appConfig: AppConfigService,private authService: AuthService) {
       this.apiUrl = this.appConfig.apiUrl + '/api';
     }
+      private get headers() {
+    return { headers: this.authService.getHeaders() };
+  }
 
   getAllCompanies(): Observable<ApiResponse<LookupItem[]>> {
-    return this.http.get<ApiResponse<LookupItem[]>>(`${this.apiUrl}/Lookup/Company`);
+    return this.http.get<ApiResponse<LookupItem[]>>(`${this.apiUrl}/Lookup/Company`,this.headers);
   }
 
   getAllDepartments(): Observable<ApiResponse<LookupItem[]>> {
-    return this.http.get<ApiResponse<LookupItem[]>>(`${this.apiUrl}/Lookup/Department`);
+    return this.http.get<ApiResponse<LookupItem[]>>(`${this.apiUrl}/Lookup/Department`,this.headers);
   }
 
   getDepartmentsByCompanyId(companyId: number): Observable<ApiResponse<LookupItem[]>> {
-    return this.http.get<ApiResponse<LookupItem[]>>(`${this.apiUrl}/Lookup/Department/LookupItemsByParentId/${companyId}`);
+    return this.http.get<ApiResponse<LookupItem[]>>(`${this.apiUrl}/Lookup/Department/LookupItemsByParentId/${companyId}`,this.headers);
   }
 }

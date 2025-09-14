@@ -15,18 +15,20 @@ export class CompanyService {
     private authService: AuthService) {
     this.apiUrl = this.appConfig.apiUrl + '/api';
   }
+    private get headers() {
+    return { headers: this.authService.getHeaders() };
+  }
   getAllCompanies(): Observable<ApiResponse<Company[]>> {
-    const headers = this.authService.getHeaders();
 
-    return this.http.get<ApiResponse<Company[]>>(`${this.apiUrl}/Lookup/Company`, { headers });
+    return this.http.get<ApiResponse<Company[]>>(`${this.apiUrl}/Lookup/Company`, this.headers );
   }
 
   createCompany(data: CreateCompany): Observable<ApiResponse<Company>> {
-    return this.http.post<ApiResponse<Company>>(`${this.apiUrl}/Lookup/Company`, data);
+    return this.http.post<ApiResponse<Company>>(`${this.apiUrl}/Lookup/Company`, data, this.headers);
   }
 
   getCompanyById(id: number): Observable<ApiResponse<Company>> {
-    return this.http.get<ApiResponse<Company>>(`${this.apiUrl}/Lookup/Company/${id}`);
+    return this.http.get<ApiResponse<Company>>(`${this.apiUrl}/Lookup/Company/${id}`, this.headers);
   }
 
   updateCompany(data: EditCompany): Observable<ApiResponse<Company>> {
@@ -39,7 +41,7 @@ export class CompanyService {
         parentId: data?.parentId,
         organizationId: data?.organizationId,
         companyTypeLookupId: data?.companyTypeLookupId
-      }
+      }, this.headers
     );
   }
 }

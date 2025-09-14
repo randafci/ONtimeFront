@@ -15,17 +15,19 @@ export class DesignationService {
     private authService: AuthService) {
     this.apiUrl = this.appConfig.apiUrl + '/api';
   }
+   private get headers() {
+    return { headers: this.authService.getHeaders() };
+  }
   getAllDesignations(): Observable<ApiResponse<Designation[]>> {
-    const headers = this.authService.getHeaders();
-    return this.http.get<ApiResponse<Designation[]>>(`${this.apiUrl}/Lookup/Designations`, { headers });
+    return this.http.get<ApiResponse<Designation[]>>(`${this.apiUrl}/Lookup/Designations`, this.headers );
   }
 
   createDesignation(data: CreateDesignation): Observable<ApiResponse<Designation>> {
-    return this.http.post<ApiResponse<Designation>>(`${this.apiUrl}/Lookup/Designations`, data);
+    return this.http.post<ApiResponse<Designation>>(`${this.apiUrl}/Lookup/Designations`, data , this.headers);
   }
 
   getDesignationById(id: number): Observable<ApiResponse<Designation>> {
-    return this.http.get<ApiResponse<Designation>>(`${this.apiUrl}/Lookup/Designations/${id}`);
+    return this.http.get<ApiResponse<Designation>>(`${this.apiUrl}/Lookup/Designations/${id}`, this.headers);
   }
 
   updateDesignation(data: EditDesignation): Observable<ApiResponse<Designation>> {
@@ -38,7 +40,7 @@ export class DesignationService {
         parentId: data?.parentId,
         organizationId: data?.organizationId,
         designationsTypeLookupId: data?.designationsTypeLookupId
-      }
+      },this.headers
     );
   }
 }

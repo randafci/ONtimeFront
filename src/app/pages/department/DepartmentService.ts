@@ -16,19 +16,20 @@ export class DepartmentService {
     private authService: AuthService) {
     this.apiUrl = this.appConfig.apiUrl + '/api';
   }
-
+  private get headers() {
+    return { headers: this.authService.getHeaders() };
+  }
   getAllDepartments(): Observable<ApiResponse<Department[]>> {
-    const headers = this.authService.getHeaders();
     
-    return this.http.get<ApiResponse<Department[]>>(`${this.apiUrl}/Lookup/Department`, { headers });
+    return this.http.get<ApiResponse<Department[]>>(`${this.apiUrl}/Lookup/Department`, this.headers);
   }
 
   createDepartment(data: CreateDepartment): Observable<ApiResponse<Department>> {
-    return this.http.post<ApiResponse<Department>>(`${this.apiUrl}/Lookup/Department`, data);
+    return this.http.post<ApiResponse<Department>>(`${this.apiUrl}/Lookup/Department`, data, this.headers);
   }
 
   getDepartmentById(id: number): Observable<ApiResponse<Department>> {
-    return this.http.get<ApiResponse<Department>>(`${this.apiUrl}/Lookup/Department/${id}`);
+    return this.http.get<ApiResponse<Department>>(`${this.apiUrl}/Lookup/Department/${id}`, this.headers);
   }
 
   updateDepartment(data: EditDepartment): Observable<ApiResponse<Department>> {
@@ -42,7 +43,7 @@ export class DepartmentService {
         organizationId: data?.organizationId,
         companyId: data?.companyId,
         departmentTypeLookupId: data?.departmentTypeLookupId
-      },
+      }, this.headers
     );
   }
 }

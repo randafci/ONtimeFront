@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CreateOrganization, EditOrganization, Organization } from '../../interfaces/organization.interface';
 import { ApiResponse } from '../../core/models/api-response.model';
-
+import { AuthService } from '@/auth/auth.service';
 
 
 
@@ -15,27 +15,37 @@ import { AppConfigService } from '../../pages/service/app-config.service';
 })
 export class LookupService {
    public apiUrl : string;
-  constructor(private http: HttpClient,private appConfig: AppConfigService){
+  constructor(private http: HttpClient,private appConfig: AppConfigService
+    ,  private authService: AuthService
+  ){
       this.apiUrl = this.appConfig.apiUrl+'/api';
   }
 
 
   getAllOrganizations(): Observable<ApiResponse<Organization[]>> {
-    return this.http.get<ApiResponse<Organization[]>>(`${this.apiUrl}/Lookup/Organization`);
+        const headers = this.authService.getHeaders();
+
+    return this.http.get<ApiResponse<Organization[]>>(`${this.apiUrl}/Lookup/Organization`,{headers});
   }
 
 createOrganization(data: CreateOrganization): Observable<ApiResponse<Organization>> {
-  return this.http.post<ApiResponse<Organization>>(`${this.apiUrl}/Lookup/Organization`, data);
+  const headers = this.authService.getHeaders();
+
+  return this.http.post<ApiResponse<Organization>>(`${this.apiUrl}/Lookup/Organization`, data,{headers});
 }
 
 getOrganizationById(id: number): Observable<ApiResponse<Organization>> {
-  return this.http.get<ApiResponse<Organization>>(`${this.apiUrl}/Lookup/Organization/${id}`);
+    const headers = this.authService.getHeaders();
+
+  return this.http.get<ApiResponse<Organization>>(`${this.apiUrl}/Lookup/Organization/${id}`,{headers});
 }
 
 updateOrganization(data: EditOrganization): Observable<ApiResponse<Organization>> {
+    const headers = this.authService.getHeaders();
+
   return this.http.put<ApiResponse<Organization>>(
     `${this.apiUrl}/Lookup/Organization/${data.id}`, 
-    { name: data.name, nameSE: data.nameSE }
+    { name: data.name, nameSE: data.nameSE },{headers}
   );
 }
 }

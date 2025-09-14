@@ -64,7 +64,7 @@ export class UserService {
   }
 
   getOrganizations(): Observable<ApiResponse<Organization[]>> {
-    return this.http.get<ApiResponse<Organization[]>>(`${this.baseApiUrl}/Lookup/Organization`);
+    return this.http.get<ApiResponse<Organization[]>>(`${this.baseApiUrl}/Lookup/Organization`,this.headers);
   }
 
 }
