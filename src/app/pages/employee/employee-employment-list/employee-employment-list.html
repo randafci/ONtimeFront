@@ -211,28 +211,32 @@
 
       <div class="field">
         <label for="sectionId" class="block text-sm font-medium mb-2">
-          Section ID
+          Section
         </label>
-        <input 
+        <p-select 
           id="sectionId"
-          pInputText 
-          type="number"
           formControlName="sectionId"
-          placeholder="Section ID"
+          placeholder="Select Section"
+          [options]="sections"
+          optionLabel="name"
+          optionValue="id"
           class="w-full">
+        </p-select>
       </div>
 
       <div class="field">
         <label for="designationId" class="block text-sm font-medium mb-2">
-          Designation ID
+          Designation
         </label>
-        <input 
+        <p-select 
           id="designationId"
-          pInputText 
-          type="number"
           formControlName="designationId"
-          placeholder="Designation ID"
+          placeholder="Select Designation"
+          [options]="designations"
+          optionLabel="name"
+          optionValue="id"
           class="w-full">
+        </p-select>
       </div>
 
       <div class="field">

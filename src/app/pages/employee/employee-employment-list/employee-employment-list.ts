@@ -57,6 +57,8 @@ export class EmployeeEmploymentListComponent implements OnInit {
   companies: LookupItem[] = [];
   departments: LookupItem[] = [];
   allDepartments: LookupItem[] = [];
+  sections: LookupItem[] = [];
+  designations: LookupItem[] = [];
   
   statusOptions: any[] = [
     { label: 'Current', value: 1 },
@@ -86,6 +88,8 @@ export class EmployeeEmploymentListComponent implements OnInit {
       this.loadEmployments();
       this.loadCompanies();
       this.loadAllDepartments();
+      this.loadSections();
+      this.loadDesignations();
     }
   }
 
@@ -300,6 +304,36 @@ export class EmployeeEmploymentListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading departments:', error);
+      }
+    });
+  }
+
+  loadSections() {
+    this.lookupService.getAllSections().subscribe({
+      next: (response: ApiResponse<LookupItem[]>) => {
+        if (response.succeeded) {
+          this.sections = response.data;
+        } else {
+          console.error('Failed to load sections:', response.message);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading sections:', error);
+      }
+    });
+  }
+
+  loadDesignations() {
+    this.lookupService.getAllDesignations().subscribe({
+      next: (response: ApiResponse<LookupItem[]>) => {
+        if (response.succeeded) {
+          this.designations = response.data;
+        } else {
+          console.error('Failed to load designations:', response.message);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading designations:', error);
       }
     });
   }
