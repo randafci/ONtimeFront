@@ -90,11 +90,14 @@ export class AppLayout {
     }
 
     get containerClass() {
+        const isTopNavigation = document.body.classList.contains('navigation-top');
+        const isTopNavWithSidebarActive = isTopNavigation && this.layoutService.layoutState().overlayMenuActive;
+        
         return {
-            'layout-overlay': this.layoutService.layoutConfig().menuMode === 'overlay',
-            'layout-static': this.layoutService.layoutConfig().menuMode === 'static',
-            'layout-static-inactive': this.layoutService.layoutState().staticMenuDesktopInactive && this.layoutService.layoutConfig().menuMode === 'static',
-            'layout-overlay-active': this.layoutService.layoutState().overlayMenuActive,
+            'layout-overlay': this.layoutService.layoutConfig().menuMode === 'overlay' && !isTopNavWithSidebarActive,
+            'layout-static': this.layoutService.layoutConfig().menuMode === 'static' || isTopNavWithSidebarActive,
+            'layout-static-inactive': this.layoutService.layoutState().staticMenuDesktopInactive && this.layoutService.layoutConfig().menuMode === 'static' && !isTopNavigation,
+            'layout-overlay-active': this.layoutService.layoutState().overlayMenuActive && !isTopNavWithSidebarActive,
             'layout-mobile-active': this.layoutService.layoutState().staticMenuMobileActive
         };
     }

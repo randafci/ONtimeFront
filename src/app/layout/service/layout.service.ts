@@ -16,6 +16,7 @@ interface LayoutState {
     configSidebarVisible?: boolean;
     staticMenuMobileActive?: boolean;
     menuHoverActive?: boolean;
+    isTopNavigationMode?: boolean;
 }
 
 interface MenuChangeEvent {
@@ -41,7 +42,8 @@ export class LayoutService {
         overlayMenuActive: false,
         configSidebarVisible: false,
         staticMenuMobileActive: false,
-        menuHoverActive: false
+        menuHoverActive: false,
+        isTopNavigationMode: false
     };
 
     layoutConfig = signal<layoutConfig>(this._config);
@@ -142,23 +144,72 @@ export class LayoutService {
     }
 
     onMenuToggle() {
-        if (this.isOverlay()) {
+        const isTopNavigation = document.body.classList.contains('navigation-top');
+        
+        if (isTopNavigation) {
             this.layoutState.update((prev) => ({ ...prev, overlayMenuActive: !this.layoutState().overlayMenuActive }));
 
             if (this.layoutState().overlayMenuActive) {
                 this.overlayOpen.next(null);
+                
+                const body = document.body;
+                const layoutWrapper = document.querySelector('.layout-wrapper') as HTMLElement;
+                
+                if (layoutWrapper) {
+                    body.classList.remove('navigation-top');
+                    body.classList.add('navigation-side');
+                    
+                    layoutWrapper.classList.remove('layout-overlay', 'layout-overlay-active');
+                    layoutWrapper.classList.add('layout-static');
+                    
+                    const sidebar = document.querySelector('.layout-sidebar') as HTMLElement;
+                    if (sidebar) {
+                        sidebar.style.removeProperty('display');
+                        sidebar.style.removeProperty('visibility');
+                        sidebar.style.removeProperty('opacity');
+                        sidebar.style.removeProperty('z-index');
+                    }
+                }
+            } else {
+                const body = document.body;
+                const layoutWrapper = document.querySelector('.layout-wrapper') as HTMLElement;
+                
+                if (layoutWrapper) {
+                    body.classList.remove('navigation-side');
+                    body.classList.add('navigation-top');
+                    
+                    layoutWrapper.classList.remove('layout-static');
+                    layoutWrapper.classList.add('layout-overlay');
+                    
+                    const sidebar = document.querySelector('.layout-sidebar') as HTMLElement;
+                    if (sidebar) {
+                        sidebar.style.display = 'none';
+                    }
+                }
             }
-        }
-
-        if (this.isDesktop()) {
-            this.layoutState.update((prev) => ({ ...prev, staticMenuDesktopInactive: !this.layoutState().staticMenuDesktopInactive }));
         } else {
-            this.layoutState.update((prev) => ({ ...prev, staticMenuMobileActive: !this.layoutState().staticMenuMobileActive }));
+            if (this.isOverlay()) {
+                this.layoutState.update((prev) => ({ ...prev, overlayMenuActive: !this.layoutState().overlayMenuActive }));
 
-            if (this.layoutState().staticMenuMobileActive) {
-                this.overlayOpen.next(null);
+                if (this.layoutState().overlayMenuActive) {
+                    this.overlayOpen.next(null);
+                }
+            }
+
+            if (this.isDesktop()) {
+                this.layoutState.update((prev) => ({ ...prev, staticMenuDesktopInactive: !this.layoutState().staticMenuDesktopInactive }));
+            } else {
+                this.layoutState.update((prev) => ({ ...prev, staticMenuMobileActive: !this.layoutState().staticMenuMobileActive }));
+
+                if (this.layoutState().staticMenuMobileActive) {
+                    this.overlayOpen.next(null);
+                }
             }
         }
+    }
+
+    setTopNavigationMode(isTop: boolean) {
+        this.layoutState.update((prev) => ({ ...prev, isTopNavigationMode: isTop }));
     }
 
     isDesktop() {
