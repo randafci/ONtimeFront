@@ -14,6 +14,7 @@ export interface CreateUserDto {
   isLdapUser: boolean;
   extraEmployeesView: string;
   employeeId?: number;
+  organizationId?: number;
 }
 
 export interface UpdateUserDto {
@@ -23,4 +24,5 @@ export interface UpdateUserDto {
   isLdapUser: boolean;
   extraEmployeesView: string;
   employeeId?: number;
+   organizationId?: number;
 }

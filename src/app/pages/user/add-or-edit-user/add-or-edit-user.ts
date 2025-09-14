@@ -19,6 +19,7 @@ import { Employee } from '../../../interfaces/employee.interface';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { SelectModule } from 'primeng/select';
 import { Organization } from '@/interfaces/organization.interface';
+import { AuthService } from '@/auth/auth.service';
 
 @Component({
   selector: 'app-add-or-edit-user',
@@ -58,6 +59,7 @@ export class AddOrEditUser implements OnInit {
   submitted = false;
   employees: Employee[] = [];
   organization: Organization[] = [];
+  isSuperAdmin = false;
 
   loadingEmployees = false;
   loadinOgrganiztions = false;
@@ -66,7 +68,9 @@ export class AddOrEditUser implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private userService: UserService,
-    private messageService: MessageService
+    private messageService: MessageService,
+   private authService: AuthService
+    
   ) {
     this.userForm = this.fb.group({
       userName: ['', Validators.required],
@@ -82,7 +86,8 @@ export class AddOrEditUser implements OnInit {
   }
 
   ngOnInit(): void {
-
+    this.isSuperAdmin = this.checkIsSuperAdmin();
+this.isSuperAdmin = true;
     this.loadEmployees();
     this.loadOrganiztions();
     this.route.params.subscribe(params => {
@@ -157,6 +162,10 @@ export class AddOrEditUser implements OnInit {
       }
     });
   }
+  private checkIsSuperAdmin(): boolean {
+    const claims = this.authService.getClaims();
+    return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
+  }
 
   loadOrganiztions(): void {
     this.loadinOgrganiztions = true;
@@ -201,7 +210,9 @@ export class AddOrEditUser implements OnInit {
         email: formData.email,
         isLdapUser: formData.isLdapUser,
         extraEmployeesView: formData.extraEmployeesView,
-        employeeId: formData.employeeId
+        employeeId: formData.employeeId,
+        organizationId : formData.organizationId
+
       };
       if (formData.password) (updateDto as any).password = formData.password; // optional password update
 
@@ -219,7 +230,8 @@ export class AddOrEditUser implements OnInit {
         password: formData.password,
         isLdapUser: formData.isLdapUser,
         extraEmployeesView: formData.extraEmployeesView,
-        employeeId: formData.employeeId
+        employeeId: formData.employeeId,
+        organizationId : formData.organizationId
       };
 
       this.userService.create(createDto).subscribe({

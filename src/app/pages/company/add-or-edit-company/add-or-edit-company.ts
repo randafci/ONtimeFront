@@ -29,6 +29,7 @@ import { AuthService } from '../../../auth/auth.service';
     SelectModule,
     ToastModule,
     TranslatePipe,
+    
   ],
   templateUrl: './add-or-edit-company.html',
   styleUrl: './add-or-edit-company.scss',

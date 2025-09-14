@@ -1,0 +1,174 @@
+<div class="card p-fluid max-w-[800px] mx-auto">
+  <!-- Form Title -->
+  <h2 class="mb-4 text-xl font-semibold">
+    {{ isEditMode ? ('locationForm.editTitle' | translate) : ('locationForm.addTitle' | translate) }}
+  </h2>
+
+  <!-- Location Form -->
+  <form [formGroup]="locationForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+    
+    <!-- Grid Layout -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Code -->
+      <div class="field">
+        <label for="code">
+          {{ 'locationForm.fields.code' | translate }} <span class="required-star">*</span>
+        </label>
+        <input
+          id="code"
+          type="text"
+          pInputText
+          class="w-full"
+          formControlName="code"
+          [ngClass]="{
+            'field-error': locationForm.controls['code'].invalid && 
+                          (locationForm.controls['code'].dirty || locationForm.controls['code'].touched || submitted)
+          }"
+        />
+        <small
+          *ngIf="locationForm.controls['code'].invalid && 
+                 (locationForm.controls['code'].dirty || locationForm.controls['code'].touched || submitted)"
+          class="p-error"
+        >
+          {{ 'locationForm.validations.codeRequired' | translate }}
+        </small>
+      </div>
+
+      <!-- Name -->
+      <div class="field">
+        <label for="name">
+          {{ 'locationForm.fields.name' | translate }} <span class="required-star">*</span>
+        </label>
+        <input
+          id="name"
+          type="text"
+          pInputText
+          class="w-full"
+          formControlName="name"
+          [ngClass]="{
+            'field-error': locationForm.controls['name'].invalid && 
+                          (locationForm.controls['name'].dirty || locationForm.controls['name'].touched || submitted)
+          }"
+        />
+        <small
+          *ngIf="locationForm.controls['name'].invalid && 
+                 (locationForm.controls['name'].dirty || locationForm.controls['name'].touched || submitted)"
+          class="p-error"
+        >
+          {{ 'locationForm.validations.nameRequired' | translate }}
+        </small>
+      </div>
+
+      <!-- Index Value -->
+      <div class="field">
+        <label for="indexValue">{{ 'locationForm.fields.indexValue' | translate }}</label>
+        <input
+          id="indexValue"
+          type="number"
+          pInputText
+          class="w-full"
+          formControlName="indexValue"
+        />
+      </div>
+
+      <!-- Longitude -->
+      <div class="field">
+        <label for="long">{{ 'locationForm.fields.long' | translate }}</label>
+        <input
+          id="long"
+          type="number"
+          pInputText
+          class="w-full"
+          formControlName="long"
+        />
+      </div>
+
+      <!-- Latitude -->
+      <div class="field">
+        <label for="lat">{{ 'locationForm.fields.lat' | translate }}</label>
+        <input
+          id="lat"
+          type="number"
+          pInputText
+          class="w-full"
+          formControlName="lat"
+        />
+      </div>
+
+      <!-- Fence -->
+      <div class="field">
+        <label for="fence">{{ 'locationForm.fields.fence' | translate }}</label>
+        <input
+          id="fence"
+          type="number"
+          pInputText
+          class="w-full"
+          formControlName="fence"
+        />
+      </div>
+
+      <!-- Parent Id -->
+      <div class="field">
+        <label for="parentId">{{ 'locationForm.fields.parentId' | translate }}</label>
+        <input
+          id="parentId"
+          type="number"
+          pInputText
+          class="w-full"
+          formControlName="parentId"
+        />
+      </div>
+
+      <!-- Organization Dropdown (Super Admin only) -->
+      <div class="field" *ngIf="isSuperAdmin">
+        <label for="organizationId">
+          {{ 'locationForm.fields.organization' | translate }} <span class="required-star">*</span>
+        </label>
+        <p-select
+          id="organizationId"
+          class="w-full"
+          formControlName="organizationId"
+          [options]="organizations"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="{{ 'locationForm.placeholders.organization' | translate }}"
+          [ngClass]="{
+            'field-error': locationForm.controls['organizationId'].invalid && 
+                          (locationForm.controls['organizationId'].dirty || locationForm.controls['organizationId'].touched || submitted)
+          }"
+        ></p-select>
+        <small
+          *ngIf="locationForm.controls['organizationId'].invalid && 
+                 (locationForm.controls['organizationId'].dirty || locationForm.controls['organizationId'].touched || submitted)"
+          class="p-error"
+        >
+          {{ 'locationForm.validations.organizationRequired' | translate }}
+        </small>
+      </div>
+
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex justify-start gap-2 mt-4">
+      <button
+        pButton
+        type="button"
+        [label]="'locationForm.buttons.cancel' | translate"
+        class="p-button-secondary"
+        (click)="onCancel()"
+        [disabled]="loading"
+      ></button>
+
+      <button
+        pButton
+        type="submit"
+        [label]="isEditMode ? ('locationForm.buttons.update' | translate) : ('locationForm.buttons.save' | translate)"
+        [disabled]="locationForm.invalid || loading"
+      ></button>
+    </div>
+  </form>
+</div>
+
+<!-- Toast -->
+<p-toast></p-toast>

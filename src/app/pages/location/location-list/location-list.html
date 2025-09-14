@@ -1,0 +1,90 @@
+<div class="card">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">{{ 'locationList.title' | translate }}</h2>
+    <div class="flex-grow-1"></div>
+    <button 
+      pButton 
+      [label]="'locationList.addButton' | translate" 
+      icon="pi pi-plus" 
+      class="p-button-sm"
+      (click)="navigateToAdd()"
+    ></button>
+  </div>
+
+  <p-table
+    #dt
+    [value]="locations"
+    dataKey="id"
+    [rows]="10"
+    [loading]="loading"
+    [rowHover]="true"
+    [showGridlines]="true"
+    [paginator]="true"
+    [globalFilterFields]="['code', 'name']"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex justify-between items-center flex-column sm:flex-row">
+        <button 
+          pButton 
+          [label]="'locationList.clearButton' | translate" 
+          class="p-button-outlined mb-2" 
+          icon="pi pi-filter-slash" 
+          (click)="clear(dt)"
+        ></button>
+        <p-iconfield iconPosition="left" class="ml-auto">
+          <p-inputicon>
+            <i class="pi pi-search"></i>
+          </p-inputicon>
+          <input 
+            pInputText 
+            type="text" 
+            #filter
+            (input)="onGlobalFilter(dt, $event)" 
+            [placeholder]="'locationList.searchPlaceholder' | translate" 
+          />
+        </p-iconfield>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>{{ 'locationList.headers.code' | translate }}</th>
+        <th>{{ 'locationList.headers.name' | translate }}</th>
+  
+        <th>{{ 'locationList.headers.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-location>
+      <tr>
+        <td>{{ location.code }}</td>
+        <td>{{ location.name }}</td>
+       
+        <td>
+          <button 
+            pButton 
+            icon="pi pi-pencil" 
+            class="p-button-rounded p-button-text p-button-sm"
+            (click)="navigateToEdit(location.id)"
+          ></button>
+          <button 
+            pButton 
+            icon="pi pi-trash" 
+            class="p-button-rounded p-button-text p-button-danger p-button-sm"
+            (click)="deleteLocation(location)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5">{{ 'locationList.messages.empty' | translate }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+<p-confirmDialog></p-confirmDialog>
+
+<p-toast></p-toast>

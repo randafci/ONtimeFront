@@ -86,7 +86,7 @@
 
       <!-- organization ID -->
 
-  <div class="field">
+  <div class="field" *ngIf="isSuperAdmin">
   <label for="organizationId">{{ 'users.formPage.labels.organization' | translate }}</label>
   <p-select 
     class="w-full"

@@ -200,6 +200,7 @@ export class LayoutService {
   getPrimary = computed(() => this.layoutConfig().primary);
   getSurface = computed(() => this.layoutConfig().surface);
   isOverlay = computed(() => this.layoutConfig().menuMode === 'overlay');
+  isHeaderVisible = computed(() => this.layoutConfig().header ?? true);
   transitionComplete = signal<boolean>(false);
   isRTL = computed(() => this.layoutConfig().direction === 'rtl');
 
@@ -362,6 +363,7 @@ export class LayoutService {
     if (this._config.direction) {
       document.documentElement.setAttribute('dir', this._config.direction);
     }
+    this.applyHeaderVisibility(this._config.header ?? true);
   }
 
   onMenuStateChange(event: MenuChangeEvent) {
@@ -608,10 +610,43 @@ export class LayoutService {
       document.body.classList.add(themeClass);
     }
 
+    // Apply header visibility
+    this.applyHeaderVisibility(config.header ?? true);
+
     // Apply the actual PrimeUI theme preset + overrides
     this.applyThemePreset();
 
     // Notify listeners
     this.onConfigUpdate();
+  }
+
+  applyHeaderVisibility(visible: boolean) {
+    const layoutWrapper = document.querySelector('.layout-wrapper') as HTMLElement;
+    if (layoutWrapper) {
+      if (visible) {
+        layoutWrapper.classList.remove('layout-header-hidden');
+      } else {
+        layoutWrapper.classList.add('layout-header-hidden');
+      }
+    }
+
+    const topbar = document.querySelector('.layout-topbar') as HTMLElement;
+    const topbarComponent = document.querySelector('app-topbar') as HTMLElement;
+    
+    if (topbar) {
+      topbar.style.display = visible ? 'flex' : 'none';
+      topbar.style.visibility = visible ? 'visible' : 'hidden';
+      topbar.style.opacity = visible ? '1' : '0';
+      topbar.style.height = visible ? '70px' : '0';
+      topbar.style.overflow = visible ? 'visible' : 'hidden';
+    }
+    
+    if (topbarComponent) {
+      topbarComponent.style.display = visible ? 'block' : 'none';
+      topbarComponent.style.visibility = visible ? 'visible' : 'hidden';
+      topbarComponent.style.opacity = visible ? '1' : '0';
+      topbarComponent.style.height = visible ? 'auto' : '0';
+      topbarComponent.style.overflow = visible ? 'visible' : 'hidden';
+    }
   }
 }

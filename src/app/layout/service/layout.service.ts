@@ -7,7 +7,7 @@ export interface layoutConfig {
     surface?: string | undefined | null;
     darkTheme?: boolean;
     menuMode?: string;
-    direction?: 'ltr' | 'rtl';   // 👈 added
+    direction?: 'ltr' | 'rtl';
 }
 
 interface LayoutState {
@@ -189,16 +189,16 @@ export class LayoutService {
     applyDirection(direction: 'ltr' | 'rtl') {
     document.documentElement.setAttribute('dir', direction);
 }
-applyConfig() {
-    const config = this.layoutConfig();
+    applyConfig() {
+        const config = this.layoutConfig();
 
-    // Apply direction
-    this.applyDirection(config.direction ?? 'ltr');
+        // Apply direction
+        this.applyDirection(config.direction ?? 'ltr');
 
-    // Apply dark theme
-    this.toggleDarkMode(config);
+        // Apply dark theme
+        this.toggleDarkMode(config);
 
-    
-  }
+
+    }
 
 }
