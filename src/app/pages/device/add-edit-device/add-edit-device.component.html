@@ -1,0 +1,69 @@
+<p-toast></p-toast>
+<div class="card">
+    <div class="flex justify-content-between align-items-center mb-5 border-bottom-1 pb-3">
+        <h1 class="font-semibold text-xl m-0">
+           
+            {{ (isEditMode ? 'devices.editForm.pageTitle' : 'devices.addForm.pageTitle') | translate }}
+        </h1>
+        <button
+            pButton pRipple
+            [label]="'common.backButton' | translate"
+            icon="pi pi-arrow-left"
+            class="p-button-secondary"
+            routerLink="/devices">
+        </button>
+    </div>
+
+    <form [formGroup]="deviceForm" (ngSubmit)="onSubmit()">
+        <div class="grid p-fluid">
+            <!-- Code Field -->
+            <div class="field col-12 md:col-6">
+                <label for="code" class="font-semibold block mb-2">{{ 'devices.form.labels.code' | translate }} <span class="text-red-500">*</span></label>
+                <input id="code" pInputText formControlName="code" />
+                <small *ngIf="f['code'].touched && f['code'].errors?.['required']" class="p-error block mt-1">{{ 'common.validation.required' | translate }}</small>
+            </div>
+
+            <!-- Name Field -->
+            <div class="field col-12 md:col-6">
+
+                <label for="name" class="font-semibold block mb-2">{{ 'devices.form.labels.name' | translate }} <span class="text-red-500">*</span></label>
+                <input id="name" pInputText formControlName="name" />
+                <small *ngIf="f['name'].touched && f['name'].errors?.['required']" class="p-error block mt-1">{{ 'common.validation.required' | translate }}</small>
+            </div>
+
+            <!-- IP Address Field -->
+            <div class="field col-12 md:col-6">
+                <label for="ipAddress" class="font-semibold block mb-2">{{ 'devices.form.labels.ipAddress' | translate }} <span class="text-red-500">*</span></label>
+                <input id="ipAddress" pInputText formControlName="ipAddress" />
+                <small *ngIf="f['ipAddress'].touched && f['ipAddress'].errors?.['required']" class="p-error block mt-1">{{ 'common.validation.required' | translate }}</small>
+            </div>
+
+            <!-- Location Field (Dropdown) -->
+            <div class="field col-12 md:col-6">
+                <label for="locationId" class="font-semibold block mb-2">{{ 'devices.form.labels.location' | translate }} <span class="text-red-500">*</span></label>
+
+                <p-select id="locationId" formControlName="locationId" [options]="locationsList" placeholder="Select a Location" optionLabel="name" optionValue="id"></p-select>
+                <small *ngIf="f['locationId'].touched && f['locationId'].errors?.['required']" class="p-error block mt-1">{{ 'common.validation.required' | translate }}</small>
+            </div>
+
+            <!-- Disabled Checkbox -->
+            <div class="field-checkbox col-12 md:col-3 flex align-items-center mt-4">
+                <p-checkbox formControlName="disabled" [binary]="true" inputId="disabled"></p-checkbox>
+                <label for="disabled" class="ml-2 font-semibold">{{ 'devices.form.labels.disabled' | translate }}</label>
+            </div>
+
+            <!-- Download Logs Checkbox -->
+            <div class="field-checkbox col-12 md:col-3 flex align-items-center mt-4">
+                <p-checkbox formControlName="download" [binary]="true" inputId="download"></p-checkbox>
+                <label for="download" class="ml-2 font-semibold">{{ 'devices.form.labels.downloadLogs' | translate }}</label>
+            </div>
+        </div>
+
+        <div class="mt-5">
+            <button pButton pRipple type="submit" [disabled]="deviceForm.invalid || isSaving">
+                <span *ngIf="!isSaving">{{ (isEditMode ? 'devices.editForm.buttons.update' : 'devices.addForm.buttons.add') | translate }}</span>
+                <span *ngIf="isSaving"><i class="pi pi-spin pi-spinner mr-2"></i> {{ (isEditMode ? 'devices.editForm.buttons.updating' : 'devices.addForm.buttons.adding') | translate }}</span>
+            </button>
+        </div>
+    </form>
+</div>
