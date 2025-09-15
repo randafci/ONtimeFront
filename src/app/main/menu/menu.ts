@@ -32,7 +32,7 @@ export class MenuComponent implements OnInit {
    
    this.model = [
      {
-       label: 'OnTime',   // fake root
+       label: 'OnTime',  
        items: [
          {
            label: 'Home',
@@ -60,7 +60,7 @@ export class MenuComponent implements OnInit {
            label: 'Users',
            items: [
              { label: 'User', icon: 'pi pi-fw pi-sitemap', routerLink: ['/users/list'] },
-             ...(isSuperAdmin ? [{ label: 'Role', icon: 'pi pi-fw pi-key', routerLink: ['/roles'] }] : []),
+             { label: 'Role', icon: 'pi pi-fw pi-key', routerLink: ['/roles'] },
              { label: 'Employee', icon: 'pi pi-fw pi-users', routerLink: ['/employees'] }
            ]
          },
@@ -76,7 +76,7 @@ export class MenuComponent implements OnInit {
             label: 'Device management',
             items: [
               { label: 'Location', icon: 'pi pi-fw pi-map-marker', routerLink: ['/locations/list'] },
-              ...(isSuperAdmin ? [{ label: 'Role', icon: 'pi pi-fw pi-key', routerLink: ['/roles'] }] : []),
+              { label: 'Device', icon: 'pi pi-fw pi-desktop', routerLink: ['/devices'] }
             ]
           }
        ]

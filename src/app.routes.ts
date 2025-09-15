@@ -14,6 +14,8 @@ import { SuperAdminGuard } from './app/auth/gurads/super-admin.guard';
 import { RolesListComponent } from './app/pages/roles/roles-list/roles-list.component';
 import { AddEditRoleComponent } from './app/pages/roles/add-role/add-edit-role.component';
 import { TranslationManagerComponent } from './app/pages/translation-manager/translation-manager/translation-manager.component';
+import { DeviceListComponent } from './app/pages/device/device-list/device-list.component';
+import { AddEditDeviceComponent } from './app/pages/device/add-edit-device/add-edit-device.component';
 
 export const appRoutes: Routes = [
   {
@@ -56,6 +58,14 @@ export const appRoutes: Routes = [
         component: AddEditRoleComponent,
         canActivate: [SuperAdminGuard]
       },
+      {
+        path: 'devices',
+        component: DeviceListComponent,
+        // canActivate: [SuperAdminGuard]
+      },
+      { path: 'devices/add', component: AddEditDeviceComponent },
+      
+{ path: 'devices/edit/:id', component: AddEditDeviceComponent },
       {
         path: 'companies',
         loadChildren: () =>
