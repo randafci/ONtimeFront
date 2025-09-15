@@ -23,7 +23,7 @@ export class AuthGuard implements CanActivate {
     }
 
     // Check for excluded routes
-    const excludeRoutes = ["/login"];
+    const excludeRoutes = ["/login" , "/ForgetPassword" , "/ChangePassowrd"];
     if (excludeRoutes.some(excluded => state.url.includes(excluded))) {
       return true;
     }

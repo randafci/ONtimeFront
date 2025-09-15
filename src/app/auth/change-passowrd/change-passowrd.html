@@ -1,1 +1,63 @@
-<p>change-passowrd works!</p>
+<app-floating-configurator />
+<div class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-screen overflow-hidden">
+  <div class="flex flex-col items-center justify-center">
+    <div
+      style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
+      <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
+
+        <!-- ✅ Title -->
+        <div class="text-center mb-8">
+          <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">
+            Reset your password
+          </div>
+          <span class="text-muted-color font-medium">
+            Please enter your new password below.
+          </span>
+          <p *ngIf="email" class="mt-2 text-primary">
+            Resetting for: <strong>{{ email }}</strong>
+          </p>
+        </div>
+
+        <!-- ✅ Reset Password Form -->
+        <form [formGroup]="resetForm" (ngSubmit)="onSubmit()">
+
+          <!-- New Password -->
+          <label for="newPassword" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">
+            New Password
+          </label>
+          <input pInputText id="newPassword" type="password" formControlName="newPassword" placeholder="Enter new password"
+            class="w-full md:w-120 mb-4" />
+          <div class="text-red-500 text-sm mb-4" *ngIf="resetForm.get('newPassword')?.touched">
+            <span *ngIf="resetForm.get('newPassword')?.errors?.['required']">
+              New password is required.
+            </span>
+            <span *ngIf="resetForm.get('newPassword')?.errors?.['minlength']">
+              Minimum 6 characters required.
+            </span>
+          </div>
+
+          <!-- Confirm Password -->
+          <label for="confirmPassword" class="block text-surface-900 dark:text-surface-0 text-xl font-medium mb-2">
+            Confirm Password
+          </label>
+          <input pInputText id="confirmPassword" type="password" formControlName="confirmPassword"
+            placeholder="Confirm new password" class="w-full md:w-120 mb-4" />
+          <div class="text-red-500 text-sm mb-4" *ngIf="resetForm.get('confirmPassword')?.touched">
+            <span *ngIf="resetForm.hasError('mismatch')">
+              Passwords do not match.
+            </span>
+          </div>
+
+          <!-- Submit Button -->
+          <p-button type="submit" [loading]="isSubmitting" label="Reset Password" styleClass="w-full"></p-button>
+        </form>
+
+        <!-- Back to login -->
+        <div class="text-center mt-6">
+          <a routerLink="/login" class="text-primary font-medium cursor-pointer">Back to Sign In</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

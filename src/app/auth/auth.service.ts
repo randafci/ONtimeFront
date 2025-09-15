@@ -229,42 +229,40 @@ getAuthUserInfo(): Observable<any> {
       responseType: "text" as "json",
     });
   }
-  forgotPassword(Email: string): Observable<any> {
-    return this.http
-      .post(
-        `${this.apiUrl}/Account/forgotpassword`,
-        { email: Email, ClientType: "Admin" },
-        { responseType: "text" as "json" }
-      )
-      .pipe(
-        catchError((error) => {
-          const errorMessage =
-            "An error occurred while sending the reset link.";
-          console.error(errorMessage, error);
-          return throwError(() => new Error(errorMessage));
-        })
-      );
-  }
-  resetPassword(
-    Email: string,
-    Token: string,
-    NewPassword: string
-  ): Observable<any> {
-    const payload = { Email, Token, NewPassword };
-
-    return this.http
-      .post(`${this.apiUrl}/Account/resetpassword`, payload, {
-        responseType: "text" as "json",
+forgotPassword(Email: string): Observable<any> {
+  return this.http
+    .post<any>(`${this.apiUrl}/api/Account/forgot-password`, {
+      email: Email,
+    })
+    .pipe(
+      catchError((error) => {
+        const errorMessage =
+          "An error occurred while sending the reset link.";
+        console.error(errorMessage, error);
+        return throwError(() => new Error(errorMessage));
       })
-      .pipe(
-        catchError((error) => {
-          const errorMessage =
-            "An error occurred while resetting the password.";
-          console.error(errorMessage, error);
-          return throwError(() => new Error(errorMessage));
-        })
-      );
-  }
+    );
+}
+
+  resetPassword(
+  Email: string,
+  Token: string,
+  NewPassword: string
+): Observable<any> {
+  const payload = { Email, Token, NewPassword };
+
+  return this.http.post(
+    `${this.apiUrl}/api/Account/reset-password`, // 👈 fixed URL
+    payload,
+    { responseType: 'text' as 'json' }
+  ).pipe(
+    catchError((error) => {
+      console.error("An error occurred while resetting the password.", error);
+      return throwError(() => new Error("An error occurred while resetting the password."));
+    })
+  );
+}
+
 
   changePassword(
     currentPassword: string,

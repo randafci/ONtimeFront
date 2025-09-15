@@ -5,6 +5,7 @@ export interface UserDto {
   isLdapUser: boolean;
   extraEmployeesView: string;
   employeeId?: number;
+  organizationId?: number;
 }
 
 export interface CreateUserDto {
