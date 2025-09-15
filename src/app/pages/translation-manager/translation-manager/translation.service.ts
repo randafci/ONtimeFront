@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { delay, map, switchMap, tap } from 'rxjs/operators';
+import { delay, map, switchMap, tap, catchError } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { AppConfigService } from '../../service/app-config.service';
 import { ApiResponse } from '../../../core/models/api-response.model';
@@ -42,6 +42,12 @@ constructor(private http: HttpClient, private appConfig: AppConfigService) {
           this.translationsSubject.next(parsedData);
           this.currentLangSubject.next(languageCode);
         }
+      }),
+      catchError(error => {
+        console.warn(`Translation data not found for language '${languageCode}'. Using empty translations.`);
+        this.translationsSubject.next({});
+        this.currentLangSubject.next(languageCode);
+        return of({});
       })
     );
   }
