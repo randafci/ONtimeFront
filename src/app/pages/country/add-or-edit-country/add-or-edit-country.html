@@ -1,0 +1,149 @@
+<div class="card p-fluid max-w-[800px] mx-auto">
+  <h2>{{ (isEditMode ? 'Edit Country' : 'Add Country') | translate }}</h2>
+  
+  <form [formGroup]="countryForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+    <!-- Vertical Grid Layout -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Country Code Field -->
+      <div class="mb-6">
+        <label for="id" class="block mb-2 font-semibold">{{ 'Country Code' | translate }} <span class="text-red-500 font-bold">*</span></label>
+        <input 
+          id="id" 
+          type="text" 
+          pInputText 
+          class="w-full {{ countryForm.controls['id'].invalid && (countryForm.controls['id'].dirty || countryForm.controls['id'].touched || submitted) ? 'border-red-500 shadow-[0_0_0_1px_#f44336]' : '' }}"
+          formControlName="id" 
+          [ngClass]="{
+            'border-red-500 shadow-[0_0_0_1px_#f44336]': 
+              (countryForm.controls['id'].invalid && 
+              (countryForm.controls['id'].dirty || countryForm.controls['id'].touched || submitted))
+          }"
+          [disabled]="isEditMode"
+          maxlength="2" />
+        <small 
+          *ngIf="countryForm.controls['id'].invalid && 
+                (countryForm.controls['id'].dirty || countryForm.controls['id'].touched || submitted)" 
+          class="text-red-500 text-sm mt-1"
+        >
+          <span *ngIf="countryForm.controls['id'].errors?.['required']">{{ 'Country code is required' | translate }}</span>
+          <span *ngIf="countryForm.controls['id'].errors?.['maxlength']">{{ 'Country code must be 2 characters' | translate }}</span>
+        </small>
+      </div>
+
+
+      <!-- Name Field -->
+      <div class="mb-6">
+        <label for="name" class="block mb-2 font-semibold">{{ 'Name' | translate }} <span class="text-red-500 font-bold">*</span></label>
+        <input class="w-full"
+          id="name" 
+          type="text" 
+          pInputText 
+          formControlName="name" 
+          [ngClass]="{
+            'border-red-500 shadow-[0_0_0_1px_#f44336]': 
+              (countryForm.controls['name'].invalid && 
+              (countryForm.controls['name'].dirty || countryForm.controls['name'].touched || submitted))
+          }"
+        />
+        <small 
+          *ngIf="countryForm.controls['name'].invalid && 
+                (countryForm.controls['name'].dirty || countryForm.controls['name'].touched || submitted)" 
+          class="text-red-500 text-sm mt-1"
+        >
+          {{ 'Name is required' | translate }}
+        </small>
+      </div>
+
+      <!-- NameSE Field -->
+      <div class="mb-6">
+        <label for="nameSE" class="block mb-2 font-semibold">{{ 'Name (SE)' | translate }} <span class="text-red-500 font-bold">*</span></label>
+        <input class="w-full"
+          id="nameSE" 
+          type="text" 
+          pInputText 
+          formControlName="nameSE" 
+          [ngClass]="{
+            'border-red-500 shadow-[0_0_0_1px_#f44336]': 
+              (countryForm.controls['nameSE'].invalid && 
+              (countryForm.controls['nameSE'].dirty || countryForm.controls['nameSE'].touched || submitted))
+          }"
+        />
+        <small 
+          *ngIf="countryForm.controls['nameSE'].invalid && 
+                (countryForm.controls['nameSE'].dirty || countryForm.controls['nameSE'].touched || submitted)" 
+          class="text-red-500 text-sm mt-1"
+        >
+          {{ 'Name (SE) is required' | translate }}
+        </small>
+      </div>
+
+      <!-- Nationality Field -->
+      <div class="mb-6">
+        <label for="nationality" class="block mb-2 font-semibold">{{ 'Nationality' | translate }} <span class="text-red-500 font-bold">*</span></label>
+        <input class="w-full"
+          id="nationality" 
+          type="text" 
+          pInputText 
+          formControlName="nationality" 
+          [ngClass]="{
+            'border-red-500 shadow-[0_0_0_1px_#f44336]': 
+              (countryForm.controls['nationality'].invalid && 
+              (countryForm.controls['nationality'].dirty || countryForm.controls['nationality'].touched || submitted))
+          }"
+        />
+        <small 
+          *ngIf="countryForm.controls['nationality'].invalid && 
+                (countryForm.controls['nationality'].dirty || countryForm.controls['nationality'].touched || submitted)" 
+          class="text-red-500 text-sm mt-1"
+        >
+          {{ 'Nationality is required' | translate }}
+        </small>
+      </div>
+
+      <!-- NationalitySE Field -->
+      <div class="mb-6">
+        <label for="nationalitySEName" class="block mb-2 font-semibold">{{ 'Nationality (SE)' | translate }} <span class="text-red-500 font-bold">*</span></label>
+        <input class="w-full"
+          id="nationalitySEName" 
+          type="text" 
+          pInputText 
+          formControlName="nationalitySEName" 
+          [ngClass]="{
+            'border-red-500 shadow-[0_0_0_1px_#f44336]': 
+              (countryForm.controls['nationalitySEName'].invalid && 
+              (countryForm.controls['nationalitySEName'].dirty || countryForm.controls['nationalitySEName'].touched || submitted))
+          }"
+        />
+        <small 
+          *ngIf="countryForm.controls['nationalitySEName'].invalid && 
+                (countryForm.controls['nationalitySEName'].dirty || countryForm.controls['nationalitySEName'].touched || submitted)" 
+          class="text-red-500 text-sm mt-1"
+        >
+          {{ 'Nationality (SE) is required' | translate }}
+        </small>
+      </div>
+
+
+    </div>
+
+    <!-- Submit Button Row -->
+    <div class="flex justify-start gap-2 mt-4">
+      <button 
+        pButton 
+        type="button" 
+        label="Cancel" 
+        class="p-button-secondary" 
+        (click)="onCancel()"
+        [disabled]="loading"
+      ></button>
+      <button 
+        pButton 
+        type="submit" 
+        [label]="(isEditMode ? 'Update' : 'Save')" 
+        [disabled]="countryForm.invalid || loading"
+      ></button>
+    </div>
+  </form>
+</div>
+
+<p-toast></p-toast>
