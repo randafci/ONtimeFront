@@ -90,6 +90,20 @@ export const appRoutes: Routes = [
           )
       },
       {
+        path: 'families',
+        loadChildren: () =>
+          import('./app/pages/family/family.routes').then(
+            (m) => m.FAMILY_ROUTES
+          )
+      },
+      {
+        path: 'grades',
+        loadChildren: () =>
+          import('./app/pages/grade/grade.routes').then(
+            (m) => m.GRADE_ROUTES
+          )
+      },
+      {
         path: 'sections',
         loadChildren: () =>
           import('./app/pages/section/section.routes').then(

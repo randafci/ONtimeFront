@@ -86,7 +86,7 @@ export class LayoutService {
     private initialized = false;
 
 
-     // Create a signal from the translation service's language observable
+
     currentLang: () => any;
 
     constructor(private translationService: TranslationService) {
@@ -95,7 +95,7 @@ export class LayoutService {
     const config = this.layoutConfig();
     if (config) {
         this.onConfigUpdate();
-        this.applyConfig();  // 👈 keep UI consistent
+        this.applyConfig();  
     }
 });
 
@@ -111,13 +111,12 @@ export class LayoutService {
             this.handleDarkModeTransition(config);
         });
 
-        // ADD THIS NEW EFFECT
-        // This effect will automatically sync the direction with the language
+
         effect(() => {
-            const lang = this.currentLang(); // Get the current language
+            const lang = this.currentLang();
             if (lang) {
                 const newDir = lang === 'ar' ? 'rtl' : 'ltr';
-                // Only update if the direction is different, to avoid infinite loops
+
                 if (newDir !== this.layoutConfig().direction) {
                     this.layoutConfig.update((config) => ({ ...config, direction: newDir }));
                 }

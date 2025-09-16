@@ -67,7 +67,9 @@ export class MenuComponent implements OnInit {
                             { label: this.t('menu.organization.designation'), icon: 'pi pi-fw pi-briefcase', routerLink: ['/designations/list'] },
                             { label: this.t('menu.organization.department'), icon: 'pi pi-fw pi-sitemap', routerLink: ['/departments/list'] },
                             { label: this.t('menu.organization.section'), icon: 'pi pi-fw pi-sitemap', routerLink: ['/sections/list'] },
-                            { label: this.t('menu.organization.event'), icon: 'pi pi-fw pi-sitemap', routerLink: ['/events/list'] }
+                            { label: this.t('menu.organization.event'), icon: 'pi pi-fw pi-sitemap', routerLink: ['/events/list'] },
+                            { label: this.t('menu.organization.family'), icon: 'pi pi-fw pi-users', routerLink: ['/families'] },
+                            { label: this.t('menu.organization.grade'), icon: 'pi pi-fw pi-star', routerLink: ['/grades'] }
                         ]
                     },
                     {

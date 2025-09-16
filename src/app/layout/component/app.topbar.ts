@@ -122,7 +122,7 @@ export class AppTopbar implements OnInit, OnDestroy {
 
     switchLanguage(): void {
         this.translationService.toggleLanguage();
-        this.switchDir();
+        this.layoutService.toggleDirection(); 
     }
 
 
