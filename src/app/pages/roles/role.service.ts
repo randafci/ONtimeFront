@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient,HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '@/environments/environment';
-import { AuthService } from '@/auth/auth.service';
+
 // Import the new models
-import { APIOperationResponse, PaginatedList, PagedListRequest } from '@/core/models/api-response.model';
 import { AppConfigService } from '../service/app-config.service';
+import { AuthService } from '../../auth/auth.service';
+import { APIOperationResponse, PagedListRequest, PaginatedList } from '../../core/models/api-response.model';
 
 // Use the DTO structure from the backend
 export interface RoleDto {

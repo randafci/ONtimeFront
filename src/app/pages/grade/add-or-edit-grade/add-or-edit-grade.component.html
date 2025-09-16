@@ -1,0 +1,41 @@
+<div class="card p-fluid max-w-[800px] mx-auto">
+  <h2>{{ (isEditMode ? 'gradeForm.title.edit' : 'gradeForm.title.add') | translate }}</h2>
+  
+  <form [formGroup]="gradeForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <div class="field">
+        <label for="code">{{ 'common.code' | translate }} <span class="required-star">*</span></label>
+        <input id="code" type="text" pInputText formControlName="code" />
+        <small *ngIf="gradeForm.controls['code'].invalid && submitted" class="p-error">
+          {{ 'common.validation.required' | translate }}
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="name">{{ 'common.name' | translate }} <span class="required-star">*</span></label>
+        <input id="name" type="text" pInputText formControlName="name" />
+        <small *ngIf="gradeForm.controls['name'].invalid && submitted" class="p-error">
+          {{ 'common.validation.required' | translate }}
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="nameSE">{{ 'common.nameSE' | translate }} <span class="required-star">*</span></label>
+        <input id="nameSE" type="text" pInputText formControlName="nameSE" />
+        <small *ngIf="gradeForm.controls['nameSE'].invalid && submitted" class="p-error">
+          {{ 'common.validation.required' | translate }}
+        </small>
+      </div>
+
+    </div>
+
+    <div class="flex justify-content-start gap-2 mt-4">
+      <button pButton type="button" [label]="'common.cancel' | translate" class="p-button-secondary" 
+              (click)="onCancel()" [disabled]="loading"></button>
+      <button pButton type="submit" [label]="(isEditMode ? 'common.update' : 'common.save') | translate" 
+              [disabled]="gradeForm.invalid || loading"></button>
+    </div>
+  </form>
+</div>
+<p-toast></p-toast>

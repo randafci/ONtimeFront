@@ -14,8 +14,10 @@ import { SuperAdminGuard } from './app/auth/gurads/super-admin.guard';
 import { RolesListComponent } from './app/pages/roles/roles-list/roles-list.component';
 import { AddEditRoleComponent } from './app/pages/roles/add-role/add-edit-role.component';
 import { TranslationManagerComponent } from './app/pages/translation-manager/translation-manager/translation-manager.component';
-import { ForgetPassword } from '@/auth/forget-password/forget-password';
-import { ChangePassowrd } from '@/auth/change-passowrd/change-passowrd';
+import { ForgetPassword } from './app/auth/forget-password/forget-password';
+import { ChangePassowrd } from './app/auth/change-passowrd/change-passowrd';
+import { DeviceListComponent } from './app/pages/device/device-list/device-list.component';
+import { AddEditDeviceComponent } from './app/pages/device/add-edit-device/add-edit-device.component';
 
 export const appRoutes: Routes = [
   {
@@ -59,6 +61,14 @@ export const appRoutes: Routes = [
         canActivate: [SuperAdminGuard]
       },
       {
+        path: 'devices',
+        component: DeviceListComponent,
+        // canActivate: [SuperAdminGuard]
+      },
+      { path: 'devices/add', component: AddEditDeviceComponent },
+      
+{ path: 'devices/edit/:id', component: AddEditDeviceComponent },
+      {
         path: 'companies',
         loadChildren: () =>
           import('./app/pages/company/company.routes').then(
@@ -77,6 +87,20 @@ export const appRoutes: Routes = [
         loadChildren: () =>
           import('./app/pages/department/department.routes').then(
             (m) => m.DEPARTMENT_ROUTES
+          )
+      },
+      {
+        path: 'families',
+        loadChildren: () =>
+          import('./app/pages/family/family.routes').then(
+            (m) => m.FAMILY_ROUTES
+          )
+      },
+      {
+        path: 'grades',
+        loadChildren: () =>
+          import('./app/pages/grade/grade.routes').then(
+            (m) => m.GRADE_ROUTES
           )
       },
       {

@@ -1,12 +1,12 @@
-import { LayoutService } from '@/layout/service/layout.service';
 import { Component, Renderer2, ViewChild } from '@angular/core';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { Subscription, filter } from 'rxjs';
 import { AppFooter } from '../footer/footer';
 import { CommonModule } from '@angular/common';
 import { AppSidebar } from '../sidebar/sidebar';
-import { AppTopbar as AppTopbar } from "@/layout/component/app.topbar";
-import { AppFloatingSettings } from "@/layout/component/app.floating-settings";
+import { LayoutService } from '../../layout/service/layout.service';
+import { AppFloatingSettings } from '../../layout/component/app.floating-settings';
+import { AppTopbar } from '../../layout/component/app.topbar';
 
 @Component({
     selector: 'app-layoutAdmin',
