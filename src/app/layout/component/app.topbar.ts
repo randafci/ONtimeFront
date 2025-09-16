@@ -8,7 +8,7 @@ import { LayoutService } from '../service/layout.service';
 import { TooltipModule } from 'primeng/tooltip';
 import { TranslationService } from '../../pages/translation-manager/translation-manager/translation.service';
 import { Subscription } from 'rxjs';
-import { AppSettingsPanel } from "@/main/settings-panel.component";
+import { AppSettingsPanel } from "../../main/settings-panel.component";
 
 
 @Component({
@@ -122,6 +122,7 @@ export class AppTopbar implements OnInit, OnDestroy {
 
     switchLanguage(): void {
         this.translationService.toggleLanguage();
+        this.switchDir();
     }
 
 

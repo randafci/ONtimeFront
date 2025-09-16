@@ -1,6 +1,7 @@
 import { Injectable, effect, signal, computed } from '@angular/core';
 import { Subject } from 'rxjs';
-
+import { TranslationService } from '../../pages/translation-manager/translation-manager/translation.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 export interface layoutConfig {
     preset?: string;
     primary?: string;
@@ -84,7 +85,12 @@ export class LayoutService {
 
     private initialized = false;
 
-    constructor() {
+
+     // Create a signal from the translation service's language observable
+    currentLang: () => any;
+
+    constructor(private translationService: TranslationService) {
+        this.currentLang = toSignal(this.translationService.currentLang$);
        effect(() => {
     const config = this.layoutConfig();
     if (config) {
@@ -103,6 +109,19 @@ export class LayoutService {
             }
 
             this.handleDarkModeTransition(config);
+        });
+
+        // ADD THIS NEW EFFECT
+        // This effect will automatically sync the direction with the language
+        effect(() => {
+            const lang = this.currentLang(); // Get the current language
+            if (lang) {
+                const newDir = lang === 'ar' ? 'rtl' : 'ltr';
+                // Only update if the direction is different, to avoid infinite loops
+                if (newDir !== this.layoutConfig().direction) {
+                    this.layoutConfig.update((config) => ({ ...config, direction: newDir }));
+                }
+            }
         });
     }
 
