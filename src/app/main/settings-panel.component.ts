@@ -367,14 +367,35 @@ export class AppSettingsPanel {
     changeNavigation(value: 'side' | 'top') {
         this.layoutService.layoutConfig.update((s) => ({ ...s, navigation: value }));
         
-        // Apply navigation mode directly
         const body = document.body;
+        const layoutWrapper = document.querySelector('.layout-wrapper') as HTMLElement;
+        
         if (value === 'top') {
             body.classList.add('navigation-top');
             body.classList.remove('navigation-side');
+            
+            if (layoutWrapper) {
+                layoutWrapper.classList.remove('layout-static');
+                layoutWrapper.classList.add('layout-overlay');
+            }
+            
+            const sidebar = document.querySelector('.layout-sidebar') as HTMLElement;
+            if (sidebar) {
+                sidebar.style.display = 'none';
+            }
         } else {
             body.classList.add('navigation-side');
             body.classList.remove('navigation-top');
+            
+            if (layoutWrapper) {
+                layoutWrapper.classList.remove('layout-overlay');
+                layoutWrapper.classList.add('layout-static');
+            }
+            
+            const sidebar = document.querySelector('.layout-sidebar') as HTMLElement;
+            if (sidebar) {
+                sidebar.style.removeProperty('display');
+            }
         }
     }
 
@@ -382,30 +403,9 @@ export class AppSettingsPanel {
         this.layoutService.layoutConfig.update((s) => ({ ...s, direction: value }));
         document.documentElement.setAttribute('dir', value);
         
-        const sidebar = document.querySelector('.layout-sidebar') as HTMLElement;
-        const mainContainer = document.querySelector('.layout-main-container') as HTMLElement;
-        
         if (value === 'rtl') {
-            if (sidebar) {
-                sidebar.style.left = 'auto';
-                sidebar.style.right = '2rem';
-            }
-            if (mainContainer) {
-                mainContainer.style.marginLeft = '0';
-                mainContainer.style.marginRight = '24rem';
-            }
-            
             this.applyRTLFormStyles();
         } else {
-            if (sidebar) {
-                sidebar.style.left = '2rem';
-                sidebar.style.right = 'auto';
-            }
-            if (mainContainer) {
-                mainContainer.style.marginLeft = '22rem';
-                mainContainer.style.marginRight = '0';
-            }
-            
             this.applyLTRFormStyles();
         }
     }
