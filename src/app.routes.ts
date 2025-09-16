@@ -114,6 +114,13 @@ export const appRoutes: Routes = [
             (m) => m.LOCATION_ROUTES
           )
       },
+       {
+        path: 'permitions',
+        loadChildren: () =>
+          import('./app/pages/Permission/permitopn.routs').then(
+            (m) => m.PERMITION_ROUTES
+          )
+      },
       { path: 'test', component: Layout },
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
     ]
