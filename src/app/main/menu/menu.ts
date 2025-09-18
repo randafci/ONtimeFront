@@ -69,7 +69,8 @@ export class MenuComponent implements OnInit {
                             { label: this.t('menu.organization.section'), icon: 'pi pi-fw pi-sitemap', routerLink: ['/sections/list'] },
                             { label: this.t('menu.organization.event'), icon: 'pi pi-fw pi-sitemap', routerLink: ['/events/list'] },
                             { label: this.t('menu.organization.family'), icon: 'pi pi-fw pi-users', routerLink: ['/families'] },
-                            { label: this.t('menu.organization.grade'), icon: 'pi pi-fw pi-star', routerLink: ['/grades'] }
+                            { label: this.t('menu.organization.grade'), icon: 'pi pi-fw pi-star', routerLink: ['/grades'] },
+                            { label: 'Cost Center', icon: 'pi pi-fw pi-dollar', routerLink: ['/cost-centers/list'] }
                         ]
                     },
                     {
@@ -83,6 +84,7 @@ export class MenuComponent implements OnInit {
                     {
                         label: this.t('menu.settings.groupLabel'),
                         items: [
+                            { label: 'Countries', icon: 'pi pi-fw pi-globe', routerLink: ['/countries/list'] },
                             { label: this.t('menu.settings.english'), icon: 'pi pi-fw pi-globe', routerLink: ['/translations/en'] },
                             { label: this.t('menu.settings.arabic'), icon: 'pi pi-fw pi-globe', routerLink: ['/translations/ar'] }
                         ]

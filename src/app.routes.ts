@@ -138,6 +138,20 @@ export const appRoutes: Routes = [
             (m) => m.LOCATION_ROUTES
           )
       },
+      {
+        path: 'cost-centers',
+        loadChildren: () =>
+          import('./app/pages/cost-center/cost-center.routes').then(
+            (m) => m.COST_CENTER_ROUTES
+          )
+      },
+      {
+        path: 'countries',
+        loadChildren: () =>
+          import('./app/pages/country/country.routes').then(
+            (m) => m.COUNTRY_ROUTES
+          )
+      },
        {
         path: 'permitions',
         loadChildren: () =>
