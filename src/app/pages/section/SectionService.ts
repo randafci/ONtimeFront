@@ -11,7 +11,6 @@ import { AuthService } from '@/auth/auth.service';
   providedIn: 'root'
 })
 export class SectionService {
-//   private apiUrl = 'https://localhost:44369/api';
 private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient, private appConfig: AppConfigService,

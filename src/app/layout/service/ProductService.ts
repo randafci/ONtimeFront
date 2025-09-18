@@ -9,7 +9,6 @@ import { AppConfigService } from '@/pages/service/app-config.service';
   providedIn: 'root'
 })
 export class ProductService {
-  // private apiUrl = 'https://localhost:44369/api/';
   private apiUrl = environment.apiUrl;
 
   // public apiUrl: string;

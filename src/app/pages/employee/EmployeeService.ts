@@ -12,6 +12,7 @@ export class EmployeeService {
   public apiUrl: string;
   constructor(private http: HttpClient, private appConfig: AppConfigService,private authService: AuthService) {
     this.apiUrl = this.appConfig.apiUrl + '/api';
+    console.log("this.apiUrl" ,this.apiUrl)
   }
   private get headers() {
     return { headers: this.authService.getHeaders() };
