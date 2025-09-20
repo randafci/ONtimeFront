@@ -96,6 +96,13 @@ export class MenuComponent implements OnInit {
                             { label: this.t('menu.device.device'), icon: 'pi pi-fw pi-desktop', routerLink: ['/devices'] }
                         ]
                     }
+                    ,
+                    {
+                        label: this.t('menu.employeeDevicesAssignment.groupLabel'),
+                        items: [
+                            { label: this.t('menu.employeeDevicesAssignment.employeeDevicesAssignment'), icon: 'pi pi-fw pi-map-marker', routerLink: ['/employeeDevicesAssignment'] },
+                        ]
+                    }
                 ]
             }
         ];

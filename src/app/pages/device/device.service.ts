@@ -13,6 +13,7 @@ export class DeviceService {
 
   constructor(private http: HttpClient, private appConfig: AppConfigService) {
     this.apiUrl = this.appConfig.apiUrl + '/api/Device';
+    console.log("this.apiUrl " , this.apiUrl )
   }
 
   getDevices(request: PagedListRequest): Observable<APIOperationResponse<PaginatedList<Device>>> {
