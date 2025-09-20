@@ -159,11 +159,18 @@ export const appRoutes: Routes = [
             (m) => m.PERMITION_ROUTES
           )
       },
-        {
+      {
         path: 'employeeDevicesAssignment',
         loadChildren: () =>
           import('./app/pages/EmployeeDevicesAssignment/employeeDevicesAssignment.routes').then(
             (m) => m.EMPLOYEE_DEVICES_ASSIGNMENT_ROUTES
+          )
+      },
+      {
+        path: 'teams',
+        loadChildren: () =>
+          import('./app/pages/teams/team.routes').then(
+            (m) => m.TEAM_ROUTES
           )
       },
       { path: 'test', component: Layout },

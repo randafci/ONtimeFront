@@ -1,0 +1,76 @@
+<div class="card p-fluid max-w-[800px] mx-auto">
+
+    <h2>{{ (isEditMode ? 'teamForm.title.edit' : 'teamForm.title.add') | translate }}</h2>
+
+    <form [formGroup]="teamForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+        <!-- Grid Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Code Field -->
+            <div class="field">
+                <label for="code">{{ 'teamForm.labels.code' | translate }} <span class="required-star">*</span></label>
+                <input id="code" type="text" pInputText class="w-full" formControlName="code" [ngClass]="{
+            'field-error': 
+              (teamForm.controls['code'].invalid && 
+              (teamForm.controls['code'].dirty || teamForm.controls['code'].touched || submitted))
+          }" />
+                <small *ngIf="teamForm.controls['code'].invalid && 
+                (teamForm.controls['code'].dirty || teamForm.controls['code'].touched || submitted)" class="p-error">
+                    {{ 'teamForm.validation.required' | translate }}
+                </small>
+            </div>
+
+            <!-- Name Field -->
+            <div class="field">
+                <label for="name">{{ 'teamForm.labels.name' | translate }} <span class="required-star">*</span></label>
+                <input id="name" type="text" pInputText class="w-full" formControlName="name" [ngClass]="{
+            'field-error': 
+              (teamForm.controls['name'].invalid && 
+              (teamForm.controls['name'].dirty || teamForm.controls['name'].touched || submitted))
+          }" />
+                <small *ngIf="teamForm.controls['name'].invalid && 
+                (teamForm.controls['name'].dirty || teamForm.controls['name'].touched || submitted)" class="p-error">
+                    {{ 'teamForm.validation.required' | translate }}
+                </small>
+            </div>
+
+            <!-- NameSE Field -->
+            <div class="field">
+                <label for="nameSE">{{ 'teamForm.labels.nameSE' | translate }} <span
+                        class="required-star">*</span></label>
+                <input id="nameSE" type="text" pInputText class="w-full" formControlName="nameSE" [ngClass]="{
+            'field-error': 
+              (teamForm.controls['nameSE'].invalid && 
+              (teamForm.controls['nameSE'].dirty || teamForm.controls['nameSE'].touched || submitted))
+          }" />
+                <small *ngIf="teamForm.controls['nameSE'].invalid && 
+                (teamForm.controls['nameSE'].dirty || teamForm.controls['nameSE'].touched || submitted)"
+                    class="p-error">
+                    {{ 'teamForm.validation.required' | translate }}
+                </small>
+            </div>
+
+            <!-- Organization (Super Admin only) -->
+            <div class="field" *ngIf="isSuperAdmin">
+                <label for="organizationId">{{ 'teamForm.labels.organization' | translate }}</label>
+                <p-select id="organizationId" formControlName="organizationId" [options]="organizations"
+                    optionLabel="name" optionValue="id"
+                    [placeholder]="'teamForm.placeholders.selectOrganization' | translate" class="w-full">
+                </p-select>
+            </div>
+
+
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-content-start gap-2 mt-4">
+            <button pButton type="button" [label]="'teamForm.buttons.cancel' | translate" class="p-button-secondary"
+                (click)="onCancel()" [disabled]="loading"></button>
+            <button pButton type="submit"
+                [label]="(isEditMode ? 'teamForm.buttons.update' : 'teamForm.buttons.save') | translate"
+                [disabled]="teamForm.invalid || loading"></button>
+        </div>
+    </form>
+</div>
+
+<p-toast></p-toast>
