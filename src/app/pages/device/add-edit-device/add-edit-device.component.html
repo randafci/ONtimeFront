@@ -46,6 +46,24 @@
                 <small *ngIf="f['locationId'].touched && f['locationId'].errors?.['required']" class="p-error block mt-1">{{ 'common.validation.required' | translate }}</small>
             </div>
 
+            <!-- Organization Dropdown (Super Admin only) -->
+            <div class="field col-12 md:col-6" *ngIf="isSuperAdmin">
+                <label for="organizationId" class="font-semibold block mb-2">
+                    {{ 'devices.form.labels.organization' | translate }} <span class="text-red-500">*</span>
+                </label>
+                <p-select
+                    id="organizationId"
+                    formControlName="organizationId"
+                    [options]="organizations"
+                    optionLabel="name"
+                    optionValue="id"
+                    placeholder="{{ 'devices.form.placeholders.organization' | translate }}">
+                </p-select>
+                <small *ngIf="f['organizationId'].touched && f['organizationId'].errors?.['required']" class="p-error block mt-1">
+                    {{ 'common.validation.required' | translate }}
+                </small>
+            </div>
+
             <!-- Disabled Checkbox -->
             <div class="field-checkbox col-12 md:col-3 flex align-items-center mt-4">
                 <p-checkbox formControlName="disabled" [binary]="true" inputId="disabled"></p-checkbox>

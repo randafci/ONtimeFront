@@ -28,6 +28,23 @@
         </small>
       </div>
 
+      <div class="field" *ngIf="isSuperAdmin">
+        <label for="organizationId">
+          {{ 'common.organization' | translate }} <span class="required-star">*</span>
+        </label>
+        <p-select
+            id="organizationId"
+            formControlName="organizationId"
+            [options]="organizations"
+            optionLabel="name"
+            optionValue="id"
+            [placeholder]="'common.placeholders.selectOrganization' | translate">
+        </p-select>
+        <small *ngIf="familyForm.controls['organizationId'].invalid && submitted" class="p-error">
+            {{ 'common.validation.required' | translate }}
+        </small>
+      </div>
+
     </div>
 
     <div class="flex justify-content-start gap-2 mt-4">

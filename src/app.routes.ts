@@ -160,7 +160,12 @@ export const appRoutes: Routes = [
           )
       },
       { path: 'test', component: Layout },
-      { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') }
+      { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
+      {
+        path: 'translations/:lang',
+        component: TranslationManagerComponent
+        // You might want to add a guard here as well, e.g., canActivate: [AuthGuard]
+      }
     ]
   },
   {
@@ -168,10 +173,10 @@ export const appRoutes: Routes = [
     component: Landing,
     canActivate: [LoginGuard] // Prevent logged-in users from accessing landing
   },
-  {
-    path: 'translations/:lang',
-    component: TranslationManagerComponent
-  },
+  // {
+  //   path: 'translations/:lang',
+  //   component: TranslationManagerComponent
+  // },
   { path: 'notfound', component: Notfound },
   {
     path: 'login',

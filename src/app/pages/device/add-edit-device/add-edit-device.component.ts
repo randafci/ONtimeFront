@@ -16,6 +16,11 @@ import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
+import { LocationService } from '../../location/location.service';
+import { LookupService } from '../../organization/OrganizationService';
+import { AuthService } from '../../../auth/auth.service';
+import { Organization } from '../../../interfaces/organization.interface';
+import { ApiResponse } from '../../../core/models/api-response.model';
 @Component({
   selector: 'app-add-edit-device',
   templateUrl: './add-edit-device.component.html',
@@ -43,13 +48,20 @@ export class AddEditDeviceComponent implements OnInit {
   private deviceId: number | null = null;
  
   locationsList: any[] = []; 
+  organizations: Organization[] = [];
+  isSuperAdmin = false;
+  submitted = false; // To help with validation display
+
 
   constructor(
     private fb: FormBuilder,
     private deviceService: DeviceService,
     private router: Router,
     private route: ActivatedRoute,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private locationService: LocationService,
+    private organizationService: LookupService, 
+    private authService: AuthService 
   ) {}
 
   ngOnInit(): void {
@@ -58,6 +70,21 @@ export class AddEditDeviceComponent implements OnInit {
     this.isEditMode = !!this.deviceId;
     
     this.initializeForm();
+    this.loadLocations();
+
+    this.isSuperAdmin = this.checkIsSuperAdmin();
+
+    if (this.isSuperAdmin) {
+      // Super Admin can choose any organization
+      this.loadOrganizations();
+    } else {
+      // Regular user's organization is pre-filled and disabled
+      const orgId = this.authService.getOrgId();
+      if (orgId) {
+        this.deviceForm.patchValue({ organizationId: +orgId });
+        this.deviceForm.get('organizationId')?.disable();
+      }
+    }
 
     if (this.isEditMode && this.deviceId) {
       this.loadDeviceData(this.deviceId);
@@ -67,6 +94,50 @@ export class AddEditDeviceComponent implements OnInit {
     // this.loadLocations();
   }
 
+  private checkIsSuperAdmin(): boolean {
+    const claims = this.authService.getClaims();
+    return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
+  }
+
+  loadOrganizations(): void {
+    this.organizationService.getAllOrganizations().subscribe({
+      next: (response: ApiResponse<Organization[]>) => {
+        if (response.succeeded && response.data) {
+          this.organizations = response.data;
+        } else {
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load organizations.' });
+        }
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to fetch organizations.' });
+      }
+    });
+  }
+  
+  loadLocations(): void {
+    this.locationService.getAllLocations().subscribe({
+      next: (response) => {
+        if (response.succeeded && response.data) {
+          this.locationsList = response.data;
+        } else {
+          this.messageService.add({ 
+            severity: 'error', 
+            summary: 'Error', 
+            detail: 'Could not load locations.' 
+          });
+        }
+      },
+      error: (err) => {
+        this.messageService.add({ 
+            severity: 'error', 
+            summary: 'Error', 
+            detail: 'Failed to fetch locations from the server.' 
+        });
+      }
+    });
+  }
+
+
   initializeForm(): void {
     this.deviceForm = this.fb.group({
       code: ['', [Validators.required, Validators.maxLength(100)]],
@@ -75,7 +146,7 @@ export class AddEditDeviceComponent implements OnInit {
       locationId: [null, Validators.required],
       disabled: [false],
       download: [true],
-      organizationId: [1] // change later
+      organizationId: [null, Validators.required]
     });
   }
 
@@ -99,11 +170,13 @@ export class AddEditDeviceComponent implements OnInit {
 
     this.isSaving = true;
 
+    const deviceData = this.deviceForm.getRawValue();
+
     if (this.isEditMode && this.deviceId) {
-      const updatedDevice: DeviceUpdate = { id: this.deviceId, ...this.deviceForm.value };
+      const updatedDevice: DeviceUpdate = { id: this.deviceId, ...deviceData };
       this.deviceService.updateDevice(this.deviceId, updatedDevice).subscribe(this.getObserver('updated'));
     } else {
-      this.deviceService.createDevice(this.deviceForm.value).subscribe(this.getObserver('added'));
+      this.deviceService.createDevice(deviceData).subscribe(this.getObserver('added'));
     }
   }
 
