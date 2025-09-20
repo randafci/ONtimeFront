@@ -17,10 +17,13 @@ import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { CostCenter } from '../../../interfaces/cost-center.interface';
 import { CostCenterService } from '../CostCenterService';
+import { LookupService } from '../../organization/OrganizationService';
+import { Organization } from '../../../interfaces/organization.interface';
 import { Router, RouterModule } from "@angular/router";
-import { DatePipe } from '@angular/common';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+import { AuthService } from '../../../auth/auth.service';
+import { CostCenterModalComponent } from '../cost-center-modal/cost-center-modal.component';
 
 @Component({
   selector: 'app-cost-center-list',
@@ -41,8 +44,8 @@ import { TranslatePipe } from '../../../core/pipes/translate.pipe';
     ToastModule,
     TooltipModule,
     RouterModule,
-    DatePipe,
-    TranslatePipe
+    TranslatePipe,
+    CostCenterModalComponent
   ],
   providers: [MessageService],
   templateUrl: './cost-center-list.html'
@@ -51,6 +54,12 @@ export class CostCenterListComponent implements OnInit {
   costCenters: CostCenter[] = [];
   loading: boolean = true;
 
+  // Dialog properties
+  dialogVisible: boolean = false;
+  isEditMode: boolean = false;
+  selectedCostCenter: CostCenter | null = null;
+  organizations: Organization[] = [];
+  isSuperAdmin = false;
 
   integrationOptions: any[] = [
     { label: 'Yes', value: true },
@@ -64,12 +73,34 @@ export class CostCenterListComponent implements OnInit {
 
   constructor(
     private costCenterService: CostCenterService,
+    private organizationService: LookupService,
     private messageService: MessageService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    this.isSuperAdmin = this.checkIsSuperAdmin();
     this.loadCostCenters();
+    this.loadOrganizations();
+  }
+
+  private checkIsSuperAdmin(): boolean {
+    const claims = this.authService.getClaims();
+    return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
+  }
+
+  loadOrganizations(): void {
+    this.organizationService.getAllOrganizations().subscribe({
+      next: (response: ApiResponse<Organization[]>) => {
+        if (response.succeeded) {
+          this.organizations = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading organizations:', error);
+      }
+    });
   }
 
   loadCostCenters() {
@@ -106,12 +137,24 @@ export class CostCenterListComponent implements OnInit {
     return fromIntegration ? 'warning' : 'info';
   }
 
-  navigateToAdd() {
-    this.router.navigate(['/cost-centers/add']);
+  openCreateDialog() {
+    this.isEditMode = false;
+    this.selectedCostCenter = null;
+    this.dialogVisible = true;
   }
 
-  navigateToEdit(id: number) {
-    this.router.navigate(['/cost-centers/edit', id]);
+  openEditDialog(costCenter: CostCenter) {
+    this.isEditMode = true;
+    this.selectedCostCenter = costCenter;
+    this.dialogVisible = true;
+  }
+
+  onCostCenterSaved(costCenter: CostCenter) {
+    this.loadCostCenters();
+  }
+
+  onCostCenterModalCancel() {
+    // Handle modal cancellation if needed
   }
 
   deleteCostCenter(costCenter: CostCenter) {

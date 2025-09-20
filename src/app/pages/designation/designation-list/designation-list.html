@@ -7,7 +7,7 @@
             label="Add Designation"
             icon="pi pi-plus" 
             class="p-button-sm"
-            (click)="navigateToAdd()"
+            (click)="openCreateDialog()"
         ></button>
     </div>
     
@@ -126,7 +126,7 @@
                         pButton 
                         icon="pi pi-pencil" 
                         class="p-button-rounded p-button-text p-button-sm"
-                        (click)="navigateToEdit(designation.id)"
+                        (click)="openEditDialog(designation)"
                     ></button>
                     <button 
                         pButton 
@@ -151,5 +151,18 @@
         </ng-template>
     </p-table>
 </div>
+
+<!-- Designation Modal Component -->
+<app-designation-modal
+  [(dialogVisible)]="dialogVisible"
+  [isEditMode]="isEditMode"
+  [designation]="selectedDesignation"
+  [organizations]="organizations"
+  [designationTypes]="designationTypes"
+  [mainDesignations]="mainDesignations"
+  [isSuperAdmin]="isSuperAdmin"
+  [loading]="loading"
+  (onSave)="onDesignationSaved($event)">
+</app-designation-modal>
 
 <p-toast></p-toast>

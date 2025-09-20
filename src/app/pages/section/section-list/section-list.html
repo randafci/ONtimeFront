@@ -7,7 +7,7 @@
             label="Add Section" 
             icon="pi pi-plus" 
             class="p-button-sm"
-            (click)="navigateToAdd()"
+            (click)="openCreateDialog()"
         ></button>
     </div>
     
@@ -144,7 +144,7 @@
                         pButton 
                         icon="pi pi-pencil" 
                         class="p-button-rounded p-button-text p-button-sm"
-                        (click)="navigateToEdit(section.id)"
+                        (click)="openEditDialog(section)"
                     ></button>
                     <button 
                         pButton 
@@ -169,5 +169,17 @@
         </ng-template>
     </p-table>
 </div>
+
+<!-- Section Modal Component -->
+<app-section-modal
+  [(dialogVisible)]="dialogVisible"
+  [isEditMode]="isEditMode"
+  [section]="selectedSection"
+  [organizations]="organizations"
+  [sectionTypes]="sectionTypes"
+  [isSuperAdmin]="isSuperAdmin"
+  [loading]="loading"
+  (onSave)="onSectionSaved($event)">
+</app-section-modal>
 
 <p-toast></p-toast>

@@ -2,7 +2,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Table } from 'primeng/table';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { InputTextModule } from 'primeng/inputtext';
@@ -14,8 +14,9 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
+import { DialogModule } from 'primeng/dialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Organization } from '../../../interfaces/organization.interface';
+import { Organization, CreateOrganization, EditOrganization } from '../../../interfaces/organization.interface';
 import { LookupService } from '../OrganizationService';
 import { Router, RouterModule } from "@angular/router";
 import { DatePipe } from '@angular/common';
@@ -29,6 +30,7 @@ import { TranslationService } from '../../translation-manager/translation-manage
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     TableModule,
     MultiSelectModule,
     InputTextModule,
@@ -40,6 +42,7 @@ import { TranslationService } from '../../translation-manager/translation-manage
     IconFieldModule,
     SelectModule,
     ToastModule,
+    DialogModule,
     RouterModule,
     DatePipe,
     TranslatePipe
@@ -59,6 +62,11 @@ export class OrganizationListComponent implements OnInit {
   statuses: any[] = [];
   private translations: any = {};
 
+  // Dialog properties
+  dialogVisible: boolean = false;
+  isEditMode: boolean = false;
+  organizationForm: FormGroup;
+
   activityValues: number[] = [0, 100];
 
   @ViewChild('dt') table!: Table;
@@ -69,8 +77,11 @@ export class OrganizationListComponent implements OnInit {
     private messageService: MessageService,
     private router: Router,
     private confirmationService: ConfirmationService, 
-    private translationService: TranslationService  
-  ) {}
+    private translationService: TranslationService,
+    private fb: FormBuilder
+  ) {
+    this.organizationForm = this.createForm();
+  }
 
   ngOnInit() {
     this.translationService.translations$.subscribe(trans => {
@@ -86,6 +97,14 @@ export class OrganizationListComponent implements OnInit {
       { label: statusTrans?.active || 'Active', value: 'active' },
       { label: statusTrans?.inactive || 'Inactive', value: 'inactive' }
     ];
+  }
+
+  createForm(): FormGroup {
+    return this.fb.group({
+      id: [null],
+      name: ['', Validators.required],
+      nameSE: ['', Validators.required]
+    });
   }
 
 
@@ -133,12 +152,104 @@ export class OrganizationListComponent implements OnInit {
     }
   }
 
-  navigateToAdd() {
-    this.router.navigate(['/organizations/add']);
+  openCreateDialog() {
+    this.isEditMode = false;
+    this.organizationForm.reset();
+    this.dialogVisible = true;
   }
 
-  navigateToEdit(id: number) {
-    this.router.navigate(['/organizations/edit', id]);
+  openEditDialog(organization: Organization) {
+    this.isEditMode = true;
+    this.organizationForm.patchValue({
+      id: organization.id,
+      name: organization.name,
+      nameSE: organization.nameSE
+    });
+    this.dialogVisible = true;
+  }
+
+  closeDialog() {
+    this.dialogVisible = false;
+    this.organizationForm.reset();
+  }
+
+  onSubmit(): void {
+    if (this.organizationForm.invalid) {
+      this.markFormGroupTouched(this.organizationForm);
+      return;
+    }
+
+    this.loading = true;
+    const formData = this.organizationForm.value;
+
+    if (this.isEditMode) {
+      const editData: EditOrganization = {
+        id: formData.id,
+        name: formData.name,
+        nameSE: formData.nameSE
+      };
+      this.updateOrganization(editData);
+    } else {
+      const createData: CreateOrganization = {
+        name: formData.name,
+        nameSE: formData.nameSE
+      };
+      this.createOrganization(createData);
+    }
+  }
+
+  createOrganization(data: CreateOrganization): void {
+    this.lookupService.createOrganization(data).subscribe({
+      next: (response: ApiResponse<Organization>) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Organization created successfully'
+        });
+        this.closeDialog();
+        this.loadOrganizations();
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to create organization'
+        });
+        this.loading = false;
+      }
+    });
+  }
+
+  updateOrganization(data: EditOrganization): void {
+    this.lookupService.updateOrganization(data).subscribe({
+      next: (response: ApiResponse<Organization>) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Organization updated successfully'
+        });
+        this.closeDialog();
+        this.loadOrganizations();
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to update organization'
+        });
+        this.loading = false;
+      }
+    });
+  }
+
+  private markFormGroupTouched(formGroup: FormGroup): void {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
   }
 
   deleteOrganization(organization: Organization) {
