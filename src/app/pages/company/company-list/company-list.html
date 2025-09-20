@@ -7,7 +7,7 @@
             [label]="'companies.listPage.addButton' | translate"
             icon="pi pi-plus" 
             class="p-button-sm"
-            (click)="navigateToAdd()"
+            (click)="openCreateDialog()"
         ></button>
     </div>
     
@@ -162,7 +162,7 @@
                         pButton 
                         icon="pi pi-pencil" 
                         class="p-button-rounded p-button-text p-button-sm"
-                        (click)="navigateToEdit(company.id)"
+                        (click)="openEditDialog(company)"
                     ></button>
                     <button 
                         pButton 
@@ -187,5 +187,19 @@
         </ng-template>
     </p-table>
 </div>
+
+<!-- Company Modal Component -->
+<app-company-modal
+  [(dialogVisible)]="dialogVisible"
+  [isEditMode]="isEditMode"
+  [company]="selectedCompany"
+  [companies]="companies"
+  [organizations]="organizations"
+  [companyTypes]="companyTypes"
+  [isSuperAdmin]="isSuperAdmin"
+  [loading]="loading"
+  (onSave)="onCompanySaved($event)"
+>
+</app-company-modal>
 
 <p-toast></p-toast>

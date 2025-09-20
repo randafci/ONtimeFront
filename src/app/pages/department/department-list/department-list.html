@@ -7,7 +7,7 @@
             [label]="'departmentList.addButton' | translate" 
             icon="pi pi-plus" 
             class="p-button-sm"
-            (click)="navigateToAdd()"
+            (click)="openCreateDialog()"
         ></button>
     </div>
     
@@ -151,7 +151,7 @@
                         pButton 
                         icon="pi pi-pencil" 
                         class="p-button-rounded p-button-text p-button-sm"
-                        (click)="navigateToEdit(department.id)"
+                        (click)="openEditDialog(department)"
                     ></button>
                     <button 
                         pButton 
@@ -176,5 +176,18 @@
         </ng-template>
     </p-table>
 </div>
+
+<!-- Department Modal Component -->
+<app-department-modal
+  [(dialogVisible)]="dialogVisible"
+  [isEditMode]="isEditMode"
+  [department]="selectedDepartment"
+  [organizations]="organizations"
+  [companies]="companies"
+  [isSuperAdmin]="isSuperAdmin"
+  [loading]="loading"
+  (onSave)="onDepartmentSaved($event)"
+  (onCancelEvent)="onDepartmentModalCancel()">
+</app-department-modal>
 
 <p-toast></p-toast>

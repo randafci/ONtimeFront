@@ -16,9 +16,15 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Designation } from '../../../interfaces/designation.interface';
 import { DesignationService } from '../DesignationService';
+import { DesignationTypeService } from '../DesignationTypeService';
+import { LookupService } from '../../organization/OrganizationService';
+import { DesignationType } from '../../../interfaces/designation-type.interface';
+import { Organization } from '../../../interfaces/organization.interface';
 import { Router, RouterModule } from "@angular/router";
 import { DatePipe } from '@angular/common';
 import { ApiResponse } from '../../../core/models/api-response.model';
+import { AuthService } from '../../../auth/auth.service';
+import { DesignationModalComponent } from '../designation-modal/designation-modal.component';
 
 @Component({
   selector: 'app-designation-list',
@@ -38,7 +44,8 @@ import { ApiResponse } from '../../../core/models/api-response.model';
     SelectModule,
     ToastModule,
     RouterModule,
-    DatePipe
+    DatePipe,
+    DesignationModalComponent
   ],
   providers: [MessageService],
   templateUrl: './designation-list.html',
@@ -59,17 +66,67 @@ export class DesignationListComponent implements OnInit {
 
   activityValues: number[] = [0, 100];
 
+  // Dialog properties
+  dialogVisible: boolean = false;
+  isEditMode: boolean = false;
+  selectedDesignation: Designation | null = null;
+  organizations: Organization[] = [];
+  designationTypes: DesignationType[] = [];
+  mainDesignations: Designation[] = [];
+  isSuperAdmin = false;
+
   @ViewChild('dt') table!: Table;
   @ViewChild('filter') filter!: ElementRef;
 
   constructor(
     private designationService: DesignationService,
+    private designationTypeService: DesignationTypeService,
+    private organizationService: LookupService,
     private messageService: MessageService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    this.isSuperAdmin = this.checkIsSuperAdmin();
     this.loadDesignations();
+    this.loadOrganizations();
+    this.loadDesignationTypes();
+  }
+
+  private checkIsSuperAdmin(): boolean {
+    const claims = this.authService.getClaims();
+    return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
+  }
+
+  loadOrganizations(): void {
+    this.organizationService.getAllOrganizations().subscribe({
+      next: (response: ApiResponse<Organization[]>) => {
+        if (response.succeeded) {
+          this.organizations = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading organizations:', error);
+      }
+    });
+  }
+
+  loadDesignationTypes(): void {
+    this.designationTypeService.getAllDesignationTypes().subscribe({
+      next: (response: ApiResponse<DesignationType[]>) => {
+        if (response.succeeded) {
+          this.designationTypes = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading designation types:', error);
+      }
+    });
+  }
+
+  updateMainDesignations(): void {
+    this.mainDesignations = this.designations.filter(designation => designation.designationsTypeLookupId === 1);
   }
 
   loadDesignations() {
@@ -78,6 +135,7 @@ export class DesignationListComponent implements OnInit {
       next: (response: ApiResponse<Designation[]>) => {
         if (response.succeeded) {
           this.designations = response.data;
+          this.updateMainDesignations();
         } else {
           this.messageService.add({
             severity: 'error',
@@ -120,13 +178,22 @@ export class DesignationListComponent implements OnInit {
     return fromIntegration ? 'warning' : 'info';
   }
 
-  navigateToAdd() {
-    this.router.navigate(['/designations/add']);
+  openCreateDialog() {
+    this.isEditMode = false;
+    this.selectedDesignation = null;
+    this.dialogVisible = true;
   }
 
-  navigateToEdit(id: number) {
-    this.router.navigate(['/designations/edit', id]);
+  openEditDialog(designation: Designation) {
+    this.isEditMode = true;
+    this.selectedDesignation = designation;
+    this.dialogVisible = true;
   }
+
+  onDesignationSaved(designation: Designation) {
+    this.loadDesignations();
+  }
+
 
   deleteDesignation(designation: Designation) {
     console.log('Deleting designation:', designation);

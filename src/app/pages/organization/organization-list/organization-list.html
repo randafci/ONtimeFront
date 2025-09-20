@@ -11,7 +11,7 @@
       [label]="'organizations.listPage.addButton' | translate"
       icon="pi pi-plus"
       class="p-button-sm"
-      (click)="navigateToAdd()"
+      (click)="openCreateDialog()"
     ></button>
   </div>
 
@@ -118,7 +118,7 @@
             pButton
             icon="pi pi-pencil"
             class="p-button-rounded p-button-text p-button-sm"
-            (click)="navigateToEdit(organization.id)"
+            (click)="openEditDialog(organization)"
           ></button>
           <button
             pButton
@@ -143,5 +143,71 @@
     </ng-template>
   </p-table>
 </div>
+
+<!-- Create/Edit Dialog -->
+<p-dialog 
+  [(visible)]="dialogVisible" 
+  [header]="isEditMode ? 'Edit Organization' : 'Add Organization'"
+  [modal]="true" 
+  [style]="{width: '50vw'}"
+  [draggable]="false" 
+  [resizable]="false"
+>
+  <form [formGroup]="organizationForm" (ngSubmit)="onSubmit()">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <!-- Name Field -->
+      <div class="field">
+        <label for="name" class="block text-sm font-medium mb-2">
+          Name <span class="text-red-500">*</span>
+        </label>
+        <input 
+          id="name" 
+          type="text" 
+          pInputText 
+          formControlName="name" 
+          class="w-full"
+          [class.ng-invalid]="organizationForm.get('name')?.invalid && organizationForm.get('name')?.touched"
+        />
+        <small class="text-red-500" *ngIf="organizationForm.get('name')?.invalid && organizationForm.get('name')?.touched">
+          Name is required
+        </small>
+      </div>
+
+      <!-- NameSE Field -->
+      <div class="field">
+        <label for="nameSE" class="block text-sm font-medium mb-2">
+          Name (SE) <span class="text-red-500">*</span>
+        </label>
+        <input 
+          id="nameSE" 
+          type="text" 
+          pInputText 
+          formControlName="nameSE" 
+          class="w-full"
+          [class.ng-invalid]="organizationForm.get('nameSE')?.invalid && organizationForm.get('nameSE')?.touched"
+        />
+        <small class="text-red-500" *ngIf="organizationForm.get('nameSE')?.invalid && organizationForm.get('nameSE')?.touched">
+          Name (SE) is required
+        </small>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+      <button 
+        pButton 
+        label="Cancel" 
+        class="p-button-secondary" 
+        type="button"
+        (click)="closeDialog()">
+      </button>
+      <button 
+        pButton 
+        [label]="isEditMode ? 'Update' : 'Save'" 
+        [loading]="loading"
+        type="submit">
+      </button>
+    </div>
+  </form>
+</p-dialog>
 
 <p-toast></p-toast>

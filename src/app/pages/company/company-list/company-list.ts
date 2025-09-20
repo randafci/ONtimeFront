@@ -16,10 +16,16 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Company } from '../../../interfaces/company.interface';
 import { CompanyService } from '../CompanyService';
+import { CompanyTypeService } from '../CompanyTypeService';
+import { LookupService } from '../../organization/OrganizationService';
+import { CompanyType } from '../../../interfaces/company-type.interface';
+import { Organization } from '../../../interfaces/organization.interface';
 import { Router, RouterModule } from "@angular/router";
 import { DatePipe } from '@angular/common';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+import { AuthService } from '../../../auth/auth.service';
+import { CompanyModalComponent } from '../../company/company-modal/company-modal.component';
 
 @Component({
   selector: 'app-company-list',
@@ -40,7 +46,8 @@ import { TranslatePipe } from '../../../core/pipes/translate.pipe';
     ToastModule,
     RouterModule,
     DatePipe,
-    TranslatePipe
+    TranslatePipe,
+    CompanyModalComponent
   ],
   providers: [MessageService],
   templateUrl: './company-list.html',
@@ -61,17 +68,36 @@ export class CompanyListComponent implements OnInit {
 
   activityValues: number[] = [0, 100];
 
+  dialogVisible: boolean = false;
+  isEditMode: boolean = false;
+  selectedCompany: Company | null = null;
+  organizations: Organization[] = [];
+  companyTypes: CompanyType[] = [];
+  isSuperAdmin = false;
+
   @ViewChild('dt') table!: Table;
   @ViewChild('filter') filter!: ElementRef;
 
   constructor(
     private companyService: CompanyService,
+    private companyTypeService: CompanyTypeService,
+    private organizationService: LookupService,
     private messageService: MessageService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    this.isSuperAdmin = this.checkIsSuperAdmin();
     this.loadCompanies();
+    this.loadOrganizations();
+    this.loadCompanyTypes();
+  }
+
+
+  private checkIsSuperAdmin(): boolean {
+    const claims = this.authService.getClaims();
+    return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
   }
 
   loadCompanies() {
@@ -101,6 +127,33 @@ export class CompanyListComponent implements OnInit {
     });
   }
 
+  loadOrganizations(): void {
+    this.organizationService.getAllOrganizations().subscribe({
+      next: (response: ApiResponse<Organization[]>) => {
+        if (response.succeeded) {
+          this.organizations = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading organizations:', error);
+      }
+    });
+  }
+
+  loadCompanyTypes(): void {
+    this.companyTypeService.getAllCompanyTypes().subscribe({
+      next: (response: ApiResponse<CompanyType[]>) => {
+        if (response.succeeded) {
+          this.companyTypes = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading company types:', error);
+      }
+    });
+  }
+
+
   getStatus(company: Company): string {
     return company.isDeleted ? 'inactive' : 'active';
   }
@@ -122,17 +175,25 @@ export class CompanyListComponent implements OnInit {
     return fromIntegration ? 'warning' : 'info';
   }
 
-  navigateToAdd() {
-    this.router.navigate(['/companies/add']);
+  openCreateDialog() {
+    this.isEditMode = false;
+    this.selectedCompany = null;
+    this.dialogVisible = true;
   }
 
-  navigateToEdit(id: number) {
-    this.router.navigate(['/companies/edit', id]);
+  openEditDialog(company: Company) {
+    this.isEditMode = true;
+    this.selectedCompany = company;
+    this.dialogVisible = true;
   }
+
+  onCompanySaved(company: Company) {
+    this.loadCompanies();
+  }
+
+
 
   deleteCompany(company: Company) {
-    // Implement delete logic here
-    console.log('Deleting company:', company);
     this.messageService.add({
       severity: 'warn',
       summary: 'Delete',

@@ -1,5 +1,5 @@
 <div class="card">
-    <div class="flex justify-content-between align-items-center mb-4">
+    <div class="flex justify-content-between items-center mb-4">
         <h2 class="mb-0">{{ 'familyList.title' | translate }}</h2>
         <div class="flex-grow-1"></div>
         <button 
@@ -7,7 +7,7 @@
             [label]="'familyList.addButton' | translate" 
             icon="pi pi-plus" 
             class="p-button-sm"
-            (click)="navigateToAdd()"
+            (click)="openCreateDialog()"
         ></button>
     </div>
     
@@ -48,7 +48,7 @@
                 <td>{{ family.creationDate | date: 'MM/dd/yyyy' }}</td>
                 <td>
                     <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm"
-                            (click)="navigateToEdit(family.id)"></button>
+                            (click)="openEditDialog(family)"></button>
                     <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm"
                             (click)="deleteFamily(family)"></button>
                 </td>
@@ -60,4 +60,17 @@
         </ng-template>
     </p-table>
 </div>
+
+<!-- Family Modal Component -->
+<app-family-modal
+  [(dialogVisible)]="dialogVisible"
+  [isEditMode]="isEditMode"
+  [family]="selectedFamily"
+  [organizations]="organizations"
+  [isSuperAdmin]="isSuperAdmin"
+  [loading]="loading"
+  (onSave)="onFamilySaved($event)"
+>
+</app-family-modal>
+
 <p-toast></p-toast>

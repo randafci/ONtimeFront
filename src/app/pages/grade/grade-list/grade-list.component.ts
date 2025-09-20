@@ -9,27 +9,39 @@ import { ToastModule } from 'primeng/toast';
 import { TagModule } from 'primeng/tag';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { SelectModule } from 'primeng/select';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Grade } from '@/interfaces/grade.interface';
 import { GradeService } from '../GradeService';
 import { TranslatePipe } from '@/core/pipes/translate.pipe';
 import { ApiResponse } from '@/core/models/api-response.model';
+import { AuthService } from '../../../auth/auth.service';
+import { LookupService } from '../../organization/OrganizationService';
+import { Organization } from '../../../interfaces/organization.interface';
+import { GradeModalComponent } from '../grade-modal/grade-modal.component';
 @Component({
     selector: 'app-grade-list',
     standalone: true,
     imports: [
         CommonModule, FormsModule, RouterModule, DatePipe,
         TableModule, ButtonModule, InputTextModule, ToastModule, TagModule,
-        IconFieldModule, InputIconModule,
-        TranslatePipe
+        IconFieldModule, InputIconModule, SelectModule,
+        TranslatePipe, GradeModalComponent
     ],
     providers: [MessageService, ConfirmationService, TranslatePipe],
     templateUrl: './grade-list.component.html',
-    styleUrls: ['./grade-list.component.scss']
 })
 export class GradeListComponent implements OnInit {
     grades: Grade[] = [];
     loading: boolean = true;
+
+    // Dialog properties
+    dialogVisible: boolean = false;
+    isEditMode: boolean = false;
+    selectedGrade: Grade | null = null;
+    organizations: Organization[] = [];
+    isSuperAdmin: boolean = false;
+
     @ViewChild('dt') table!: Table;
     @ViewChild('filter') filter!: ElementRef;
     constructor(
@@ -37,11 +49,18 @@ export class GradeListComponent implements OnInit {
         private messageService: MessageService,
         private router: Router,
         private confirmationService: ConfirmationService,
-        private translatePipe: TranslatePipe
-    ) { }
+        private translatePipe: TranslatePipe,
+        private authService: AuthService,
+        private organizationService: LookupService
+    ) {}
     ngOnInit() {
+        this.isSuperAdmin = this.checkIsSuperAdmin();
+        if (this.isSuperAdmin) {
+            this.loadOrganizations();
+        }
         this.loadGrades();
     }
+
     loadGrades() {
         this.loading = true;
         this.gradeService.getAllGrades().subscribe({
@@ -65,12 +84,40 @@ export class GradeListComponent implements OnInit {
     getSeverity(status: string): string {
         return status === 'active' ? 'success' : 'danger';
     }
-    navigateToAdd() {
-        this.router.navigate(['/grades/add']);
+    private checkIsSuperAdmin(): boolean {
+        const claims = this.authService.getClaims();
+        return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
     }
-    navigateToEdit(id: number) {
-        this.router.navigate(['/grades/edit', id]);
+
+    loadOrganizations(): void {
+        this.organizationService.getAllOrganizations().subscribe({
+            next: (response: ApiResponse<Organization[]>) => {
+                if (response.succeeded && response.data) {
+                    this.organizations = response.data;
+                } else {
+                    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load organizations.' });
+                }
+            }
+        });
     }
+
+    openCreateDialog() {
+        this.isEditMode = false;
+        this.selectedGrade = null;
+        this.dialogVisible = true;
+    }
+
+    openEditDialog(grade: Grade) {
+        this.isEditMode = true;
+        this.selectedGrade = grade;
+        this.dialogVisible = true;
+    }
+
+    onGradeSaved(grade: Grade): void {
+        this.loadGrades();
+    }
+
+  
     deleteGrade(grade: Grade) {
         const message = this.translatePipe.transform('common.deleteConfirm').replace('{name}', grade.name);
         this.confirmationService.confirm({

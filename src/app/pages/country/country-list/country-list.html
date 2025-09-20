@@ -7,7 +7,7 @@
             [label]="'Add Country' | translate"
             icon="pi pi-plus" 
             class="p-button-sm"
-            (click)="navigateToAdd()"
+            (click)="openCreateDialog()"
         ></button>
     </div>
 
@@ -87,7 +87,7 @@
                         pButton 
                         icon="pi pi-pencil" 
                         class="p-button-rounded p-button-text p-button-sm"
-                        (click)="navigateToEdit(country.id)"
+                        (click)="openEditDialog(country)"
                     ></button>
                     <button 
                         pButton 
@@ -106,6 +106,16 @@
         </ng-template>
     </p-table>
 </div>
+
+<!-- Country Modal Component -->
+<app-country-modal
+  [(dialogVisible)]="dialogVisible"
+  [isEditMode]="isEditMode"
+  [country]="selectedCountry"
+  [loading]="loading"
+  (onSave)="onCountrySaved($event)"
+  (onCancelEvent)="onCountryModalCancel()">
+</app-country-modal>
 
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
