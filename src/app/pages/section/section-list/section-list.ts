@@ -17,9 +17,15 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Section } from '@/interfaces/section.interface';
 import { SectionService } from '../SectionService';
+import { SectionTypeService } from '../SectionTypeService';
+import { LookupService } from '../../organization/OrganizationService';
+import { Organization } from '@/interfaces/organization.interface';
+import { SectionType } from '@/interfaces/section-type.interface';
 import { Router, RouterModule } from "@angular/router";
 import { DatePipe } from '@angular/common';
 import { ApiResponse } from '@/core/models/api-response.model';
+import { AuthService } from '@/auth/auth.service';
+import { SectionModalComponent } from '../section-modal/section-modal.component';
 
 
 @Component({
@@ -40,6 +46,7 @@ import { ApiResponse } from '@/core/models/api-response.model';
     SelectModule,
     ToastModule,
     RouterModule,
+    SectionModalComponent,
     DatePipe
   ],
   providers: [MessageService, ConfirmationService],
@@ -49,6 +56,13 @@ import { ApiResponse } from '@/core/models/api-response.model';
 export class SectionListComponent implements OnInit {
   sections: Section[] = [];
   loading: boolean = true;
+
+  dialogVisible: boolean = false;
+  isEditMode: boolean = false;
+  selectedSection: Section | null = null;
+  organizations: Organization[] = [];
+  sectionTypes: SectionType[] = [];
+  isSuperAdmin = false;
 
   statuses: any[] = [
     { label: 'Active', value: 'active' },
@@ -67,13 +81,51 @@ export class SectionListComponent implements OnInit {
 
   constructor(
     private sectionService: SectionService,
+    private sectionTypeService: SectionTypeService,
+    private organizationService: LookupService,
     private messageService: MessageService,
     private router: Router,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    this.isSuperAdmin = this.checkIsSuperAdmin();
     this.loadSections();
+    this.loadOrganizations();
+    this.loadSectionTypes();
+  }
+
+
+  private checkIsSuperAdmin(): boolean {
+    const claims = this.authService.getClaims();
+    return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
+  }
+
+  loadOrganizations(): void {
+    this.organizationService.getAllOrganizations().subscribe({
+      next: (response: ApiResponse<Organization[]>) => {
+        if (response.succeeded) {
+          this.organizations = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading organizations:', error);
+      }
+    });
+  }
+
+  loadSectionTypes(): void {
+    this.sectionTypeService.getAllSectionTypes().subscribe({
+      next: (response: ApiResponse<SectionType[]>) => {
+        if (response.succeeded) {
+          this.sectionTypes = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading section types:', error);
+      }
+    });
   }
 
   loadSections() {
@@ -124,12 +176,20 @@ export class SectionListComponent implements OnInit {
     return fromIntegration ? 'warning' : 'info';
   }
 
-  navigateToAdd() {
-    this.router.navigate(['/sections/add']);
+  openCreateDialog() {
+    this.isEditMode = false;
+    this.selectedSection = null;
+    this.dialogVisible = true;
   }
 
-  navigateToEdit(id: number) {
-    this.router.navigate(['/sections/edit', id]);
+  openEditDialog(section: Section) {
+    this.isEditMode = true;
+    this.selectedSection = section;
+    this.dialogVisible = true;
+  }
+
+  onSectionSaved(section: Section): void {
+    this.loadSections();
   }
 
   deleteSection(section: Section) {

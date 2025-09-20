@@ -1,52 +1,61 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { ToastModule } from 'primeng/toast';
-import { CountryService } from '../CountryService';
-import { Country, CreateCountry, EditCountry } from '../../../interfaces/country.interface';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
+import { MessageService } from 'primeng/api';
+import { Country, CreateCountry, EditCountry } from '../../../interfaces/country.interface';
+import { CountryService } from '../CountryService';
 import { ApiResponse } from '../../../core/models/api-response.model';
-import { TranslatePipe } from '../../../core/pipes/translate.pipe';
-import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
-import { AuthService } from '../../../auth/auth.service';
 
 @Component({
-  selector: 'app-add-or-edit-country',
+  selector: 'app-country-modal',
   standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterModule,
-    ButtonModule,
+    DialogModule,
     InputTextModule,
-    SelectModule,
-    ToastModule,
-    TranslatePipe,
+    ButtonModule
   ],
-  templateUrl: './add-or-edit-country.html',
- 
-  providers: [MessageService, TranslationService]
+  providers: [MessageService],
+  templateUrl: './country-modal.component.html'
 })
-export class AddOrEditCountry implements OnInit {
+export class CountryModalComponent implements OnInit, OnChanges {
+  @Input() dialogVisible: boolean = false;
+  @Input() isEditMode: boolean = false;
+  @Input() country: Country | null = null;
+  @Input() loading: boolean = false;
+
+  @Output() dialogVisibleChange = new EventEmitter<boolean>();
+  @Output() onSave = new EventEmitter<Country>();
+  @Output() onCancelEvent = new EventEmitter<void>();
+
   countryForm: FormGroup;
-  isEditMode = false;
-  countryId: string | null = null;
-  loading = false;
-  submitted = false;
 
   constructor(
     private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
     private countryService: CountryService,
-    private messageService: MessageService,
-    private authService: AuthService
+    private messageService: MessageService
   ) {
-    this.countryForm = this.fb.group({
+    this.countryForm = this.createForm();
+  }
+
+  ngOnInit(): void {
+    // Initialize form
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['dialogVisible'] && this.dialogVisible && this.isEditMode && this.country) {
+      this.patchForm(this.country);
+    } else if (changes['dialogVisible'] && this.dialogVisible && !this.isEditMode) {
+      this.resetFormForCreate();
+    }
+  }
+
+  createForm(): FormGroup {
+    return this.fb.group({
       id: ['', [Validators.required, Validators.maxLength(2)]],
       name: ['', Validators.required],
       nameSE: ['', Validators.required],
@@ -55,42 +64,18 @@ export class AddOrEditCountry implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      if (params['id']) {
-        this.isEditMode = true;
-        this.countryId = params['id'];
-        this.loadCountry(this.countryId!);
-      }
+  patchForm(country: Country): void {
+    this.countryForm.patchValue({
+      id: country.id,
+      name: country.name,
+      nameSE: country.nameSE,
+      nationality: country.nationality,
+      nationalitySEName: country.nationalitySEName
     });
   }
 
-
-
-  loadCountry(id: string): void {
-    this.loading = true;
-    this.countryService.getCountryById(id).subscribe({
-      next: (response: ApiResponse<Country>) => {
-        if (response.succeeded && response.data) {
-          this.countryForm.patchValue({
-            id: response.data.id,
-            name: response.data.name,
-            nameSE: response.data.nameSE,
-            nationality: response.data.nationality,
-            nationalitySEName: response.data.nationalitySEName
-          });
-        }
-        this.loading = false;
-      },
-      error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load country data'
-        });
-        this.loading = false;
-      }
-    });
+  resetFormForCreate(): void {
+    this.countryForm.reset();
   }
 
   onSubmit(): void {
@@ -102,7 +87,7 @@ export class AddOrEditCountry implements OnInit {
     this.loading = true;
     const formData = this.countryForm.value;
 
-    if (this.isEditMode && this.countryId) {
+    if (this.isEditMode) {
       const editData: EditCountry = {
         id: formData.id,
         name: formData.name,
@@ -131,7 +116,8 @@ export class AddOrEditCountry implements OnInit {
           summary: 'Success',
           detail: 'Country created successfully'
         });
-        this.router.navigate(['/countries']);
+        this.onSave.emit(response.data);
+        this.closeDialog();
       },
       error: (error) => {
         this.messageService.add({
@@ -152,7 +138,8 @@ export class AddOrEditCountry implements OnInit {
           summary: 'Success',
           detail: 'Country updated successfully'
         });
-        this.router.navigate(['/countries']);
+        this.onSave.emit(response.data);
+        this.closeDialog();
       },
       error: (error) => {
         this.messageService.add({
@@ -165,6 +152,15 @@ export class AddOrEditCountry implements OnInit {
     });
   }
 
+  closeDialog(): void {
+    this.dialogVisibleChange.emit(false);
+  }
+
+  onCancel(): void {
+    this.closeDialog();
+    this.onCancelEvent.emit();
+  }
+
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
@@ -174,8 +170,5 @@ export class AddOrEditCountry implements OnInit {
       }
     });
   }
-
-  onCancel(): void {
-    this.router.navigate(['/countries']);
-  }
 }
+

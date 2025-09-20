@@ -16,19 +16,21 @@ export class EventsService {
     private authService: AuthService) {
     this.apiUrl = this.appConfig.apiUrl + '/api';
   }
+  private get headers() {
+    return { headers: this.authService.getHeaders() };
+  }
 
   getAllEvents(): Observable<ApiResponse<Events[]>> {
-    const headers = this.authService.getHeaders();
     
-    return this.http.get<ApiResponse<Events[]>>(`${this.apiUrl}/Lookup/Events`, { headers });
+    return this.http.get<ApiResponse<Events[]>>(`${this.apiUrl}/Lookup/Events`, this.headers);
   }
 
   createEvents(data: CreateEvents): Observable<ApiResponse<Events>> {
-    return this.http.post<ApiResponse<Events>>(`${this.apiUrl}/Lookup/Events`, data);
+    return this.http.post<ApiResponse<Events>>(`${this.apiUrl}/Lookup/Events`, data, this.headers);
   }
 
   getEventsById(id: number): Observable<ApiResponse<Events>> {
-    return this.http.get<ApiResponse<Events>>(`${this.apiUrl}/Lookup/Events/${id}`);
+    return this.http.get<ApiResponse<Events>>(`${this.apiUrl}/Lookup/Events/${id}`, this.headers);
   }
 
   updateEvents(data: EditEvents): Observable<ApiResponse<Events>> {

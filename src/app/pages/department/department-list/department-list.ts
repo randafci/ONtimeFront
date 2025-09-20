@@ -17,11 +17,17 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Department } from '@/interfaces/department.interface';
 import { DepartmentService } from '../DepartmentService';
+import { LookupService } from '../../organization/OrganizationService';
+import { CompanyService } from '../../company/CompanyService';
+import { Organization } from '@/interfaces/organization.interface';
+import { Company } from '@/interfaces/company.interface';
 import { Router, RouterModule } from "@angular/router";
 import { DatePipe } from '@angular/common';
 import { TranslatePipe } from '@/core/pipes/translate.pipe';
 import { TranslationService } from '@/pages/translation-manager/translation-manager/translation.service';
 import { ApiResponse } from '@/core/models/api-response.model';
+import { AuthService } from '@/auth/auth.service';
+import { DepartmentModalComponent } from '../department-modal/department-modal.component';
 
 
 @Component({
@@ -43,7 +49,8 @@ import { ApiResponse } from '@/core/models/api-response.model';
     ToastModule,
     RouterModule,
     DatePipe,
-    TranslatePipe
+    TranslatePipe,
+    DepartmentModalComponent
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './department-list.html',
@@ -53,11 +60,13 @@ export class DepartmentListComponent implements OnInit {
   departments: Department[] = [];
   loading: boolean = true;
 
-  // statuses: any[] = [
-  //   { label: 'Active', value: 'active' },
-  //   { label: 'Inactive', value: 'inactive' }
-  // ];
-
+  // Dialog properties
+  dialogVisible: boolean = false;
+  isEditMode: boolean = false;
+  selectedDepartment: Department | null = null;
+  organizations: Organization[] = [];
+  companies: Company[] = [];
+  isSuperAdmin = false;
 
   statuses: any[] = []; // Will be populated from translations
   integrationOptions: any[] = [
@@ -70,19 +79,23 @@ export class DepartmentListComponent implements OnInit {
   @ViewChild('dt') table!: Table;
   @ViewChild('filter') filter!: ElementRef;
 
-
   // Store the current translations
   private translations: any = {};
 
   constructor(
     private departmentService: DepartmentService,
+    private organizationService: LookupService,
+    private companyService: CompanyService,
     private messageService: MessageService,
     private router: Router,
-    private translationService: TranslationService, // Inject the service
-    private confirmationService: ConfirmationService // Inject ConfirmationService
+    private translationService: TranslationService,
+    private confirmationService: ConfirmationService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    this.isSuperAdmin = this.checkIsSuperAdmin();
+
     // Subscribe to translation changes to build dynamic arrays
     this.translationService.translations$.subscribe(translations => {
       this.translations = translations;
@@ -93,6 +106,39 @@ export class DepartmentListComponent implements OnInit {
     });
 
     this.loadDepartments();
+    this.loadOrganizations();
+    this.loadCompanies();
+  }
+
+  private checkIsSuperAdmin(): boolean {
+    const claims = this.authService.getClaims();
+    return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
+  }
+
+  loadOrganizations(): void {
+    this.organizationService.getAllOrganizations().subscribe({
+      next: (response: ApiResponse<Organization[]>) => {
+        if (response.succeeded) {
+          this.organizations = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading organizations:', error);
+      }
+    });
+  }
+
+  loadCompanies(): void {
+    this.companyService.getAllCompanies().subscribe({
+      next: (response: ApiResponse<Company[]>) => {
+        if (response.succeeded) {
+          this.companies = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading companies:', error);
+      }
+    });
   }
 
   loadDepartments() {
@@ -145,12 +191,24 @@ export class DepartmentListComponent implements OnInit {
     return fromIntegration ? 'warning' : 'info';
   }
 
-  navigateToAdd() {
-    this.router.navigate(['/departments/add']);
+  openCreateDialog() {
+    this.isEditMode = false;
+    this.selectedDepartment = null;
+    this.dialogVisible = true;
   }
 
-  navigateToEdit(id: number) {
-    this.router.navigate(['/departments/edit', id]);
+  openEditDialog(department: Department) {
+    this.isEditMode = true;
+    this.selectedDepartment = department;
+    this.dialogVisible = true;
+  }
+
+  onDepartmentSaved(department: Department) {
+    this.loadDepartments();
+  }
+
+  onDepartmentModalCancel() {
+    // Handle modal cancellation if needed
   }
 
   deleteDepartment(department: Department) {
