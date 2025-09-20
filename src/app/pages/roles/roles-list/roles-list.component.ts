@@ -130,6 +130,9 @@ export class RolesListComponent implements OnInit {
     this.router.navigate(['/roles/edit', role.id]);
   }
 
+  editPermitions(role: RoleDto) {
+    this.router.navigate(['/permitions/edit', role.id]);
+  }
   deleteRole(role: RoleDto) {
     this.confirmationService.confirm({
       message: `Are you sure you want to delete the role '${role.name}'?`,
