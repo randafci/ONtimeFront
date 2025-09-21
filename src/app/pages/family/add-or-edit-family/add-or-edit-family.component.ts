@@ -110,7 +110,10 @@ export class AddOrEditFamilyComponent implements OnInit {
 
   onSubmit(): void {
     this.submitted = true;
-    if (this.familyForm.invalid) return;
+     if (this.familyForm.invalid) {
+      this.markFormGroupTouched(this.familyForm);
+      return;
+    }
 
     this.loading = true;
     const formData = this.familyForm.getRawValue();
@@ -146,6 +149,16 @@ export class AddOrEditFamilyComponent implements OnInit {
       error: (err) => {
         this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Failed to update family' });
         this.loading = false;
+      }
+    });
+  }
+
+  private markFormGroupTouched(formGroup: FormGroup): void {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
       }
     });
   }

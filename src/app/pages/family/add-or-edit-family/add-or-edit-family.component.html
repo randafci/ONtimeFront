@@ -1,57 +1,90 @@
 <div class="card p-fluid max-w-[800px] mx-auto">
-  <h2>{{ (isEditMode ? 'familyForm.title.edit' : 'familyForm.title.add') | translate }}</h2>
+  <h2 class="mb-4">{{ (isEditMode ? 'familyForm.title.edit' : 'familyForm.title.add') | translate }}</h2>
   
-  <form [formGroup]="familyForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <form [formGroup]="familyForm" (ngSubmit)="onSubmit()" class="flex flex-col">
+    <!-- Responsive 2-column grid for form fields -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
       
+      <!-- Code Field -->
       <div class="field">
-        <label for="code">{{ 'common.code' | translate }} <span class="required-star">*</span></label>
-        <input id="code" type="text" pInputText formControlName="code" />
-        <small *ngIf="familyForm.controls['code'].invalid && submitted" class="p-error">
+        <label for="code">{{ 'common.headers.code' | translate }} <span class="required-star">*</span></label>
+        <input 
+          id="code" 
+          type="text" 
+          pInputText 
+          formControlName="code"
+          [ngClass]="{'field-error': familyForm.controls['code'].invalid && (familyForm.controls['code'].touched || submitted)}"
+        />
+        <small *ngIf="familyForm.controls['code'].invalid && (familyForm.controls['code'].touched || submitted)" class="p-error">
           {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
+      <!-- Name Field -->
       <div class="field">
-        <label for="name">{{ 'common.name' | translate }} <span class="required-star">*</span></label>
-        <input id="name" type="text" pInputText formControlName="name" />
-        <small *ngIf="familyForm.controls['name'].invalid && submitted" class="p-error">
+        <label for="name">{{ 'common.headers.name' | translate }} <span class="required-star">*</span></label>
+        <input 
+          id="name" 
+          type="text" 
+          pInputText 
+          formControlName="name"
+          [ngClass]="{'field-error': familyForm.controls['name'].invalid && (familyForm.controls['name'].touched || submitted)}"
+        />
+        <small *ngIf="familyForm.controls['name'].invalid && (familyForm.controls['name'].touched || submitted)" class="p-error">
           {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
+      <!-- NameSE Field -->
       <div class="field">
-        <label for="nameSE">{{ 'common.nameSE' | translate }} <span class="required-star">*</span></label>
-        <input id="nameSE" type="text" pInputText formControlName="nameSE" />
-        <small *ngIf="familyForm.controls['nameSE'].invalid && submitted" class="p-error">
+        <label for="nameSE">{{ 'common.headers.nameSE' | translate }} <span class="required-star">*</span></label>
+        <input 
+          id="nameSE" 
+          type="text" 
+          pInputText 
+          formControlName="nameSE"
+          [ngClass]="{'field-error': familyForm.controls['nameSE'].invalid && (familyForm.controls['nameSE'].touched || submitted)}"
+        />
+        <small *ngIf="familyForm.controls['nameSE'].invalid && (familyForm.controls['nameSE'].touched || submitted)" class="p-error">
           {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
+      <!-- Organization Field -->
       <div class="field" *ngIf="isSuperAdmin">
-        <label for="organizationId">
-          {{ 'common.organization' | translate }} <span class="required-star">*</span>
-        </label>
+        <label for="organizationId">{{ 'common.labels.organization' | translate }} <span class="required-star">*</span></label>
         <p-select
             id="organizationId"
             formControlName="organizationId"
             [options]="organizations"
             optionLabel="name"
             optionValue="id"
-            [placeholder]="'common.placeholders.selectOrganization' | translate">
+            [placeholder]="'common.placeholders.selectOrganization' | translate"
+            [ngClass]="{'field-error': familyForm.controls['organizationId'].invalid && (familyForm.controls['organizationId'].touched || submitted)}"
+        >
         </p-select>
-        <small *ngIf="familyForm.controls['organizationId'].invalid && submitted" class="p-error">
+        <small *ngIf="familyForm.controls['organizationId'].invalid && (familyForm.controls['organizationId'].touched || submitted)" class="p-error">
             {{ 'common.validation.required' | translate }}
         </small>
       </div>
-
     </div>
 
+    <!-- Action Buttons -->
     <div class="flex justify-content-start gap-2 mt-4">
-      <button pButton type="button" [label]="'common.cancel' | translate" class="p-button-secondary" 
-              (click)="onCancel()" [disabled]="loading"></button>
-      <button pButton type="submit" [label]="(isEditMode ? 'common.update' : 'common.save') | translate" 
-              [disabled]="familyForm.invalid || loading"></button>
+      <button 
+        pButton 
+        type="button" 
+        [label]="'common.buttons.cancel' | translate" 
+        class="p-button-secondary" 
+        (click)="onCancel()" 
+        [disabled]="loading">
+      </button>
+      <button 
+        pButton 
+        type="submit" 
+        [label]="(isEditMode ? 'common.buttons.update' : 'common.buttons.save') | translate" 
+        [disabled]="loading">
+      </button>
     </div>
   </form>
 </div>

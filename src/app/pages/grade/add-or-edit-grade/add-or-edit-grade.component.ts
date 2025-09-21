@@ -111,7 +111,10 @@ export class AddOrEditGradeComponent implements OnInit {
 
   onSubmit(): void {
     this.submitted = true;
-    if (this.gradeForm.invalid) return;
+    if (this.gradeForm.invalid) {
+      this.markFormGroupTouched(this.gradeForm);
+      return;
+    }
 
     this.loading = true;
     const formData = this.gradeForm.getRawValue();
@@ -151,6 +154,17 @@ export class AddOrEditGradeComponent implements OnInit {
       }
     });
   }
+
+  private markFormGroupTouched(formGroup: FormGroup): void {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
+  }
+
 
   onCancel(): void {
     this.router.navigate(['/grades']);

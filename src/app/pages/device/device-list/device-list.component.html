@@ -1,20 +1,23 @@
 <p-toast></p-toast>
 <p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+
 <div class="card">
-    <div class="flex justify-content-between align-items-center mb-4">
-        <h1 class="font-semibold text-xl m-0">{{ 'devices.listPage.title' | translate }}</h1>
+    <!-- Header: Title and "Create" Button -->
+    <div class="table-header">
+        <h2 class="m-0">{{ 'devices.listPage.title' | translate }}</h2>
         <button
             pButton
             [label]="'devices.listPage.createButton' | translate"
             icon="pi pi-plus"
+            class="p-button-sm"
             routerLink="/devices/add">
         </button>
     </div>
 
+    <!-- PrimeNG Table -->
     <p-table
         #table
         [value]="devices"
-        [columns]="cols"
         dataKey="id"
         [rows]="rows"
         [totalRecords]="totalRecords"
@@ -26,73 +29,78 @@
         (onLazyLoad)="loadDevices($event)"
         [rowsPerPageOptions]="[10, 25, 50]">
 
+        <!-- Caption: Search and Clear Buttons -->
         <ng-template pTemplate="caption">
             <div class="flex justify-content-between align-items-center">
                 <button
                     pButton
                     pRipple
-                    (click)="clear(table)"
+                    (click)="clear()"
                     icon="pi pi-filter-slash"
                     class="p-button-outlined"
                     [label]="'devices.listPage.clearButton' | translate">
                 </button>
-                <div class="p-input-icon-left">
-                    <i class="pi pi-search"></i>
+                <p-iconfield iconPosition="left">
+                    <p-inputicon><i class="pi pi-search"></i></p-inputicon>
                     <input
+                        #filter
                         pInputText
                         type="text"
                         [(ngModel)]="searchValue"
-                        (input)="onSearch(table)"
+                        (input)="onSearch()"
                         [placeholder]="'devices.listPage.searchPlaceholder' | translate" />
-                </div>
+                </p-iconfield>
             </div>
         </ng-template>
 
-        <ng-template pTemplate="header" let-columns>
+        <!-- Table Header Columns -->
+        <ng-template pTemplate="header">
             <tr>
-                <th *ngFor="let col of columns" [pSortableColumn]="col.field">
-                    {{ col.headerKey | translate }}
-                    <p-sortIcon *ngIf="col.field !== 'actions'" [field]="col.field"></p-sortIcon>
-                </th>
+                <th pSortableColumn="code">{{ 'devices.listPage.headers.code' | translate }} <p-sortIcon field="code"></p-sortIcon></th>
+                <th pSortableColumn="name">{{ 'devices.listPage.headers.name' | translate }} <p-sortIcon field="name"></p-sortIcon></th>
+                <th pSortableColumn="ipAddress">{{ 'devices.listPage.headers.ipAddress' | translate }} <p-sortIcon field="ipAddress"></p-sortIcon></th>
+                <th pSortableColumn="locationName">{{ 'devices.listPage.headers.location' | translate }} <p-sortIcon field="locationName"></p-sortIcon></th>
+                <th>{{ 'devices.listPage.headers.disabled' | translate }}</th>
+                <th>{{ 'devices.listPage.headers.downloadLogs' | translate }}</th>
+                <th style="text-align: center;">{{ 'devices.listPage.headers.actions' | translate }}</th>
             </tr>
         </ng-template>
 
-        <ng-template pTemplate="body" let-device let-columns="columns">
+        <!-- Table Body Rows -->
+        <ng-template pTemplate="body" let-device>
             <tr>
-                <td *ngFor="let col of columns">
-                    <ng-container [ngSwitch]="col.field">
-                        <span *ngSwitchCase="'disabled'">{{ (device.disabled ? 'common.yes' : 'common.no') | translate }}</span>
-                        <span *ngSwitchCase="'download'">{{ (device.download ? 'common.yes' : 'common.no') | translate }}</span>
-                        
-                        <div *ngSwitchCase="'actions'" class="flex gap-2">
-                            <button
-                                (click)="editDevice(device)"
-                                pButton pRipple type="button" icon="pi pi-pencil"
-                                class="p-button-rounded p-button-text"
-                                [pTooltip]="'devices.listPage.actions.edit' | translate" tooltipPosition="top">
-                            </button>
-                            <button
-                                (click)="deleteDevice(device)"
-                                pButton pRipple type="button" icon="pi pi-trash"
-                                class="p-button-rounded p-button-text p-button-danger"
-                                [pTooltip]="'devices.listPage.actions.delete' | translate" tooltipPosition="top">
-                            </button>
-                        </div>
-
-                        <span *ngSwitchDefault>{{ device[col.field] }}</span>
-                    </ng-container>
+                <td>{{ device.code }}</td>
+                <td>{{ device.name }}</td>
+                <td>{{ device.ipAddress }}</td>
+                <td>{{ device.locationName }}</td>
+                <td>{{ (device.disabled ? 'common.yes' : 'common.no') | translate }}</td>
+                <td>{{ (device.download ? 'common.yes' : 'common.no') | translate }}</td>
+                <td class="actions-cell">
+                    <button
+                        (click)="editDevice(device)"
+                        pButton pRipple type="button" icon="pi pi-pencil"
+                        class="p-button-rounded p-button-text p-button-sm"
+                        [pTooltip]="'devices.listPage.actions.edit' | translate" tooltipPosition="top">
+                    </button>
+                    <button
+                        (click)="deleteDevice(device)"
+                        pButton pRipple type="button" icon="pi pi-trash"
+                        class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                        [pTooltip]="'devices.listPage.actions.delete' | translate" tooltipPosition="top">
+                    </button>
                 </td>
             </tr>
         </ng-template>
 
+        <!-- Empty and Loading Messages -->
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td [attr.colspan]="cols.length">{{ 'devices.listPage.messages.noResults' | translate }}</td>
+                <td [attr.colspan]="7" class="text-center">{{ 'devices.listPage.messages.noResults' | translate }}</td>
             </tr>
         </ng-template>
         <ng-template pTemplate="loadingbody">
             <tr>
-                <td [attr.colspan]="cols.length">{{ 'devices.listPage.messages.loading' | translate }}</td>
+                <td [attr.colspan]="7" class="text-center">{{ 'devices.listPage.messages.loading' | translate }}</td>
             </tr>
         </ng-template>
     </p-table>

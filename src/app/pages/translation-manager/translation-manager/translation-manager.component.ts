@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { JsonEditorComponent, JsonEditorOptions } from 'ang-jsoneditor';
-import { CommonModule } from '@angular/common'; // Often needed for directives
+import { CommonModule } from '@angular/common'; 
 
 import { finalize } from 'rxjs';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
@@ -12,14 +12,14 @@ import { TranslationService } from './translation.service';
   standalone: true,
   imports: [
     CommonModule,
-    JsonEditorComponent, // <--- IMPORT THE MODULE HERE
+    JsonEditorComponent,
     TranslatePipe
   ],
   templateUrl: './translation-manager.component.html',
   styleUrls: ['./translation-manager.component.scss']
 })
 export class TranslationManagerComponent implements OnInit {
-
+@ViewChild(JsonEditorComponent, { static: false }) editor!: JsonEditorComponent;
   public editorOptions: JsonEditorOptions;
   public initialData: any = null;
   public visibleData: any = null;
@@ -30,6 +30,8 @@ export class TranslationManagerComponent implements OnInit {
   public isLoading = true;
   public isSaving = false;
   public updateStatus: 'success' | 'error' | null = null;
+  public isJsonInvalid = false;
+
 
   constructor(
     private translationService: TranslationService,
@@ -38,6 +40,8 @@ export class TranslationManagerComponent implements OnInit {
     this.editorOptions = new JsonEditorOptions();
     this.editorOptions.mode = 'tree';
     this.editorOptions.modes = ['code', 'form', 'text', 'tree', 'view'];
+
+    this.editorOptions.onError = () => { this.isJsonInvalid = true; };
   }
 
   ngOnInit(): void {
@@ -72,11 +76,20 @@ export class TranslationManagerComponent implements OnInit {
 
 
   onDataChange(event: any) {
-    this.visibleData = event;
+    try {     
+      this.visibleData = this.editor.get();
+      this.isJsonInvalid = false; 
+    } catch (e) {
+      this.isJsonInvalid = true;
+      console.error('Invalid JSON format:', e);
+    }
   }
 
   onSubmit() {
-    if (!this.visibleData) return;
+    this.onDataChange(null);
+    
+    if (!this.visibleData || this.isJsonInvalid) return;
+
     this.isSaving = true;
     this.updateStatus = null;
 

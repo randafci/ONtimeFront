@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { PagedListRequest } from '../../../core/models/api-response.model'; 
 import { Device } from '../device.model';
 import { DeviceService } from '../device.service';
@@ -14,7 +14,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { TooltipModule } from 'primeng/tooltip';
-import { TieredMenuModule } from 'primeng/tieredmenu';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 
 @Component({
   selector: 'app-device-list',
@@ -22,32 +23,22 @@ import { TieredMenuModule } from 'primeng/tieredmenu';
   styleUrls: ['./device-list.component.scss'],
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    TableModule,
-    ButtonModule,
-    InputTextModule,
-    RippleModule,
-    TooltipModule,
-    TieredMenuModule,
-    TranslatePipe,
-    RouterLink,
-    ToastModule,
-    ConfirmDialogModule
+    CommonModule, FormsModule, TableModule, ButtonModule, InputTextModule,
+    RippleModule, TooltipModule, TranslatePipe, RouterLink, ToastModule,
+    ConfirmDialogModule, IconFieldModule, InputIconModule
   ],
   providers: [ConfirmationService, MessageService, TranslatePipe]
 })
 export class DeviceListComponent implements OnInit {
+  @ViewChild('table') table!: Table;
+  @ViewChild('filter') filter!: ElementRef;
+
   devices: Device[] = [];
-  cols: any[] = [];
   loading = true;
-
-
   totalRecords = 0;
   rows = 10;
-  
-
   searchValue = '';
+  lastLazyLoadEvent: TableLazyLoadEvent | null = null; // Store the last event for reloads
 
   constructor(
     private deviceService: DeviceService,
@@ -58,19 +49,12 @@ export class DeviceListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.cols = [
-      { field: 'code', headerKey: 'devices.listPage.headers.code' },
-      { field: 'name', headerKey: 'devices.listPage.headers.name' },
-      { field: 'ipAddress', headerKey: 'devices.listPage.headers.ipAddress' },
-      { field: 'locationName', headerKey: 'devices.listPage.headers.location' },
-      { field: 'disabled', headerKey: 'devices.listPage.headers.disabled' },
-      { field: 'download', headerKey: 'devices.listPage.headers.downloadLogs' },
-      { field: 'actions', headerKey: 'devices.listPage.headers.actions' }
-    ];
+    // The cols array is no longer needed as columns are now defined in the HTML.
   }
 
   loadDevices(event: TableLazyLoadEvent): void {
     this.loading = true;
+    this.lastLazyLoadEvent = event; // Save the current state
     
     const page = (event.first || 0) / (event.rows || 10) + 1;
     const sortField = event.sortField as string || 'Name'; 
@@ -98,23 +82,32 @@ export class DeviceListComponent implements OnInit {
         if (response.succeeded && response.data) {
           this.devices = response.data.items;
           this.totalRecords = response.data.totalCount;
+        } else {
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: this.translatePipe.transform('devices.listPage.messages.loadError') });
         }
         this.loading = false;
       },
       error: () => {
         this.loading = false;
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load devices.' });
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: this.translatePipe.transform('devices.listPage.messages.loadError') });
       }
     });
   }
   
-  onSearch(table: any): void {
-    table.reset();
+  // CORRECTED: This now triggers a data reload.
+  onSearch(): void {
+    if (this.lastLazyLoadEvent) {
+        this.loadDevices(this.lastLazyLoadEvent);
+    }
   }
 
-  clear(table: any): void {
+  // CORRECTED: This now clears the search and reloads the data.
+  clear(): void {
     this.searchValue = '';
-    table.reset();
+    this.filter.nativeElement.value = '';
+    if (this.lastLazyLoadEvent) {
+      this.loadDevices(this.lastLazyLoadEvent);
+    }
   }
 
   editDevice(device: Device): void {
@@ -129,11 +122,14 @@ export class DeviceListComponent implements OnInit {
       accept: () => {
         this.deviceService.deleteDevice(device.id).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Device deleted successfully.' });
-            this.onSearch(null);
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: this.translatePipe.transform('devices.listPage.messages.deleteSuccess') });
+            // Reload the table with current settings after a successful delete
+            if (this.lastLazyLoadEvent) {
+              this.loadDevices(this.lastLazyLoadEvent);
+            }
           },
           error: (err) => {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Failed to delete device.' });
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || this.translatePipe.transform('devices.listPage.messages.deleteError') });
           }
         });
       }

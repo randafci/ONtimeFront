@@ -50,7 +50,7 @@ export class AddEditDeviceComponent implements OnInit {
   locationsList: any[] = []; 
   organizations: Organization[] = [];
   isSuperAdmin = false;
-  submitted = false; // To help with validation display
+  submitted = false; 
 
 
   constructor(
@@ -85,6 +85,7 @@ export class AddEditDeviceComponent implements OnInit {
         this.deviceForm.get('organizationId')?.disable();
       }
     }
+    this.submitted = false;
 
     if (this.isEditMode && this.deviceId) {
       this.loadDeviceData(this.deviceId);
@@ -204,5 +205,8 @@ export class AddEditDeviceComponent implements OnInit {
 
   get f() {
     return this.deviceForm.controls;
+  }
+  onCancel(): void {
+    this.router.navigate(['/devices']);
   }
 }
