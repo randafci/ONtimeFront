@@ -12,8 +12,12 @@ import { InputIconModule } from 'primeng/inputicon';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Family } from '@/interfaces/family.interface';
 import { FamilyService } from '../FamilyService';
+import { LookupService } from '../../organization/OrganizationService';
+import { Organization } from '@/interfaces/organization.interface';
 import { TranslatePipe } from '@/core/pipes/translate.pipe';
+import { AuthService } from '@/auth/auth.service';
 import { ApiResponse } from '@/core/models/api-response.model';
+import { FamilyModalComponent } from '../family-modal/family-modal.component';
 
 @Component({
   selector: 'app-family-list',
@@ -22,30 +26,59 @@ import { ApiResponse } from '@/core/models/api-response.model';
     CommonModule, FormsModule, RouterModule, DatePipe,
     TableModule, ButtonModule, InputTextModule, ToastModule, TagModule,
     IconFieldModule, InputIconModule,
-    TranslatePipe
+    TranslatePipe, FamilyModalComponent
   ],
   providers: [MessageService, ConfirmationService, TranslatePipe],
   templateUrl: './family-list.component.html',
-  styleUrls: ['./family-list.component.scss']
 })
 export class FamilyListComponent implements OnInit {
   families: Family[] = [];
   loading: boolean = true;
+
+  dialogVisible: boolean = false;
+  isEditMode: boolean = false;
+  selectedFamily: Family | null = null;
+  
+  organizations: Organization[] = [];
+  isSuperAdmin: boolean = false;
 
   @ViewChild('dt') table!: Table;
   @ViewChild('filter') filter!: ElementRef;
 
   constructor(
     private familyService: FamilyService,
+    private organizationService: LookupService,
     private messageService: MessageService,
     private router: Router,
     private confirmationService: ConfirmationService,
-    private translatePipe: TranslatePipe
+    private translatePipe: TranslatePipe,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    this.isSuperAdmin = this.checkIsSuperAdmin();
     this.loadFamilies();
+    this.loadOrganizations();
   }
+
+  private checkIsSuperAdmin(): boolean {
+    const claims = this.authService.getClaims();
+    return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
+  }
+
+  loadOrganizations(): void {
+    this.organizationService.getAllOrganizations().subscribe({
+      next: (response: ApiResponse<Organization[]>) => {
+        if (response.succeeded) {
+          this.organizations = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading organizations:', error);
+      }
+    });
+  }
+
 
   loadFamilies() {
     this.loading = true;
@@ -73,12 +106,20 @@ export class FamilyListComponent implements OnInit {
     return status === 'active' ? 'success' : 'danger';
   }
 
-  navigateToAdd() {
-    this.router.navigate(['/families/add']);
+  openCreateDialog() {
+    this.isEditMode = false;
+    this.selectedFamily = null;
+    this.dialogVisible = true;
   }
 
-  navigateToEdit(id: number) {
-    this.router.navigate(['/families/edit', id]);
+  openEditDialog(family: Family) {
+    this.isEditMode = true;
+    this.selectedFamily = family;
+    this.dialogVisible = true;
+  }
+
+  onFamilySaved(family: Family): void {
+    this.loadFamilies();
   }
 
   deleteFamily(family: Family) {

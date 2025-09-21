@@ -22,6 +22,8 @@ import { ApiResponse } from '../../../core/models/api-response.model';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { AuthService } from '../../../auth/auth.service';
+import { CountryModalComponent } from '../country-modal/country-modal.component';
 
 @Component({
   selector: 'app-country-list',
@@ -43,7 +45,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     TooltipModule,
     RouterModule,
     TranslatePipe,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    CountryModalComponent
   ],
   providers: [MessageService, ConfirmationService, TranslationService],
   templateUrl: './country-list.html'
@@ -52,6 +55,11 @@ export class CountryListComponent implements OnInit {
   countries: Country[] = [];
   loading: boolean = true;
 
+  // Dialog properties
+  dialogVisible: boolean = false;
+  isEditMode: boolean = false;
+  selectedCountry: Country | null = null;
+
   @ViewChild('dt') table!: Table;
   @ViewChild('filter') filter!: ElementRef;
 
@@ -59,7 +67,8 @@ export class CountryListComponent implements OnInit {
     private countryService: CountryService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -93,12 +102,24 @@ export class CountryListComponent implements OnInit {
     });
   }
 
-  navigateToAdd() {
-    this.router.navigate(['/countries/add']);
+  openCreateDialog() {
+    this.isEditMode = false;
+    this.selectedCountry = null;
+    this.dialogVisible = true;
   }
 
-  navigateToEdit(id: string) {
-    this.router.navigate(['/countries/edit', id]);
+  openEditDialog(country: Country) {
+    this.isEditMode = true;
+    this.selectedCountry = country;
+    this.dialogVisible = true;
+  }
+
+  onCountrySaved(country: Country) {
+    this.loadCountries();
+  }
+
+  onCountryModalCancel() {
+    // Handle modal cancellation if needed
   }
 
   deleteCountry(country: Country) {

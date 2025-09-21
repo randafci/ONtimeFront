@@ -1,5 +1,5 @@
 <div class="card">
-    <div class="flex justify-content-between align-items-center mb-4">
+    <div class="flex justify-content-between items-center mb-4">
         <h2 class="mb-0">{{ 'gradeList.title' | translate }}</h2>
         <div class="flex-grow-1"></div>
         <button 
@@ -7,7 +7,7 @@
             [label]="'gradeList.addButton' | translate" 
             icon="pi pi-plus" 
             class="p-button-sm"
-            (click)="navigateToAdd()"
+            (click)="openCreateDialog()"
         ></button>
     </div>
     
@@ -48,7 +48,7 @@
                 <td>{{ grade.creationDate | date: 'MM/dd/yyyy' }}</td>
                 <td>
                     <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm"
-                            (click)="navigateToEdit(grade.id)"></button>
+                            (click)="openEditDialog(grade)"></button>
                     <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm"
                             (click)="deleteGrade(grade)"></button>
                 </td>
@@ -60,4 +60,16 @@
         </ng-template>
     </p-table>
 </div>
+
+<!-- Grade Modal Component -->
+<app-grade-modal
+  [(dialogVisible)]="dialogVisible"
+  [isEditMode]="isEditMode"
+  [grade]="selectedGrade"
+  [organizations]="organizations"
+  [isSuperAdmin]="isSuperAdmin"
+  [loading]="loading"
+  (onSave)="onGradeSaved($event)">
+</app-grade-modal>
+
 <p-toast></p-toast>

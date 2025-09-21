@@ -1,0 +1,140 @@
+<p-dialog
+  [(visible)]="dialogVisible"
+  [header]="isEditMode ? 'Edit Designation' : 'Add Designation'"
+  [modal]="true"
+  [style]="{width: '50vw'}"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="onCancel()">
+  <form [formGroup]="designationForm" (ngSubmit)="onSubmit()">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <!-- Code Field -->
+      <div class="field">
+        <label for="code" class="block text-sm font-medium mb-2">
+          Code <span class="text-red-500">*</span>
+        </label>
+        <input
+          id="code"
+          type="text"
+          pInputText
+          class="w-full"
+          formControlName="code"
+          [class.ng-invalid]="designationForm.get('code')?.invalid && designationForm.get('code')?.touched"/>
+        <small class="text-red-500" *ngIf="designationForm.get('code')?.invalid && designationForm.get('code')?.touched">
+          Code is required
+        </small>
+      </div>
+
+      <!-- Name Field -->
+      <div class="field">
+        <label for="name" class="block text-sm font-medium mb-2">
+          Name <span class="text-red-500">*</span>
+        </label>
+        <input
+          id="name"
+          type="text"
+          pInputText
+          class="w-full"
+          formControlName="name"
+          [class.ng-invalid]="designationForm.get('name')?.invalid && designationForm.get('name')?.touched"/>
+        <small class="text-red-500" *ngIf="designationForm.get('name')?.invalid && designationForm.get('name')?.touched">
+          Name is required
+        </small>
+      </div>
+
+      <!-- NameSE Field -->
+      <div class="field">
+        <label for="nameSE" class="block text-sm font-medium mb-2">
+          Name (SE) <span class="text-red-500">*</span>
+        </label>
+        <input
+          id="nameSE"
+          type="text"
+          pInputText
+          class="w-full"
+          formControlName="nameSE"
+          [class.ng-invalid]="designationForm.get('nameSE')?.invalid && designationForm.get('nameSE')?.touched"/>
+        <small class="text-red-500" *ngIf="designationForm.get('nameSE')?.invalid && designationForm.get('nameSE')?.touched">
+          Name (SE) is required
+        </small>
+      </div>
+
+      <!-- Organization Field -->
+      <div class="field" *ngIf="isSuperAdmin">
+        <label for="organizationId" class="block text-sm font-medium mb-2">
+          Organization <span class="text-red-500">*</span>
+        </label>
+        <p-select
+          id="organizationId"
+          class="w-full"
+          formControlName="organizationId"
+          [options]="organizations"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="Select Organization"
+          appendTo="body"
+          [class.ng-invalid]="designationForm.get('organizationId')?.invalid && designationForm.get('organizationId')?.touched">
+        </p-select>
+        <small class="text-red-500" *ngIf="designationForm.get('organizationId')?.invalid && designationForm.get('organizationId')?.touched">
+          Organization is required
+        </small>
+      </div>
+
+      <!-- Designation Type Field -->
+      <div class="field">
+        <label for="designationsTypeLookupId" class="block text-sm font-medium mb-2">
+          Designation Type <span class="text-red-500">*</span>
+        </label>
+        <p-select
+          id="designationsTypeLookupId"
+          class="w-full"
+          formControlName="designationsTypeLookupId"
+          [options]="designationTypes"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="Select Designation Type"
+          appendTo="body"
+          [class.ng-invalid]="designationForm.get('designationsTypeLookupId')?.invalid && designationForm.get('designationsTypeLookupId')?.touched"
+          (onChange)="onDesignationTypeChange($event.value)">
+        </p-select>
+        <small class="text-red-500" *ngIf="designationForm.get('designationsTypeLookupId')?.invalid && designationForm.get('designationsTypeLookupId')?.touched">
+          Designation Type is required
+        </small>
+      </div>
+
+      <!-- Parent Designation Field - Only shown for Sub Designations -->
+      <div class="field" *ngIf="designationForm.get('designationsTypeLookupId')?.value === 2">
+        <label for="parentId" class="block text-sm font-medium mb-2">
+          Parent Designation
+        </label>
+        <p-select
+          id="parentId"
+          class="w-full"
+          formControlName="parentId"
+          [options]="mainDesignations"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="Select Parent Designation"
+          appendTo="body">
+        </p-select>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+      <button
+        pButton
+        label="Cancel"
+        class="p-button-secondary"
+        type="button"
+        (click)="onCancel()">
+      </button>
+      <button
+        pButton
+        [label]="isEditMode ? 'Update' : 'Save'"
+        [loading]="loading"
+        type="submit">
+      </button>
+    </div>
+  </form>
+</p-dialog>
+

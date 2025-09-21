@@ -7,7 +7,7 @@
             [label]="'Add Cost Center' | translate"
             icon="pi pi-plus" 
             class="p-button-sm"
-            (click)="navigateToAdd()"
+            (click)="openCreateDialog()"
         ></button>
     </div>
 
@@ -80,7 +80,7 @@
                         pButton 
                         icon="pi pi-pencil" 
                         class="p-button-rounded p-button-text p-button-sm"
-                        (click)="navigateToEdit(costCenter.id)"
+                        (click)="openEditDialog(costCenter)"
                     ></button>
                     <button 
                         pButton 
@@ -99,5 +99,17 @@
         </ng-template>
     </p-table>
 </div>
+
+<!-- Cost Center Modal Component -->
+<app-cost-center-modal
+  [(dialogVisible)]="dialogVisible"
+  [isEditMode]="isEditMode"
+  [costCenter]="selectedCostCenter"
+  [organizations]="organizations"
+  [isSuperAdmin]="isSuperAdmin"
+  [loading]="loading"
+  (onSave)="onCostCenterSaved($event)"
+  (onCancelEvent)="onCostCenterModalCancel()">
+</app-cost-center-modal>
 
 <p-toast></p-toast>
