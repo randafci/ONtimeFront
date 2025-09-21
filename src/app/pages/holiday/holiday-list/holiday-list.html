@@ -1,0 +1,118 @@
+<div class="card">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="mb-0">Holidays</h2>
+        <div class="flex-grow"></div>
+        <button 
+            pButton 
+            label="Add Holiday"
+            icon="pi pi-plus" 
+            class="p-button-sm"
+            (click)="openCreateDialog()"
+        ></button>
+    </div>
+    
+    <p-table
+        #dt
+        [value]="holidays"
+        dataKey="id"
+        [rows]="10"
+        [loading]="loading"
+        [rowHover]="true"
+        [showGridlines]="true"
+        [paginator]="true"
+        [globalFilterFields]="['symbol', 'holidayTypeName']"
+        responsiveLayout="scroll"
+    >
+        <ng-template pTemplate="caption">
+            <div class="flex justify-between items-center flex-col sm:flex-row">
+                <button 
+                    pButton 
+                    label="Clear"
+                    class="p-button-outlined mb-2" 
+                    icon="pi pi-filter-slash" 
+                    (click)="clear(dt)"
+                ></button>
+                <p-iconfield iconPosition="left" class="ml-auto">
+                    <p-inputicon>
+                        <i class="pi pi-search"></i>
+                    </p-inputicon>
+                    <input 
+                        pInputText 
+                        type="text" 
+                        #filter
+                        (input)="onGlobalFilter(dt, $event)" 
+                        placeholder="Search holidays..."
+                    />
+                </p-iconfield>
+            </div>
+        </ng-template>
+        
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="symbol">
+                    Symbol
+                    <p-sortIcon field="symbol"></p-sortIcon>
+                </th>
+                <th pSortableColumn="holidayTypeName">
+                    Holiday Type
+                    <p-sortIcon field="holidayTypeName"></p-sortIcon>
+                </th>
+                <th pSortableColumn="start">
+                    Start Date
+                    <p-sortIcon field="start"></p-sortIcon>
+                </th>
+                <th pSortableColumn="end">
+                    End Date
+                    <p-sortIcon field="end"></p-sortIcon>
+                </th>
+                <th style="min-width: 8rem">Actions</th>
+            </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="body" let-holiday>
+            <tr>
+                <td>
+                    <p-tag [value]="holiday.symbol" severity="info"></p-tag>
+                </td>
+                <td>{{ getHolidayTypeName(holiday.holidayTypeId) }}</td>
+                <td>{{ holiday.start | date: 'MM/dd/yyyy' }}</td>
+                <td>{{ holiday.end | date: 'MM/dd/yyyy' }}</td>
+                <td>
+                    <button 
+                        pButton 
+                        icon="pi pi-pencil" 
+                        class="p-button-rounded p-button-text p-button-sm"
+                        (click)="openEditDialog(holiday)"
+                    ></button>
+                    <button 
+                        pButton 
+                        icon="pi pi-trash" 
+                        class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                        (click)="deleteHoliday(holiday)"
+                    ></button>
+                </td>
+            </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="5">No holidays found.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<!-- Holiday Modal Component -->
+<app-holiday-modal
+  [(dialogVisible)]="dialogVisible"
+  [isEditMode]="isEditMode"
+  [holiday]="selectedHoliday"
+  [holidayTypes]="holidayTypes"
+  [isSuperAdmin]="isSuperAdmin"
+  [loading]="loading"
+  (onSave)="onHolidaySaved($event)"
+>
+</app-holiday-modal>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
