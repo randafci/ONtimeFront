@@ -160,8 +160,6 @@ export const appRoutes: Routes = [
           )
       },
       {
-<<<<<<< Updated upstream
-=======
         path: 'holidays',
         loadChildren: () =>
           import('./app/pages/holiday/holiday.routes').then(
@@ -176,7 +174,6 @@ export const appRoutes: Routes = [
           )
       },
         {
->>>>>>> Stashed changes
         path: 'employeeDevicesAssignment',
         loadChildren: () =>
           import('./app/pages/EmployeeDevicesAssignment/employeeDevicesAssignment.routes').then(
