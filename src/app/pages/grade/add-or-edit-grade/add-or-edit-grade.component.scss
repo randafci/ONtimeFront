@@ -1,10 +1,10 @@
 // Defines the base card layout and padding
 .card {
   padding: 1.5rem;
-  border-radius: 6px;
+  border-radius: 6px; // Optional: Adds rounded corners
 }
 
-// Adds consistent vertical spacing between each form field group
+// Adds consistent vertical spacing between each form field (label, input, error)
 .field {
   margin-bottom: 1.5rem;
 }
@@ -14,12 +14,17 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 600;
-  color: #495057;
+  color: #495057; // A standard text color
+}
+
+// A specific rule for PrimeNG's fluid grid system
+.p-fluid .field {
+  margin-bottom: 1.5rem;
 }
 
 // A helper for the red asterisk on required fields
 .required-star {
-  color: #f44336;
+  color: #f44336; // A standard error red color
   font-weight: bold;
 }
 
@@ -34,12 +39,4 @@
   color: #f44336;
   font-size: 0.875rem;
   margin-top: 0.25rem;
-}
-
-// A specific container for a checkbox to align it vertically with its label
-.field-checkbox-container {
-    display: flex;
-    align-items: center;
-    // Pushes the label up slightly to align with the text inputs
-    padding-top: 1.75rem; 
 }

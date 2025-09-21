@@ -1,0 +1,91 @@
+<div class="card p-fluid max-w-[800px] mx-auto">
+  <h2 class="mb-4">{{ (isEditMode ? 'gradeForm.title.edit' : 'gradeForm.title.add') | translate }}</h2>
+  
+  <form [formGroup]="gradeForm" (ngSubmit)="onSubmit()" class="flex flex-col">
+    <!-- Responsive 2-column grid for form fields -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+      
+      <!-- Code Field -->
+      <div class="field">
+        <label for="code">{{ 'common.headers.code' | translate }} <span class="required-star">*</span></label>
+        <input 
+          id="code" 
+          type="text" 
+          pInputText 
+          formControlName="code"
+          [ngClass]="{'field-error': gradeForm.controls['code'].invalid && (gradeForm.controls['code'].touched || submitted)}"
+        />
+        <small *ngIf="gradeForm.controls['code'].invalid && (gradeForm.controls['code'].touched || submitted)" class="p-error">
+          {{ 'common.validation.required' | translate }}
+        </small>
+      </div>
+
+      <!-- Name Field -->
+      <div class="field">
+        <label for="name">{{ 'common.headers.name' | translate }} <span class="required-star">*</span></label>
+        <input 
+          id="name" 
+          type="text" 
+          pInputText 
+          formControlName="name"
+          [ngClass]="{'field-error': gradeForm.controls['name'].invalid && (gradeForm.controls['name'].touched || submitted)}"
+        />
+        <small *ngIf="gradeForm.controls['name'].invalid && (gradeForm.controls['name'].touched || submitted)" class="p-error">
+          {{ 'common.validation.required' | translate }}
+        </small>
+      </div>
+
+      <!-- NameSE Field -->
+      <div class="field">
+        <label for="nameSE">{{ 'common.headers.nameSE' | translate }} <span class="required-star">*</span></label>
+        <input 
+          id="nameSE" 
+          type="text" 
+          pInputText 
+          formControlName="nameSE"
+          [ngClass]="{'field-error': gradeForm.controls['nameSE'].invalid && (gradeForm.controls['nameSE'].touched || submitted)}"
+        />
+        <small *ngIf="gradeForm.controls['nameSE'].invalid && (gradeForm.controls['nameSE'].touched || submitted)" class="p-error">
+          {{ 'common.validation.required' | translate }}
+        </small>
+      </div>
+
+      <!-- Organization Field -->
+      <div class="field" *ngIf="isSuperAdmin">
+        <label for="organizationId">{{ 'common.labels.organization' | translate }} <span class="required-star">*</span></label>
+        <p-select
+            id="organizationId"
+            formControlName="organizationId"
+            [options]="organizations"
+            optionLabel="name"
+            optionValue="id"
+            [placeholder]="'common.placeholders.selectOrganization' | translate"
+            [ngClass]="{'field-error': gradeForm.controls['organizationId'].invalid && (gradeForm.controls['organizationId'].touched || submitted)}"
+        >
+        </p-select>
+        <small *ngIf="gradeForm.controls['organizationId'].invalid && (gradeForm.controls['organizationId'].touched || submitted)" class="p-error">
+            {{ 'common.validation.required' | translate }}
+        </small>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-content-start gap-2 mt-4">
+      <button 
+        pButton 
+        type="button" 
+        [label]="'common.buttons.cancel' | translate" 
+        class="p-button-secondary" 
+        (click)="onCancel()" 
+        [disabled]="loading">
+      </button>
+      <button 
+        pButton 
+        type="submit" 
+        [label]="(isEditMode ? 'common.buttons.update' : 'common.buttons.save') | translate" 
+        [disabled]="loading">
+      </button>
+    </div>
+  </form>
+</div>
+<p-toast></p-toast>
