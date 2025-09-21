@@ -1,0 +1,107 @@
+<!-- Create/Edit Dialog -->
+<p-dialog 
+  [(visible)]="dialogVisible" 
+  [header]="isEditMode ? 'Edit Holiday Type' : 'Add Holiday Type'"
+  [modal]="true" 
+  [style]="{width: '50vw'}"
+  [draggable]="false" 
+  [resizable]="false"
+  (onHide)="onDialogHide()">
+  <form [formGroup]="holidayTypeForm" (ngSubmit)="onSubmit()">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <!-- Code Field -->
+      <div class="field">
+        <label for="code" class="block text-sm font-medium mb-2">
+          Code <span class="text-red-500">*</span>
+        </label>
+        <input 
+          id="code" 
+          type="text" 
+          pInputText 
+          class="w-full"
+          formControlName="code" 
+          placeholder="Enter code (e.g., NAT, REL, COM)"
+          [class.ng-invalid]="holidayTypeForm.get('code')?.invalid && holidayTypeForm.get('code')?.touched"
+        />
+        <small class="text-red-500" *ngIf="holidayTypeForm.get('code')?.invalid && holidayTypeForm.get('code')?.touched">
+          Code is required 
+        </small>
+      </div>
+
+      <!-- Organization Field -->
+      <div class="field" *ngIf="isSuperAdmin">
+        <label for="organizationId" class="block text-sm font-medium mb-2">
+          Organization <span class="text-red-500">*</span>
+        </label>
+        <p-select 
+          id="organizationId" 
+          formControlName="organizationId" 
+          [options]="organizations" 
+          optionLabel="name" 
+          optionValue="id"
+          placeholder="Select Organization"
+          class="w-full"
+          appendTo="body"
+          [class.ng-invalid]="holidayTypeForm.get('organizationId')?.invalid && holidayTypeForm.get('organizationId')?.touched"
+        ></p-select>
+        <small class="text-red-500" *ngIf="holidayTypeForm.get('organizationId')?.invalid && holidayTypeForm.get('organizationId')?.touched">
+          Organization is required
+        </small>
+      </div>
+
+      <!-- Name Field -->
+      <div class="field">
+        <label for="name" class="block text-sm font-medium mb-2">
+          Name <span class="text-red-500">*</span>
+        </label>
+        <input 
+          id="name" 
+          type="text" 
+          pInputText 
+          class="w-full"
+          formControlName="name" 
+          placeholder="Enter holiday type name"
+          [class.ng-invalid]="holidayTypeForm.get('name')?.invalid && holidayTypeForm.get('name')?.touched"
+        />
+        <small class="text-red-500" *ngIf="holidayTypeForm.get('name')?.invalid && holidayTypeForm.get('name')?.touched">
+          Name is required and must be maximum 100 characters
+        </small>
+      </div>
+
+      <!-- Name SE Field -->
+      <div class="field">
+        <label for="nameSE" class="block text-sm font-medium mb-2">
+          Name (SE) <span class="text-red-500">*</span>
+        </label>
+        <input 
+          id="nameSE" 
+          type="text" 
+          pInputText 
+          class="w-full"
+          formControlName="nameSE" 
+          placeholder="Enter holiday type name "
+          [class.ng-invalid]="holidayTypeForm.get('nameSE')?.invalid && holidayTypeForm.get('nameSE')?.touched"
+        />
+        <small class="text-red-500" *ngIf="holidayTypeForm.get('nameSE')?.invalid && holidayTypeForm.get('nameSE')?.touched">
+          Name (SE) is required and must be maximum 100 characters
+        </small>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+      <button 
+        pButton 
+        label="Cancel" 
+        class="p-button-secondary" 
+        type="button"
+        (click)="onCancel()">
+      </button>
+      <button 
+        pButton 
+        [label]="isEditMode ? 'Update' : 'Save'" 
+        [loading]="loading"
+        type="submit">
+      </button>
+    </div>
+  </form>
+</p-dialog>
