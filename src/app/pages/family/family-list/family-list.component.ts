@@ -6,6 +6,7 @@ import { Table, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TagModule } from 'primeng/tag';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
@@ -24,7 +25,7 @@ import { FamilyModalComponent } from '../family-modal/family-modal.component';
   standalone: true,
   imports: [
     CommonModule, FormsModule, RouterModule, DatePipe,
-    TableModule, ButtonModule, InputTextModule, ToastModule, TagModule,
+    TableModule, ButtonModule, InputTextModule, ToastModule, ConfirmDialogModule, TagModule,
     IconFieldModule, InputIconModule,
     TranslatePipe, FamilyModalComponent
   ],

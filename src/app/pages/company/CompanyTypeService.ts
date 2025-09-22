@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { CompanyType } from '@/interfaces/company-type.interface';
 import { AppConfigService } from '@/pages/service/app-config.service';
 import { ApiResponse } from '@/core/models/api-response.model';
+import { AuthService } from '@/auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +12,15 @@ import { ApiResponse } from '@/core/models/api-response.model';
 export class CompanyTypeService {
 
   public apiUrl: string;
-  constructor(private http: HttpClient, private appConfig: AppConfigService) {
+  constructor(private http: HttpClient, private appConfig: AppConfigService, private authService: AuthService) {
     this.apiUrl = this.appConfig.apiUrl + '/api';
   }
 
+  private get headers() {
+    return { headers: this.authService.getHeaders() };
+  }
+
   getAllCompanyTypes(): Observable<ApiResponse<CompanyType[]>> {
-    return this.http.get<ApiResponse<CompanyType[]>>(`${this.apiUrl}/Lookup/CompanyType`);
+    return this.http.get<ApiResponse<CompanyType[]>>(`${this.apiUrl}/Lookup/CompanyType`, this.headers);
   }
 }

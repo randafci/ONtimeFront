@@ -44,4 +44,8 @@ export class CompanyService {
       }, this.headers
     );
   }
+
+  deleteCompany(id: number): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.apiUrl}/Lookup/Company/${id}`, this.headers);
+  }
 }

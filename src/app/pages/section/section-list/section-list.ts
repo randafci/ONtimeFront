@@ -13,6 +13,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Section } from '@/interfaces/section.interface';
@@ -45,6 +46,7 @@ import { SectionModalComponent } from '../section-modal/section-modal.component'
     IconFieldModule,
     SelectModule,
     ToastModule,
+    ConfirmDialogModule,
     RouterModule,
     SectionModalComponent,
     DatePipe
@@ -200,6 +202,32 @@ export class SectionListComponent implements OnInit {
       header: 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
+        this.sectionService.deleteSection(section.id).subscribe({
+          next: (response: ApiResponse<boolean>) => {
+            if (response.succeeded) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: `Section ${section.name} deleted successfully`
+              });
+              this.loadSections();
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: response.message || 'Failed to delete section'
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting section:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to delete section'
+            });
+          }
+        });
       }
     });
   }
