@@ -52,4 +52,8 @@ export class CostCenterService {
   searchCostCenters(searchText: string): Observable<ApiResponse<CostCenter[]>> {
     return this.http.get<ApiResponse<CostCenter[]>>(`${this.apiUrl}/Lookup/CostCenter/search?searchText=${searchText}`, this.headers);
   }
+
+  deleteCostCenter(id: number): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.apiUrl}/Lookup/CostCenter/${id}`, this.headers);
+  }
 }

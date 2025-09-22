@@ -13,7 +13,8 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { Designation } from '../../../interfaces/designation.interface';
 import { DesignationService } from '../DesignationService';
 import { DesignationTypeService } from '../DesignationTypeService';
@@ -43,11 +44,12 @@ import { DesignationModalComponent } from '../designation-modal/designation-moda
     IconFieldModule,
     SelectModule,
     ToastModule,
+    ConfirmDialogModule,
     RouterModule,
     DatePipe,
     DesignationModalComponent
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './designation-list.html',
   styleUrl: './designation-list.scss'
 })
@@ -83,6 +85,7 @@ export class DesignationListComponent implements OnInit {
     private designationTypeService: DesignationTypeService,
     private organizationService: LookupService,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
     private router: Router,
     private authService: AuthService
   ) {}
@@ -196,12 +199,38 @@ export class DesignationListComponent implements OnInit {
 
 
   deleteDesignation(designation: Designation) {
-    console.log('Deleting designation:', designation);
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Delete',
-      detail: `Are you sure you want to delete ${designation.name}?`,
-      life: 3000
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete ${designation.name}?`,
+      header: 'Confirm Deletion',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.designationService.deleteDesignation(designation.id).subscribe({
+          next: (response: ApiResponse<boolean>) => {
+            if (response.succeeded) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: `Designation ${designation.name} deleted successfully`
+              });
+              this.loadDesignations();
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: response.message || 'Failed to delete designation'
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting designation:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to delete designation'
+            });
+          }
+        });
+      }
     });
   }
 

@@ -46,4 +46,8 @@ export class DepartmentService {
       }, this.headers
     );
   }
+
+  deleteDepartment(id: number): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.apiUrl}/Lookup/Department/${id}`, this.headers);
+  }
 }

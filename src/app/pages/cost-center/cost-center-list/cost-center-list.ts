@@ -13,8 +13,9 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { CostCenter } from '../../../interfaces/cost-center.interface';
 import { CostCenterService } from '../CostCenterService';
 import { LookupService } from '../../organization/OrganizationService';
@@ -42,12 +43,13 @@ import { CostCenterModalComponent } from '../cost-center-modal/cost-center-modal
     IconFieldModule,
     SelectModule,
     ToastModule,
+    ConfirmDialogModule,
     TooltipModule,
     RouterModule,
     TranslatePipe,
     CostCenterModalComponent
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './cost-center-list.html'
 })
 export class CostCenterListComponent implements OnInit {
@@ -75,6 +77,7 @@ export class CostCenterListComponent implements OnInit {
     private costCenterService: CostCenterService,
     private organizationService: LookupService,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
     private router: Router,
     private authService: AuthService
   ) {}
@@ -158,13 +161,38 @@ export class CostCenterListComponent implements OnInit {
   }
 
   deleteCostCenter(costCenter: CostCenter) {
-    // Implement delete logic here
-    console.log('Deleting cost center:', costCenter);
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Delete',
-      detail: `Are you sure you want to delete ${costCenter.name}?`,
-      life: 3000
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete ${costCenter.name}?`,
+      header: 'Confirm Deletion',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.costCenterService.deleteCostCenter(costCenter.id).subscribe({
+          next: (response: ApiResponse<boolean>) => {
+            if (response.succeeded) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: `Cost Center ${costCenter.name} deleted successfully`
+              });
+              this.loadCostCenters();
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: response.message || 'Failed to delete cost center'
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting cost center:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to delete cost center'
+            });
+          }
+        });
+      }
     });
   }
 

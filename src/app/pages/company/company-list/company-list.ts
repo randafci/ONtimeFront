@@ -13,7 +13,8 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { Company } from '../../../interfaces/company.interface';
 import { CompanyService } from '../CompanyService';
 import { CompanyTypeService } from '../CompanyTypeService';
@@ -44,12 +45,13 @@ import { CompanyModalComponent } from '../../company/company-modal/company-modal
     IconFieldModule,
     SelectModule,
     ToastModule,
+    ConfirmDialogModule,
     RouterModule,
     DatePipe,
     TranslatePipe,
     CompanyModalComponent
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './company-list.html',
   styleUrl: './company-list.scss'
 })
@@ -83,6 +85,7 @@ export class CompanyListComponent implements OnInit {
     private companyTypeService: CompanyTypeService,
     private organizationService: LookupService,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
     private router: Router,
     private authService: AuthService
   ) {}
@@ -194,11 +197,38 @@ export class CompanyListComponent implements OnInit {
 
 
   deleteCompany(company: Company) {
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Delete',
-      detail: `Are you sure you want to delete ${company.name}?`,
-      life: 3000
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete ${company.name}?`,
+      header: 'Confirm Deletion',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.companyService.deleteCompany(company.id).subscribe({
+          next: (response: ApiResponse<boolean>) => {
+            if (response.succeeded) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: `Company ${company.name} deleted successfully`
+              });
+              this.loadCompanies();
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: response.message || 'Failed to delete company'
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting company:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to delete company'
+            });
+          }
+        });
+      }
     });
   }
 

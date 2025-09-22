@@ -34,13 +34,13 @@ export class LocationService {
   createLocation(data: CreateLocation): Observable<ApiResponse<Location>> {
     const headers = this.authService.getHeaders();
 
-    return this.http.post<ApiResponse<Location>>(`${this.apiUrl}/Location`, data);
+    return this.http.post<ApiResponse<Location>>(`${this.apiUrl}/Location`, data, { headers });
   }
 
   updateLocation(data: EditLocation): Observable<ApiResponse<Location>> {
     const headers = this.authService.getHeaders();
 
-    return this.http.put<ApiResponse<Location>>(`${this.apiUrl}/Location/${data.id}`, data);
+    return this.http.put<ApiResponse<Location>>(`${this.apiUrl}/Location/${data.id}`, data, { headers });
   }
   deleteLocation(id: number): Observable<ApiResponse<boolean>> {
     const headers = this.authService.getHeaders();

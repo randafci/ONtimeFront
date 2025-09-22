@@ -13,6 +13,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Department } from '@/interfaces/department.interface';
@@ -47,6 +48,7 @@ import { DepartmentModalComponent } from '../department-modal/department-modal.c
     IconFieldModule,
     SelectModule,
     ToastModule,
+    ConfirmDialogModule,
     RouterModule,
     DatePipe,
     TranslatePipe,
@@ -212,17 +214,40 @@ export class DepartmentListComponent implements OnInit {
   }
 
   deleteDepartment(department: Department) {
-
-    const message = (this.translations.departmentList?.messages?.deleteConfirm || '')
-                    .replace('${name}', department.name);
+    const message = (this.translations.departmentList?.messages?.deleteConfirm || 'Are you sure you want to delete {name}?')
+                    .replace('{name}', department.name);
 
     this.confirmationService.confirm({
       message: message,
       header: this.translations.departmentList?.messages?.deleteHeader || 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        // Implement actual delete logic here if needed
-        console.log('Deleting department:', department);
+        this.departmentService.deleteDepartment(department.id).subscribe({
+          next: (response: ApiResponse<boolean>) => {
+            if (response.succeeded) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: `Department ${department.name} deleted successfully`
+              });
+              this.loadDepartments();
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: response.message || 'Failed to delete department'
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting department:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to delete department'
+            });
+          }
+        });
       }
     });
   }

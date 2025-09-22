@@ -24,14 +24,17 @@ private apiUrl = environment.apiUrl;
   }
 
   createSection(data: CreateSection): Observable<ApiResponse<Section>> {
-    return this.http.post<ApiResponse<Section>>(`${this.apiUrl}/Lookup/Section`, data);
+    const headers = this.authService.getHeaders();
+    return this.http.post<ApiResponse<Section>>(`${this.apiUrl}/Lookup/Section`, data, { headers });
   }
 
   getSectionById(id: number): Observable<ApiResponse<Section>> {
-    return this.http.get<ApiResponse<Section>>(`${this.apiUrl}/Lookup/Section/${id}`);
+    const headers = this.authService.getHeaders();
+    return this.http.get<ApiResponse<Section>>(`${this.apiUrl}/Lookup/Section/${id}`, { headers });
   }
 
   updateSection(data: EditSection): Observable<ApiResponse<Section>> {
+    const headers = this.authService.getHeaders();
     return this.http.put<ApiResponse<Section>>(
       `${this.apiUrl}/Lookup/Section/${data?.id}`, 
       { 
@@ -42,7 +45,13 @@ private apiUrl = environment.apiUrl;
         organizationId: data?.organizationId,
         companyId: data?.companyId,
         sectionTypeLookupId: data?.sectionTypeLookupId,
-       }
+       },
+       { headers }
     );
+  }
+
+  deleteSection(id: number): Observable<ApiResponse<boolean>> {
+    const headers = this.authService.getHeaders();
+    return this.http.delete<ApiResponse<boolean>>(`${this.apiUrl}/Lookup/Section/${id}`, { headers });
   }
 }
