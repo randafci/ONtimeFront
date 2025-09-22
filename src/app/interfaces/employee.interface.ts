@@ -22,6 +22,7 @@ export interface Employee {
   createdBy?: string;
   modifiedBy?: string;
   isDeleted?: boolean;
+  departmentName?: string;
 }
 
 export interface EmployeeContact {

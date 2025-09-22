@@ -108,7 +108,9 @@ export class MenuComponent implements OnInit {
                         items: [
                             { label: this.t('menu.users.employee'), icon: 'pi pi-fw pi-users', routerLink: ['/employees'] },
                             { label: this.t('menu.employeeDevicesAssignment.employeeDevicesAssignment'), icon: 'pi pi-fw pi-map-marker', routerLink: ['/employeeDevicesAssignment'] },
-                            { label: this.t('menu.teams.teams'), icon: 'pi pi-fw pi-map-marker', routerLink: ['/teams'] },
+                            { label: this.t('menu.employee.teams'), icon: 'pi pi-fw pi-map-marker', routerLink: ['/teams'] },
+                            { label: this.t('menu.employee.reportingmanager'), icon: 'pi pi-fw pi-map-marker', routerLink: ['/employees/reportingmanager/add'] },
+
 
                         ]
                     }
