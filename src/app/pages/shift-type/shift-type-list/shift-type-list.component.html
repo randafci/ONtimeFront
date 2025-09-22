@@ -1,0 +1,63 @@
+<div class="card">
+    <div class="flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">{{ 'shiftTypeList.title' | translate }}</h2>
+        <div class="flex-grow-1"></div>
+        <button 
+            pButton 
+            [label]="'shiftTypeList.addButton' | translate" 
+            icon="pi pi-plus" 
+            class="p-button-sm"
+            (click)="navigateToAdd()"
+        ></button>
+    </div>
+    
+    <p-table #dt [value]="shiftTypes" dataKey="id" [rows]="10" [loading]="loading" [rowHover]="true"
+        [showGridlines]="true" [paginator]="true" [globalFilterFields]="['name', 'nameSE', 'priority']">
+        
+        <ng-template pTemplate="caption">
+            <div class="flex justify-between items-center">
+                <button pButton [label]="'common.buttons.clear' | translate" class="p-button-outlined" icon="pi pi-filter-slash" 
+                    (click)="clear(dt)"></button>
+                <p-iconfield iconPosition="left" class="ml-auto">
+                    <p-inputicon><i class="pi pi-search"></i></p-inputicon>
+                    <input pInputText type="text" #filter (input)="onGlobalFilter(dt, $event)" 
+                           [placeholder]="'common.searchPlaceholder' | translate" />
+                </p-iconfield>
+            </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th>{{ 'common.headers.name' | translate }}</th>
+                <th>{{ 'common.headers.nameSE' | translate }}</th>
+                <th>{{ 'shiftTypeList.headers.priority' | translate }}</th>
+                <th>{{ 'common.headers.status' | translate }}</th>
+                <th>{{ 'common.headers.createdDate' | translate }}</th>
+                <th>{{ 'common.headers.actions' | translate }}</th>
+            </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="body" let-shiftType>
+            <tr>
+                <td>{{ shiftType.name }}</td>
+                <td>{{ shiftType.nameSE }}</td>
+                <td>{{ shiftType.priority }}</td>
+                <td>
+                    <p-tag [value]="getStatus(shiftType)" [severity]="getSeverity(getStatus(shiftType))"></p-tag>
+                </td>
+                <td>{{ shiftType.creationDate | date: 'MM/dd/yyyy' }}</td>
+                <td>
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm"
+                            (click)="navigateToEdit(shiftType.id)"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                            (click)="deleteShiftType(shiftType)"></button>
+                </td>
+            </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="emptymessage">
+            <tr><td colspan="6">{{ 'common.emptyMessage' | translate }}</td></tr>
+        </ng-template>
+    </p-table>
+</div>
+<p-toast></p-toast>
