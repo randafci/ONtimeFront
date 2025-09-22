@@ -187,6 +187,14 @@ export const appRoutes: Routes = [
             (m) => m.TEAM_ROUTES
           )
       },
+      {
+        path: 'employees/reportingmanager',
+        loadChildren: () =>
+          import('./app/pages/employeeReportingManager/employeeReportingManager.routes').then(
+            (m) => m.EMPLOYEEREPORTINGMANAGER_ROUTES
+          )
+      },
+
       { path: 'test', component: Layout },
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
       {
