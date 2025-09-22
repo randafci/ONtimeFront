@@ -104,6 +104,13 @@ export const appRoutes: Routes = [
           )
       },
       {
+        path: 'shift-types',
+        loadChildren: () =>
+          import('./app/pages/shift-type/shift-type.routes').then(
+            (m) => m.SHIFT_TYPE_ROUTES
+          )
+      },
+      {
         path: 'sections',
         loadChildren: () =>
           import('./app/pages/section/section.routes').then(

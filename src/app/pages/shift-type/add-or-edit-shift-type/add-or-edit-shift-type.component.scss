@@ -1,0 +1,37 @@
+
+.card {
+  padding: 1.5rem;
+  border-radius: 6px; 
+}
+
+.field {
+  margin-bottom: 1.5rem;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #495057; 
+}
+
+.p-fluid .field {
+  margin-bottom: 1.5rem;
+}
+
+.required-star {
+  color: #f44336; 
+  font-weight: bold;
+}
+
+
+.field-error {
+  border-color: #f44336 !important;
+  box-shadow: 0 0 0 1px #f44336 !important;
+}
+
+.p-error {
+  color: #f44336;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
