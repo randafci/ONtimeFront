@@ -213,45 +213,64 @@ export class AddOrEditEmployeeReportingManager implements OnInit {
   }
 
   /** 🔹 Apply Action */
-  applyAction() {
+ applyAction() {
+  console.log("selectedReportMangerEmployeeId ", this.selectedReportMangerEmployeeId);
+  console.log("selectedEmployees ", this.selectedEmployees);
 
-    console.log("selectedReportMangerEmployeeId " , this.selectedReportMangerEmployeeId )
-    console.log("selectedEmployees " , this.selectedEmployees )
+  if (!this.selectedReportMangerEmployeeId || !this.selectedEmployees?.length) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Validation',
+      detail: 'Please select a reporting manager and at least one employee.',
+    });
+    return;
+  }
 
-    if (!this.selectedReportMangerEmployeeId || !this.selectedEmployees?.length) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Validation',
-        detail: 'Please select a reporting manager and at least one employee.',
-      });
-      return;
-    }
-    const dto: EmployeeReportingManagerUpdateDto = {
-      employeeIds: this.selectedEmployees.map(emp => emp.id),
-      reportingManagerId: this.selectedReportMangerEmployeeId,
-      level: this.level ?? 0,
-    };
+  const dto: EmployeeReportingManagerUpdateDto = {
+    employeeIds: this.selectedEmployees.map(emp => emp.id),
+    reportingManagerId: this.selectedReportMangerEmployeeId,
+    level: this.level ?? 0,
+  };
 
-    this.ermService.update(dto).subscribe({
-      next: (res: ApiResponse<boolean>) => {
-        if (res.succeeded && res.data) {
+  this.ermService.update(dto).subscribe({
+    next: (res: ApiResponse<any>) => { // Change from boolean to any
+      if (res.succeeded) {
+        // Check if all operations were successful
+        const allSuccessful = res.data.every((result: any) => result.success);
+        
+        if (allSuccessful) {
           this.messageService.add({
             severity: 'success',
             summary: 'Success',
-            detail: 'Reporting manager updated successfully',
+            detail: 'Reporting manager updated successfully for all employees',
           });
-          this.applyDialogVisible = false;
-          this.filterEmployees(); // reload main table
         } else {
-          this.showError(res.message || 'Update failed');
+          // Some operations failed - show individual errors
+          const failedUpdates = res.data.filter((result: any) => !result.success);
+          const errorMessages = failedUpdates.map((result: any) => 
+            `Employee ${result.employeeId}: ${result.message}`
+          ).join('\n');
+          
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Partial Success',
+            detail: `Some updates failed:\n${errorMessages}`,
+            life: 10000 // Show for 10 seconds
+          });
         }
-      },
-      error: (err) => {
-        console.error(err);
-        this.showError('Something went wrong');
-      },
-    });
-  }
+        
+        this.applyDialogVisible = false;
+        this.filterEmployees(); // reload main table
+      } else {
+        this.showError(res.message || 'Update failed');
+      }
+    },
+    error: (err) => {
+      console.error(err);
+      this.showError('Something went wrong');
+    },
+  });
+}
 
 
   clearTable(table: Table) {
