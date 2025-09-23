@@ -9,7 +9,8 @@ import {
   ReportingManagerLookupDto, 
   EmployeeList, 
   EmployeeFilterDto, 
-  EmployeeReportingManagerUpdateDto 
+  EmployeeReportingManagerUpdateDto, 
+  ManagerConflictResolution
 } from '@/interfaces/employeeReportingManager.interface';
 
 import { EmployeeReportingManagerService } from '../employeeReportingManager.service';
@@ -33,7 +34,7 @@ import { Table, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
-import { Dialog } from 'primeng/dialog';
+import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'app-add-or-edit-employee-reporting-manager',
@@ -55,9 +56,9 @@ import { Dialog } from 'primeng/dialog';
     ToastModule,
     RouterModule,
     ConfirmDialogModule,
+    DialogModule,
     TooltipModule,
     TranslatePipe,
-    Dialog
   ],
   templateUrl: './add-or-edit-employee-reporting-manager.html',
   styleUrls: ['./add-or-edit-employee-reporting-manager.scss'],
@@ -83,8 +84,13 @@ export class AddOrEditEmployeeReportingManager implements OnInit {
   applyDialogVisible = false;
   level: number | null = null;
 
+  conflictDialogVisible = false;
+conflictEmployees: { employeeName: string; conflictingManagers: string[] }[] = [];
+
+
   @ViewChild('dt') table!: Table;
   @ViewChild('filter') filter!: ElementRef;
+  ManagerConflictResolution = ManagerConflictResolution;
 
   constructor(
     private ermService: EmployeeReportingManagerService,
@@ -156,20 +162,16 @@ export class AddOrEditEmployeeReportingManager implements OnInit {
     };
 
     this.loading = true;
-    this.ermService.getFilteredEmployees(filter).subscribe({
-      next: (res: ApiResponse<EmployeeList[]>) => {
-        if (res.succeeded) {
-          this.employees = res.data;
-        } else {
-          this.showError(res.message || 'Failed to load employees');
-        }
-        this.loading = false;
-      },
-      error: () => {
-        this.showError('Failed to load employees');
-        this.loading = false;
-      },
-    });
+ this.ermService.getFilteredEmployees(filter).subscribe(response => {
+  this.loading = false;
+  if (response.succeeded) {
+    this.employees = response.data;   // 🔹 bind to table
+  } else {
+    this.showError(response.message || 'Failed to load employees');
+    this.employees = []; // clear on failure
+  }
+});
+
   }
 
   /** 🔹 Filter Employees (for popup dropdown) */
@@ -180,17 +182,26 @@ export class AddOrEditEmployeeReportingManager implements OnInit {
       ReportingManagerId: this.selectedReportingManagerId ?? undefined,
     };
 
-    this.ermService.getFilteredEmployees(filter).subscribe({
-      next: (res: ApiResponse<EmployeeList[]>) => {
-        if (res.succeeded) {
-          this.employeesList = res.data;
-        } else {
-          this.showError(res.message || 'Failed to load employees');
-        }
-      },
-      error: () => this.showError('Failed to load employees'),
-    });
+ this.ermService.getFilteredEmployees(filter).subscribe(response => {
+  this.loading = false;
+  if (response.succeeded) {
+    this.employees = response.data;   // 🔹 bind to table
+   this.employeesList = response.data;
+
+  } else {
+    this.showError(response.message || 'Failed to load employees');
+    this.employees = []; // clear on failure
   }
+});
+
+  }
+
+
+  getManagersDisplay(emp: EmployeeList): string {
+  if (!emp.reportingManagers?.length) return 'N/A';
+  return emp.reportingManagers.map(mgr => mgr.name).join(', ');
+}
+
 
   /** 🔹 Utility for error toast */
   private showError(detail: string): void {
@@ -213,7 +224,84 @@ export class AddOrEditEmployeeReportingManager implements OnInit {
   }
 
   /** 🔹 Apply Action */
+
   applyAction() {
+  if (!this.selectedReportMangerEmployeeId || !this.selectedEmployees?.length) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Validation',
+      detail: 'Please select a reporting manager and at least one employee.',
+    });
+    return;
+  }
+
+  // 🔹 Detect conflicts
+  const conflicts: { employeeName: string; conflictingManagers: string[] }[] = [];
+
+  this.selectedEmployees.forEach(emp => {
+   const levelNum = Number(this.level);
+    const sameLevelMgrs = emp.reportingManagers?.filter(
+      mgr => mgr.level === levelNum
+    ) || [];
+
+
+    if (sameLevelMgrs.length > 0) {
+      conflicts.push({
+        employeeName: emp.employeeName,
+        conflictingManagers: sameLevelMgrs.map(m => m.name),
+      });
+    }
+  });
+
+  if (conflicts.length > 0) {
+    this.conflictEmployees = conflicts;
+    this.conflictDialogVisible = true;
+    return; // stop here, wait for user decision
+  }
+
+  // ✅ No conflicts → proceed directly
+
+  this.sendUpdate(ManagerConflictResolution.Continue);
+}
+
+sendUpdate(resolution: ManagerConflictResolution) {
+    this.conflictDialogVisible = false; // close immediately
+
+if (resolution == ManagerConflictResolution.Ignore)
+{
+return;
+}
+  const dto: EmployeeReportingManagerUpdateDto = {
+    employeeIds: this.selectedEmployees.map(emp => emp.id),
+    reportingManagerId: this.selectedReportMangerEmployeeId!,
+    level: this.level ?? 0,
+    managerConflictResolution: resolution
+  };
+
+  this.ermService.update(dto).subscribe({
+    next: (res: ApiResponse<boolean>) => {
+      if (res.succeeded && res.data) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Reporting manager updated successfully',
+        });
+        this.applyDialogVisible = false;
+        this.conflictDialogVisible = false;
+        this.filterEmployees(); // reload main table
+      } else {
+        this.showError(res.message || 'Update failed');
+      }
+    },
+    error: (err) => {
+      console.error(err);
+      this.showError('Something went wrong');
+    },
+  });
+}
+
+//#region 
+/*   applyAction() {
 
     console.log("selectedReportMangerEmployeeId " , this.selectedReportMangerEmployeeId )
     console.log("selectedEmployees " , this.selectedEmployees )
@@ -230,6 +318,7 @@ export class AddOrEditEmployeeReportingManager implements OnInit {
       employeeIds: this.selectedEmployees.map(emp => emp.id),
       reportingManagerId: this.selectedReportMangerEmployeeId,
       level: this.level ?? 0,
+      managerConflictResolution : ManagerConflictResolution.Ignore // edit according to selection 
     };
 
     this.ermService.update(dto).subscribe({
@@ -251,9 +340,9 @@ export class AddOrEditEmployeeReportingManager implements OnInit {
         this.showError('Something went wrong');
       },
     });
-  }
+  } */
 
-
+//#endregion
   clearTable(table: Table) {
   table.clear();
   this.employeeSearchValue = '';
