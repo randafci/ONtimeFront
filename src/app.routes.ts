@@ -180,6 +180,13 @@ export const appRoutes: Routes = [
             (m) => m.HOLIDAY_TYPE_ROUTES
           )
       },
+      {
+        path: 'ramadan-periods',
+        loadChildren: () =>
+          import('./app/pages/ramadan-period/ramadan-period.routes').then(
+            (m) => m.RAMADAN_PERIOD_ROUTES
+          )
+      },
         {
         path: 'employeeDevicesAssignment',
         loadChildren: () =>
