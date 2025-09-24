@@ -3,7 +3,7 @@ export interface EmployeeReportingManagerCreateDto {
   employeeIds: number[]; // list of employees (for batch assignment)
   reportingManagerId: number;
   level: number;
-  conflictResolution?: ConflictResolutionStrategy; // optional, default = Ignore
+  conflictResolution?: ManagerConflictResolution; // optional, default = Ignore
 }
 
 // employee-reporting-manager-update.dto.ts
@@ -11,6 +11,7 @@ export interface EmployeeReportingManagerUpdateDto {
   employeeIds: number[];
   reportingManagerId: number;
   level: number;
+  managerConflictResolution :ManagerConflictResolution;
 }
 
 // employee-reporting-manager.dto.ts
@@ -31,18 +32,19 @@ export interface ReportingManagerLookupDto {
   name: string;
 }
 
-export interface EmployeeFilterDto
-{
-    CompanyId?: number;
-    DepartmentId?: number;
-    ReportingManagerId ?: number;
+export interface EmployeeFilterDto {
+  CompanyId?: number;
+  DepartmentId?: number;
+  ReportingManagerId?: number;
 }
 
 // conflict-resolution-strategy.enum.ts
-export enum ConflictResolutionStrategy {
-  Ignore = 0,
-  Lower = 1,
-  Higher = 2
+export enum ManagerConflictResolution {
+  Ignore = 1,        // Do nothing - allow multiple managers at same level
+  Continue = 2,      // Force adding - keep both managers as they are
+  Replace = 3,       // Change old manager and set end date of old report manager
+  LevelUp = 4,       // If both at L2 then new one is L2 and old one becomes L3
+  LevelDown = 5      // If both at L2 then new one is L2 and old one becomes L1
 }
 
 export interface EmployeeList {
@@ -51,5 +53,11 @@ export interface EmployeeList {
   employeeName: string;
   departmentName: string;
   designationName: string;  // will be "N/A" if null
-  reportingManagers: string[];
+  reportingManagers: ManagerInfo[];
 }
+
+export interface ManagerInfo
+ {
+     level : number;
+     name : string;
+ }

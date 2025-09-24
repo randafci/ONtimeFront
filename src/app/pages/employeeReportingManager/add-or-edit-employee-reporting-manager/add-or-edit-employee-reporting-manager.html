@@ -55,37 +55,21 @@
   </div>
 
   <!-- Enhanced Table -->
-  <p-table #employeeTable
-           [value]="employees" 
-           [(selection)]="selectedEmployees" 
-           dataKey="id"
-           [rowHover]="true"
-           [showGridlines]="true"
-           [paginator]="true"
-           
-           [rows]="10"
-           [globalFilterFields]="['employeeCode', 'employeeName', 'departmentName', 'designationName', 'reportingManagers']">
-    
+  <p-table #employeeTable [value]="employees" [(selection)]="selectedEmployees" dataKey="id" [rowHover]="true"
+    [showGridlines]="true" [paginator]="true" [rows]="10"
+    [globalFilterFields]="['employeeCode', 'employeeName', 'departmentName', 'designationName', 'reportingManagers']">
+
     <!-- Search Template -->
     <ng-template pTemplate="caption">
       <div class="flex justify-between items-center flex-column sm:flex-row">
-        <button 
-          pButton 
-          [label]="'common.clear' | translate"
-          class="p-button-outlined mb-2" 
-          icon="pi pi-filter-slash" 
-          (click)="clearTable(employeeTable)"
-        ></button>
+        <button pButton [label]="'common.clear' | translate" class="p-button-outlined mb-2" icon="pi pi-filter-slash"
+          (click)="clearTable(employeeTable)"></button>
         <p-iconfield iconPosition="left" class="ml-auto">
           <p-inputicon>
             <i class="pi pi-search"></i>
           </p-inputicon>
-          <input 
-            pInputText 
-            type="text" 
-            (input)="onGlobalFilter(employeeTable, $event)" 
-            [placeholder]="'common.search' | translate"
-          />
+          <input pInputText type="text" (input)="onGlobalFilter(employeeTable, $event)"
+            [placeholder]="'common.search' | translate" />
         </p-iconfield>
       </div>
     </ng-template>
@@ -139,7 +123,7 @@
         <td>{{ emp.employeeName }}</td>
         <td>{{ emp.departmentName || 'N/A' }}</td>
         <td>{{ emp.designationName || 'N/A' }}</td>
-        <td>{{ emp.reportingManagers?.join(', ') || 'N/A' }}</td>
+        <td>{{ getManagersDisplay(emp) }}</td>
       </tr>
     </ng-template>
 
@@ -165,14 +149,27 @@
 
 
 <!-- Apply Popup -->
-<p-dialog header="{{ 'employeesReporting.listPage.applyDialog.title' | translate }}" [(visible)]="applyDialogVisible"
-  [modal]="true" [style]="{ width: '40vw', height: '100vh' }"
-  contentStyle="height: calc(100% - 100px); overflow-y: auto;">
-  <div class="p-fluid h-full">
-    <div class="field mb-4 flex-1">
+<p-dialog 
+  header="{{ 'employeesReporting.listPage.applyDialog.title' | translate }}" 
+  [(visible)]="applyDialogVisible"
+  [modal]="true" 
+  [style]="{ width: '40vw'}">
+
+    <ng-template #header>
+        <div class="inline-flex items-center justify-center gap-2">
+            <span class="font-bold whitespace-nowrap">{{ 'employeesReporting.listPage.applyDialog.title' | translate }}</span>
+        </div>
+    </ng-template>
+
+  <div class="p-fluid" style="min-height: 45vh; display: flex; flex-direction: column; justify-content: center;">
+    <div class="field mb-4">
       <label>{{ 'employeesReporting.listPage.applyDialog.selectEmployee' | translate }}</label>
-      <p-select [options]="employeesList" optionLabel="employeeName" optionValue="id"
-        [(ngModel)]="selectedReportMangerEmployeeId" [filter]="true"
+      <p-select 
+        [options]="employeesList" 
+        optionLabel="employeeName" 
+        optionValue="id"
+        [(ngModel)]="selectedReportMangerEmployeeId" 
+        [filter]="true"
         filterPlaceholder="{{ 'common.search' | translate }}"
         placeholder="{{ 'employeesReporting.listPage.applyDialog.selectEmployeePlaceholder' | translate }}"
         class="w-full">
@@ -181,10 +178,8 @@
 
     <div class="field mb-4">
       <label>{{ 'employeesReporting.listPage.applyDialog.level' | translate }}</label>
-      <input type="number" pInputText [(ngModel)]="level" />
+      <input type="number" class="w-full" pInputText [(ngModel)]="level" />
     </div>
-
-
   </div>
 
   <ng-template pTemplate="footer">
@@ -192,6 +187,39 @@
       (click)="applyDialogVisible=false"></button>
     <button pButton label="{{ 'common.apply' | translate }}" icon="pi pi-check" class="p-button-success"
       (click)="applyAction()"></button>
+  </ng-template>
+</p-dialog>
+
+
+
+<!-- Conflict Resolution Popup -->
+<p-dialog 
+  header="{{ 'employeesReporting.conflictDialog.title' | translate }}" 
+  [(visible)]="conflictDialogVisible"
+  [modal]="true" 
+  [style]="{ width: '40vw' }">
+
+  <div class="mb-4">
+    <p>{{ 'employeesReporting.conflictDialog.message' | translate }}</p>
+    <ul class="list-disc ml-6">
+      <li *ngFor="let emp of conflictEmployees">
+        <strong>{{ emp.employeeName }}</strong> → 
+        {{ emp.conflictingManagers.join(', ') }}
+      </li>
+    </ul>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Ignore" class="p-button-secondary"
+            (click)="sendUpdate(ManagerConflictResolution.Ignore)"></button>
+    <button pButton label="Continue" class="p-button-secondary"
+            (click)="sendUpdate(ManagerConflictResolution.Continue)"></button>
+    <button pButton label="Replace" class="p-button-warning"
+            (click)="sendUpdate(ManagerConflictResolution.Replace)"></button>
+    <button pButton label="Level Up" class="p-button-info"
+            (click)="sendUpdate(ManagerConflictResolution.LevelUp)"></button>
+    <button pButton label="Level Down" class="p-button-help"
+            (click)="sendUpdate(ManagerConflictResolution.LevelDown)"></button>
   </ng-template>
 </p-dialog>
 
