@@ -100,7 +100,8 @@ export class MenuComponent implements OnInit {
                     {
                         label: 'HR Management',
                         items: [
-                            { label: 'Holidays', icon: 'pi pi-fw pi-calendar', routerLink: ['/holidays/list'] }
+                            { label: 'Holidays', icon: 'pi pi-fw pi-calendar', routerLink: ['/holidays/list'] },
+                            { label: 'Ramadan Periods', icon: 'pi pi-fw pi-moon', routerLink: ['/ramadan-periods/list'] }
                         ]
                     }
                     ,
