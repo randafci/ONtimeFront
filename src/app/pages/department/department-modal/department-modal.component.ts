@@ -12,6 +12,8 @@ import { Organization } from '../../../interfaces/organization.interface';
 import { Company } from '../../../interfaces/company.interface';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 
 @Component({
   selector: 'app-department-modal',
@@ -22,7 +24,8 @@ import { AuthService } from '../../../auth/auth.service';
     DialogModule,
     InputTextModule,
     SelectModule,
-    ButtonModule
+    ButtonModule,
+    TranslatePipe
   ],
   providers: [MessageService],
   templateUrl: './department-modal.component.html'
@@ -41,18 +44,23 @@ export class DepartmentModalComponent implements OnInit, OnChanges {
   @Output() onCancelEvent = new EventEmitter<void>();
 
   departmentForm: FormGroup;
+  private translations: any = {};
+
 
   constructor(
     private fb: FormBuilder,
     private departmentService: DepartmentService,
     private messageService: MessageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private translationService: TranslationService
   ) {
     this.departmentForm = this.createForm();
   }
 
   ngOnInit(): void {
-    // Initialize form
+    this.translationService.translations$.subscribe(translations => {
+      this.translations = translations;
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -136,21 +144,10 @@ export class DepartmentModalComponent implements OnInit, OnChanges {
   createDepartment(data: CreateDepartment): void {
     this.departmentService.createDepartment(data).subscribe({
       next: (response: ApiResponse<Department>) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Department created successfully'
-        });
-        this.onSave.emit(response.data);
-        this.closeDialog();
+        this.handleSuccess(this.translations.departmentForm?.toasts?.createSuccess || 'Department created successfully', response.data);
       },
       error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to create department'
-        });
-        this.loading = false;
+        this.handleError(this.translations.departmentForm?.toasts?.createError || 'Failed to create department');
       }
     });
   }
@@ -158,24 +155,33 @@ export class DepartmentModalComponent implements OnInit, OnChanges {
   updateDepartment(data: EditDepartment): void {
     this.departmentService.updateDepartment(data).subscribe({
       next: (response: ApiResponse<Department>) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Department updated successfully'
-        });
-        this.onSave.emit(response.data);
-        this.closeDialog();
+        this.handleSuccess(this.translations.departmentForm?.toasts?.updateSuccess || 'Department updated successfully', response.data);
       },
       error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to update department'
-        });
-        this.loading = false;
+        this.handleError(this.translations.departmentForm?.toasts?.updateError || 'Failed to update department');
       }
     });
   }
+
+  private handleSuccess(detail: string, data: Department): void {
+    this.messageService.add({
+      severity: 'success',
+      summary: this.translations.common?.success || 'Success',
+      detail: detail
+    });
+    this.onSave.emit(data);
+    this.closeDialog();
+  }
+
+  private handleError(detail: string): void {
+    this.messageService.add({
+      severity: 'error',
+      summary: this.translations.common?.error || 'Error',
+      detail: detail
+    });
+    this.loading = false;
+  }
+
 
   closeDialog(): void {
     this.dialogVisibleChange.emit(false);

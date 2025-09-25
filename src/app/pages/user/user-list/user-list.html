@@ -75,7 +75,7 @@
                                     [ngModel]="value" 
                                     [options]="integrationOptions" 
                                     (onChange)="filter($event.value)" 
-                                    [placeholder]="'userList.filters.any' | translate" 
+                                    [placeholder]="'users.listPage.filters.any' | translate" 
                                     [style]="{ 'min-width': '12rem' }"
                                 >
                                     <ng-template let-option pTemplate="item">
@@ -97,8 +97,8 @@
                 <td>{{ user.email }}</td>
                 <td>
                     <p-tag 
-                        [value]="(user.isLdapUser ? 'users.common.yes' : 'users.common.no') | translate"
-                        [severity]="user.isLdapUser ? 'success' : 'info'"
+                        [value]="(user.isLdapUser ? 'common.yes' : 'common.no') | translate"
+                        [severity]="getSeverity(user.isLdapUser)"
                     ></p-tag>
                 </td>
                 <td>
@@ -133,3 +133,4 @@
 </div>
 
 <p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

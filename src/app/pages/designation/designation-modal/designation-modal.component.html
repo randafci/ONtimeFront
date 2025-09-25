@@ -1,6 +1,6 @@
 <p-dialog
   [(visible)]="dialogVisible"
-  [header]="isEditMode ? 'Edit Designation' : 'Add Designation'"
+  [header]="(isEditMode ? 'designationForm.title.edit' : 'designationForm.title.add') | translate"
   [modal]="true"
   [style]="{width: '50vw'}"
   [draggable]="false"
@@ -11,7 +11,7 @@
       <!-- Code Field -->
       <div class="field">
         <label for="code" class="block text-sm font-medium mb-2">
-          Code <span class="text-red-500">*</span>
+          {{ 'designationForm.labels.code' | translate }} <span class="text-red-500">*</span>
         </label>
         <input
           id="code"
@@ -21,14 +21,14 @@
           formControlName="code"
           [class.ng-invalid]="designationForm.get('code')?.invalid && designationForm.get('code')?.touched"/>
         <small class="text-red-500" *ngIf="designationForm.get('code')?.invalid && designationForm.get('code')?.touched">
-          Code is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <!-- Name Field -->
       <div class="field">
         <label for="name" class="block text-sm font-medium mb-2">
-          Name <span class="text-red-500">*</span>
+          {{ 'designationForm.labels.name' | translate }} <span class="text-red-500">*</span>
         </label>
         <input
           id="name"
@@ -38,14 +38,14 @@
           formControlName="name"
           [class.ng-invalid]="designationForm.get('name')?.invalid && designationForm.get('name')?.touched"/>
         <small class="text-red-500" *ngIf="designationForm.get('name')?.invalid && designationForm.get('name')?.touched">
-          Name is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <!-- NameSE Field -->
       <div class="field">
         <label for="nameSE" class="block text-sm font-medium mb-2">
-          Name (SE) <span class="text-red-500">*</span>
+          {{ 'designationForm.labels.nameSE' | translate }} <span class="text-red-500">*</span>
         </label>
         <input
           id="nameSE"
@@ -55,14 +55,14 @@
           formControlName="nameSE"
           [class.ng-invalid]="designationForm.get('nameSE')?.invalid && designationForm.get('nameSE')?.touched"/>
         <small class="text-red-500" *ngIf="designationForm.get('nameSE')?.invalid && designationForm.get('nameSE')?.touched">
-          Name (SE) is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <!-- Organization Field -->
       <div class="field" *ngIf="isSuperAdmin">
         <label for="organizationId" class="block text-sm font-medium mb-2">
-          Organization <span class="text-red-500">*</span>
+          {{ 'designationForm.labels.organization' | translate }} <span class="text-red-500">*</span>
         </label>
         <p-select
           id="organizationId"
@@ -71,19 +71,19 @@
           [options]="organizations"
           optionLabel="name"
           optionValue="id"
-          placeholder="Select Organization"
+          [placeholder]="'designationForm.placeholders.selectOrg' | translate"
           appendTo="body"
           [class.ng-invalid]="designationForm.get('organizationId')?.invalid && designationForm.get('organizationId')?.touched">
         </p-select>
         <small class="text-red-500" *ngIf="designationForm.get('organizationId')?.invalid && designationForm.get('organizationId')?.touched">
-          Organization is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <!-- Designation Type Field -->
       <div class="field">
         <label for="designationsTypeLookupId" class="block text-sm font-medium mb-2">
-          Designation Type <span class="text-red-500">*</span>
+          {{ 'designationForm.labels.designationType' | translate }} <span class="text-red-500">*</span>
         </label>
         <p-select
           id="designationsTypeLookupId"
@@ -92,20 +92,20 @@
           [options]="designationTypes"
           optionLabel="name"
           optionValue="id"
-          placeholder="Select Designation Type"
+          [placeholder]="'designationForm.placeholders.selectType' | translate"
           appendTo="body"
           [class.ng-invalid]="designationForm.get('designationsTypeLookupId')?.invalid && designationForm.get('designationsTypeLookupId')?.touched"
           (onChange)="onDesignationTypeChange($event.value)">
         </p-select>
         <small class="text-red-500" *ngIf="designationForm.get('designationsTypeLookupId')?.invalid && designationForm.get('designationsTypeLookupId')?.touched">
-          Designation Type is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <!-- Parent Designation Field - Only shown for Sub Designations -->
       <div class="field" *ngIf="designationForm.get('designationsTypeLookupId')?.value === 2">
         <label for="parentId" class="block text-sm font-medium mb-2">
-          Parent Designation
+          {{ 'designationForm.labels.parentDesignation' | translate }}
         </label>
         <p-select
           id="parentId"
@@ -114,7 +114,7 @@
           [options]="mainDesignations"
           optionLabel="name"
           optionValue="id"
-          placeholder="Select Parent Designation"
+          [placeholder]="'designationForm.placeholders.selectParent' | translate"
           appendTo="body">
         </p-select>
       </div>
@@ -123,18 +123,17 @@
     <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
       <button
         pButton
-        label="Cancel"
+        [label]="'common.buttons.cancel' | translate"
         class="p-button-secondary"
         type="button"
         (click)="onCancel()">
       </button>
       <button
         pButton
-        [label]="isEditMode ? 'Update' : 'Save'"
+        [label]="(isEditMode ? 'common.buttons.update' : 'common.buttons.save') | translate"
         [loading]="loading"
         type="submit">
       </button>
     </div>
   </form>
 </p-dialog>
-

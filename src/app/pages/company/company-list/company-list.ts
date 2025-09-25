@@ -13,7 +13,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { Company } from '../../../interfaces/company.interface';
 import { CompanyService } from '../CompanyService';
 import { CompanyTypeService } from '../CompanyTypeService';
@@ -26,6 +26,7 @@ import { ApiResponse } from '../../../core/models/api-response.model';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { AuthService } from '../../../auth/auth.service';
 import { CompanyModalComponent } from '../../company/company-modal/company-modal.component';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 
 @Component({
   selector: 'app-company-list',
@@ -49,17 +50,19 @@ import { CompanyModalComponent } from '../../company/company-modal/company-modal
     TranslatePipe,
     CompanyModalComponent
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './company-list.html',
   styleUrl: './company-list.scss'
 })
 export class CompanyListComponent implements OnInit {
   companies: Company[] = [];
   loading: boolean = true;
-  statuses: any[] = [
-    { label: 'Active', value: 'active' },
-    { label: 'Inactive', value: 'inactive' }
-  ];
+  // statuses: any[] = [
+  //   { label: 'Active', value: 'active' },
+  //   { label: 'Inactive', value: 'inactive' }
+  // ];
+  statuses: any[] = [];
+  private translations: any = {};
 
   integrationOptions: any[] = [
     { label: 'Yes', value: true },
@@ -84,14 +87,27 @@ export class CompanyListComponent implements OnInit {
     private organizationService: LookupService,
     private messageService: MessageService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private translationService: TranslationService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit() {
+    this.translationService.translations$.subscribe(trans => {
+      this.translations = trans;
+      this.initializeStatuses();
+    });
     this.isSuperAdmin = this.checkIsSuperAdmin();
     this.loadCompanies();
     this.loadOrganizations();
     this.loadCompanyTypes();
+  }
+  initializeStatuses(): void {
+    const statusTrans = this.translations.companies?.listPage?.statuses;
+    this.statuses = [
+      { label: statusTrans?.active || 'Active', value: 'active' },
+      { label: statusTrans?.inactive || 'Inactive', value: 'inactive' }
+    ];
   }
 
 
@@ -109,8 +125,8 @@ export class CompanyListComponent implements OnInit {
         } else {
           this.messageService.add({
             severity: 'error',
-            summary: 'Error',
-            detail: response.message || 'Failed to load companies'
+            summary: this.translations.common?.error || 'Error',
+            detail: response.message || this.translations.companies?.listPage?.messages?.loadError || 'Failed to load companies'
           });
         }
         this.loading = false;
@@ -119,8 +135,8 @@ export class CompanyListComponent implements OnInit {
         console.error('Error loading companies:', error);
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load companies'
+          summary: this.translations.common?.error || 'Error',
+          detail: this.translations.companies?.listPage?.messages?.loadError || 'Failed to load companies'
         });
         this.loading = false;
       }
@@ -193,12 +209,23 @@ export class CompanyListComponent implements OnInit {
 
 
 
-  deleteCompany(company: Company) {
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Delete',
-      detail: `Are you sure you want to delete ${company.name}?`,
-      life: 3000
+  deleteCompany(company: Company): void {
+    const trans = this.translations.companies?.listPage?.messages;
+    const commonTrans = this.translations.common;
+
+    this.confirmationService.confirm({
+      message: (trans?.deleteConfirm || 'Are you sure you want to delete {name}?').replace('{name}', company.name),
+      header: trans?.deleteHeader || commonTrans?.confirmDelete || 'Confirm Deletion',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        // call the method to delete the company
+        this.messageService.add({
+          severity: 'success',
+          summary: commonTrans?.success || 'Success',
+          detail: trans?.deleteSuccess || 'Company deleted successfully'
+        });
+      },
+      reject: () => {}
     });
   }
 

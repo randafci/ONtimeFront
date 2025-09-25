@@ -8,6 +8,7 @@ import { MessageService } from 'primeng/api';
 import { Country, CreateCountry, EditCountry } from '../../../interfaces/country.interface';
 import { CountryService } from '../CountryService';
 import { ApiResponse } from '../../../core/models/api-response.model';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-country-modal',
@@ -17,9 +18,10 @@ import { ApiResponse } from '../../../core/models/api-response.model';
     ReactiveFormsModule,
     DialogModule,
     InputTextModule,
-    ButtonModule
+    ButtonModule,
+    TranslatePipe
   ],
-  providers: [MessageService],
+  providers: [MessageService, TranslatePipe],
   templateUrl: './country-modal.component.html'
 })
 export class CountryModalComponent implements OnInit, OnChanges {
@@ -114,7 +116,7 @@ export class CountryModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Country created successfully'
+          detail: 'countryForm.toasts.createSuccess'
         });
         this.onSave.emit(response.data);
         this.closeDialog();
@@ -123,7 +125,7 @@ export class CountryModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to create country'
+          detail: 'countryForm.toasts.createError'
         });
         this.loading = false;
       }
@@ -136,7 +138,7 @@ export class CountryModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Country updated successfully'
+          detail: 'countryForm.toasts.updateSuccess'
         });
         this.onSave.emit(response.data);
         this.closeDialog();
@@ -145,7 +147,7 @@ export class CountryModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to update country'
+          detail: 'countryForm.toasts.updateError'
         });
         this.loading = false;
       }

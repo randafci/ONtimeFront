@@ -1,12 +1,11 @@
 <div class="card">
   <div class="flex justify-between items-center mb-4">
     <h1 class="font-semibold text-xl mb-0">
-      {{ 'permitoin.listPage.title' | translate }}
+      {{ 'permissions.pageTitle' | translate }}
     </h1>
-    <div class="flex-grow-1"></div>
     <button
       pButton
-      [label]="'permitoin.listPage.Back' | translate"
+      [label]="'common.backButton' | translate"
       icon="pi pi-arrow-left"
       class="p-button-sm"
       (click)="navigateToRoleList()"
@@ -16,7 +15,7 @@
   <div class="container mx-auto p-6">
     <!-- Role Name -->
     <div class="mb-6">
-      <h2 class="text-xl font-semibold">{{ roleName }}</h2>
+      <h2 class="text-xl font-semibold">{{ 'permissions.roleLabel' | translate }}: {{ roleName }}</h2>
     </div>
 
     <!-- Select All -->
@@ -45,7 +44,7 @@
           </label>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           <div *ngFor="let perm of group.permissionsList; let i = index" class="flex items-center">
             <p-checkbox 
               *ngIf="perm.displayValue"
@@ -69,12 +68,12 @@
       <p-table [value]="crudPermissionGroups" [tableStyle]="{'min-width': '50rem'}">
         <ng-template pTemplate="header">
           <tr>
-            <th>{{ 'common.entities' | translate }}</th>
-            <th>{{ 'common.page' | translate }}</th>
-            <th>{{ 'buttons.view' | translate }}</th>
-            <th>{{ 'buttons.create' | translate }}</th>
-            <th>{{ 'buttons.edit' | translate }}</th>
-            <th>{{ 'buttons.delete' | translate }}</th>
+            <th>{{ 'permissions.headers.entity' | translate }}</th>
+            <th>{{ 'permissions.headers.page' | translate }}</th>
+            <th>{{ 'permissions.headers.view' | translate }}</th>
+            <th>{{ 'permissions.headers.create' | translate }}</th>
+            <th>{{ 'permissions.headers.edit' | translate }}</th>
+            <th>{{ 'permissions.headers.delete' | translate }}</th>
             <th>{{ 'common.selectAll' | translate }}</th>
           </tr>
         </ng-template>
@@ -105,8 +104,8 @@
 
     <!-- Action Buttons -->
     <div class="flex justify-end space-x-4 mt-8">
-      <button pButton type="button" [label]="'common.cancel' | translate" class="p-button-outlined" (click)="navigateToRoleList()"></button>
-      <button pButton type="button" [label]="'common.save' | translate" class="p-button-primary" (click)="savePermissions()"></button>
+      <button pButton type="button" [label]="'common.buttons.cancel' | translate" class="p-button-outlined" (click)="navigateToRoleList()"></button>
+      <button pButton type="button" [label]="'common.buttons.save' | translate" class="p-button-primary" (click)="savePermissions()"></button>
     </div>
   </div>
 </div>

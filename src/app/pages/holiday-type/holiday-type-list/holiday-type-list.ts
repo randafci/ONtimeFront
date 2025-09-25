@@ -24,6 +24,7 @@ import { HolidayTypeModalComponent } from '../holiday-type-modal/holiday-type-mo
 import { Organization } from '../../../interfaces/organization.interface';
 import { LookupService } from '../../organization/OrganizationService';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-holiday-type-list',
@@ -45,9 +46,10 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     TooltipModule,
     RouterModule,
     ConfirmDialogModule,
-    HolidayTypeModalComponent
+    HolidayTypeModalComponent,
+    TranslatePipe
   ],
-  providers: [MessageService, ConfirmationService],
+  providers: [MessageService, ConfirmationService, TranslatePipe],
   templateUrl: './holiday-type-list.html'
 })
 export class HolidayTypeListComponent implements OnInit {
@@ -69,7 +71,8 @@ export class HolidayTypeListComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private router: Router,
     private authService: AuthService,
-    private organizationService: LookupService
+    private organizationService: LookupService,
+    private translatePipe: TranslatePipe
   ) {}
 
   ngOnInit() {
@@ -93,7 +96,7 @@ export class HolidayTypeListComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: response.message || 'Failed to load holiday types'
+            detail: this.translatePipe.transform('holidayTypeList.messages.loadError')
           });
         }
         this.loading = false;
@@ -103,7 +106,7 @@ export class HolidayTypeListComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to load holiday types'
+          detail: this.translatePipe.transform('holidayTypeList.messages.loadError')
         });
         this.loading = false;
       }
@@ -140,9 +143,10 @@ export class HolidayTypeListComponent implements OnInit {
   }
 
   deleteHolidayType(holidayType: HolidayTypeList) {
+    const message = this.translatePipe.transform('holidayTypeList.messages.deleteConfirm').replace('{name}', holidayType.name);
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete ${holidayType.name}?`,
-      header: 'Confirm Delete',
+       message: message,
+      header: this.translatePipe.transform('common.deleteHeader'),
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.holidayTypeService.deleteHolidayType(holidayType.id).subscribe({
@@ -151,14 +155,14 @@ export class HolidayTypeListComponent implements OnInit {
               this.messageService.add({
                 severity: 'success',
                 summary: 'Success',
-                detail: 'Holiday type deleted successfully'
+                detail: this.translatePipe.transform('holidayTypeList.messages.deleteSuccess')
               });
               this.loadHolidayTypes();
             } else {
               this.messageService.add({
                 severity: 'error',
                 summary: 'Error',
-                detail: response.message || 'Failed to delete holiday type'
+                detail: response.message || this.translatePipe.transform('holidayTypeList.messages.deleteError')
               });
             }
           },
@@ -166,7 +170,7 @@ export class HolidayTypeListComponent implements OnInit {
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
-              detail: 'Failed to delete holiday type'
+              detail: this.translatePipe.transform('holidayTypeList.messages.deleteError')
             });
           }
         });

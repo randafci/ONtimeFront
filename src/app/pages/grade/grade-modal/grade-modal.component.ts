@@ -11,6 +11,8 @@ import { GradeService } from '../GradeService';
 import { Organization } from '../../../interfaces/organization.interface';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-grade-modal',
@@ -21,7 +23,8 @@ import { AuthService } from '../../../auth/auth.service';
     DialogModule,
     InputTextModule,
     SelectModule,
-    ButtonModule
+    ButtonModule,
+    TranslatePipe
   ],
   providers: [MessageService],
   templateUrl: './grade-modal.component.html'
@@ -39,24 +42,31 @@ export class GradeModalComponent implements OnInit, OnChanges {
   @Output() onCancelEvent = new EventEmitter<void>();
 
   gradeForm: FormGroup;
+  private translations: any = {};
 
   constructor(
     private fb: FormBuilder,
     private gradeService: GradeService,
     private messageService: MessageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private translationService: TranslationService
   ) {
     this.gradeForm = this.createForm();
   }
 
   ngOnInit(): void {
+    this.translationService.translations$.subscribe(translations => {
+      this.translations = translations;
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['dialogVisible'] && this.dialogVisible && this.isEditMode && this.grade) {
-      this.patchForm(this.grade);
-    } else if (changes['dialogVisible'] && this.dialogVisible && !this.isEditMode) {
-      this.resetFormForCreate();
+    if (changes['dialogVisible'] && this.dialogVisible) {
+      if (this.isEditMode && this.grade) {
+        this.patchForm(this.grade);
+      } else {
+        this.resetFormForCreate();
+      }
     }
   }
 
@@ -71,13 +81,7 @@ export class GradeModalComponent implements OnInit, OnChanges {
   }
 
   patchForm(grade: Grade): void {
-    this.gradeForm.patchValue({
-      id: grade.id,
-      code: grade.code,
-      name: grade.name,
-      nameSE: grade.nameSE,
-      organizationId: grade.organizationId
-    });
+    this.gradeForm.patchValue(grade);
   }
 
   resetFormForCreate(): void {
@@ -103,43 +107,19 @@ export class GradeModalComponent implements OnInit, OnChanges {
     const formData = this.gradeForm.getRawValue();
 
     if (this.isEditMode) {
-      const editData: EditGrade = {
-        id: formData.id,
-        code: formData.code,
-        name: formData.name,
-        nameSE: formData.nameSE,
-        organizationId: formData.organizationId
-      };
-      this.updateGrade(editData);
+      this.updateGrade(formData as EditGrade);
     } else {
-      const createData: CreateGrade = {
-        code: formData.code,
-        name: formData.name,
-        nameSE: formData.nameSE,
-        organizationId: formData.organizationId
-      };
-      this.createGrade(createData);
+      this.createGrade(formData as CreateGrade);
     }
   }
 
   createGrade(data: CreateGrade): void {
     this.gradeService.createGrade(data).subscribe({
       next: (response: ApiResponse<Grade>) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Grade created successfully'
-        });
-        this.onSave.emit(response.data);
-        this.closeDialog();
+        this.handleSuccess(this.translations.gradeForm?.toasts?.createSuccess, response.data);
       },
       error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to create grade'
-        });
-        this.loading = false;
+        this.handleError(this.translations.gradeForm?.toasts?.createError);
       }
     });
   }
@@ -147,28 +127,35 @@ export class GradeModalComponent implements OnInit, OnChanges {
   updateGrade(data: EditGrade): void {
     this.gradeService.updateGrade(data).subscribe({
       next: (response: ApiResponse<Grade>) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Grade updated successfully'
-        });
-        this.onSave.emit(response.data);
-        this.closeDialog();
+        this.handleSuccess(this.translations.gradeForm?.toasts?.updateSuccess, response.data);
       },
       error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to update grade'
-        });
-        this.loading = false;
+        this.handleError(this.translations.gradeForm?.toasts?.updateError);
       }
     });
+  }
+  
+  private handleSuccess(detailKey: string, data: Grade): void {
+    this.messageService.add({
+      severity: 'success',
+      summary: this.translations.common?.success || 'Success',
+      detail: detailKey || 'Operation successful'
+    });
+    this.onSave.emit(data);
+    this.closeDialog();
+  }
+
+  private handleError(detailKey: string): void {
+    this.messageService.add({
+      severity: 'error',
+      summary: this.translations.common?.error || 'Error',
+      detail: detailKey || 'An error occurred'
+    });
+    this.loading = false;
   }
 
   closeDialog(): void {
     this.dialogVisibleChange.emit(false);
-    this.gradeForm.get('organizationId')?.enable();
   }
 
   onCancel(): void {
@@ -179,7 +166,6 @@ export class GradeModalComponent implements OnInit, OnChanges {
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
-
       if (control instanceof FormGroup) {
         this.markFormGroupTouched(control);
       }

@@ -1,10 +1,10 @@
 <div class="card">
     <div class="flex justify-between items-center mb-4">
-        <h2 class="mb-0">Holidays</h2>
+        <h2 class="mb-0">{{ 'holidayList.title' | translate }}</h2>
         <div class="flex-grow"></div>
         <button 
             pButton 
-            label="Add Holiday"
+            [label]="'holidayList.addButton' | translate"
             icon="pi pi-plus" 
             class="p-button-sm"
             (click)="openCreateDialog()"
@@ -27,7 +27,7 @@
             <div class="flex justify-between items-center flex-col sm:flex-row">
                 <button 
                     pButton 
-                    label="Clear"
+                    [label]="'holidayList.clearButton' | translate"
                     class="p-button-outlined mb-2" 
                     icon="pi pi-filter-slash" 
                     (click)="clear(dt)"
@@ -41,7 +41,7 @@
                         type="text" 
                         #filter
                         (input)="onGlobalFilter(dt, $event)" 
-                        placeholder="Search holidays..."
+                        [placeholder]="'holidayList.searchPlaceholder' | translate"
                     />
                 </p-iconfield>
             </div>
@@ -50,22 +50,22 @@
         <ng-template pTemplate="header">
             <tr>
                 <th pSortableColumn="symbol">
-                    Symbol
+                    {{ 'holidayList.headers.symbol' | translate }}
                     <p-sortIcon field="symbol"></p-sortIcon>
                 </th>
                 <th pSortableColumn="holidayTypeName">
-                    Holiday Type
+                    {{ 'holidayList.headers.holidayType' | translate }}
                     <p-sortIcon field="holidayTypeName"></p-sortIcon>
                 </th>
                 <th pSortableColumn="start">
-                    Start Date
+                    {{ 'holidayList.headers.startDate' | translate }}
                     <p-sortIcon field="start"></p-sortIcon>
                 </th>
                 <th pSortableColumn="end">
-                    End Date
+                    {{ 'holidayList.headers.endDate' | translate }}
                     <p-sortIcon field="end"></p-sortIcon>
                 </th>
-                <th style="min-width: 8rem">Actions</th>
+                <th style="min-width: 8rem">{{ 'holidayList.headers.actions' | translate }}</th>
             </tr>
         </ng-template>
         
@@ -96,7 +96,7 @@
         
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="5">No holidays found.</td>
+                <td colspan="5">{{ 'holidayList.messages.empty' | translate }}</td>
             </tr>
         </ng-template>
     </p-table>

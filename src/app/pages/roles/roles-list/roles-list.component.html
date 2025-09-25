@@ -30,17 +30,14 @@
 
         <ng-template pTemplate="caption">
             <div class="flex justify-content-between align-items-center">
-                <div>
-                    <button pButton pRipple type="button" icon="pi pi-ellipsis-v" class="p-button-text"></button>
-                    <button
-                        pButton
-                        pRipple
-                        (click)="clear(table)"
-                        icon="pi pi-filter-slash"
-                        class="p-button-danger ml-2"
-                        [label]="'rolesList.clearButton' | translate">
-                    </button>
-                </div>
+                <button
+                    pButton
+                    pRipple
+                    (click)="clear(table)"
+                    icon="pi pi-filter-slash"
+                    class="p-button-danger"
+                    [label]="'rolesList.clearButton' | translate">
+                </button>
                 <div class="p-input-icon-left">
                     <i class="pi pi-search"></i>
                     <input
@@ -68,10 +65,10 @@
                 <td>{{ role.name }}</td>
 
                 <!-- Default Role Column -->
-                <td>{{ (role.isDefaultRole ? 'rolesList.common.yes' : 'rolesList.common.no') | translate }}</td>
+                <td>{{ (role.isDefaultRole ? 'common.yes' : 'common.no') | translate }}</td>
 
                 <!-- HR Role Column -->
-                <td>{{ (role.isHRRole ? 'rolesList.common.yes' : 'rolesList.common.no') | translate }}</td>
+                <td>{{ (role.isHRRole ? 'common.yes' : 'common.no') | translate }}</td>
 
                 <!-- Actions Column -->
                 <td>
@@ -79,7 +76,7 @@
                         <button (click)="deleteRole(role)" pButton pRipple type="button" class="p-button-rounded p-button-danger" [pTooltip]="'rolesList.actions.delete' | translate" tooltipPosition="top" [label]="'rolesList.actions.delete' | translate"></button>
                         <button (click)="makeAsDefault(role)" pButton pRipple type="button" class="p-button-rounded" [pTooltip]="(role.isDefaultRole ? 'rolesList.actions.unmarkAsDefault' : 'rolesList.actions.markAsDefault') | translate" tooltipPosition="top" [label]="(role.isDefaultRole ? 'rolesList.actions.unmarkAsDefault' : 'rolesList.actions.markAsDefault') | translate"></button>
                         <button (click)="editRole(role)" pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.edit' | translate" tooltipPosition="top" [label]="'rolesList.actions.edit' | translate"></button>
-                        <button (click)="editPermitions(role)" pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.permissions' | translate" tooltipPosition="top" [label]="'rolesList.actions.permissions' | translate"></button>
+                        <button (click)="editPermissions(role)" pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.permissions' | translate" tooltipPosition="top" [label]="'rolesList.actions.permissions' | translate"></button>
                         <button pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.systemUsers' | translate" tooltipPosition="top" [label]="'rolesList.actions.systemUsers' | translate"></button>
                     </div>
                 </td>

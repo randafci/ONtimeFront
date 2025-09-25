@@ -1,10 +1,10 @@
 <div class="card">
     <div class="flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Sections</h2>
+        <h2 class="mb-0">{{ 'sectionList.title' | translate }}</h2>
         <div class="flex-grow-1"></div>
         <button 
             pButton 
-            label="Add Section" 
+            [label]="'sectionList.addButton' | translate" 
             icon="pi pi-plus" 
             class="p-button-sm"
             (click)="openCreateDialog()"
@@ -27,7 +27,7 @@
             <div class="flex justify-between items-center flex-column sm:flex-row">
                 <button 
                     pButton 
-                    label="Clear" 
+                    [label]="'sectionList.clearButton' | translate" 
                     class="p-button-outlined mb-2" 
                     icon="pi pi-filter-slash" 
                     (click)="clear(dt)"
@@ -41,62 +41,60 @@
                         type="text" 
                         #filter
                         (input)="onGlobalFilter(dt, $event)" 
-                        placeholder="Search sections..." 
+                        [placeholder]="'sectionList.searchPlaceholder' | translate" 
                     />
                 </p-iconfield>
             </div>
         </ng-template>
         
-
         <ng-template pTemplate="header">
             <tr>
                 <!-- Code Header -->
                 <th style="min-width: 8rem">
                     <div class="flex justify-between items-center">
-                        Code
-                        <p-columnFilter type="text" field="code" display="menu" placeholder="Search by code"></p-columnFilter>
+                        {{ 'sectionList.headers.code' | translate }}
+                        <p-columnFilter type="text" field="code" display="menu" [placeholder]="'sectionList.filters.searchByCode' | translate"></p-columnFilter>
                     </div>
                 </th>
                 <!-- Name Header -->
                 <th style="min-width: 12rem">
                     <div class="flex justify-between items-center">
-                        Name
-                        <p-columnFilter type="text" field="name" display="menu" placeholder="Search by name"></p-columnFilter>
+                        {{ 'sectionList.headers.name' | translate }}
+                        <p-columnFilter type="text" field="name" display="menu" [placeholder]="'sectionList.filters.searchByName' | translate"></p-columnFilter>
                     </div>
                 </th>
                 <!-- Name (SE) Header -->
                 <th style="min-width: 12rem">
                     <div class="flex justify-between items-center">
-                        Name (SE)
-                        <p-columnFilter type="text" field="nameSE" display="menu" placeholder="Search by name (SE)"></p-columnFilter>
+                        {{ 'sectionList.headers.nameSE' | translate }}
+                        <p-columnFilter type="text" field="nameSE" display="menu" [placeholder]="'sectionList.filters.searchByNameSE' | translate"></p-columnFilter>
                     </div>
                 </th>
 
                 <th style="min-width: 12rem">
                     <div class="flex justify-between items-center">
-                        Parent Section
-                        <p-columnFilter type="text" field="parentName" display="menu" placeholder="Search by parent"></p-columnFilter>
+                        {{ 'sectionList.headers.parentSection' | translate }}
+                        <p-columnFilter type="text" field="parentName" display="menu" [placeholder]="'sectionList.filters.searchByParent' | translate"></p-columnFilter>
                     </div>
                 </th>
                 <!-- Section Type Header -->
                 <th style="min-width: 8rem">
                     <div class="flex justify-between items-center">
-                        Section Type
+                        {{ 'sectionList.headers.sectionType' | translate }}
                         <p-columnFilter type="numeric" field="sectionType" display="menu"></p-columnFilter>
                     </div>
                 </th>
                 
-
                 <th style="min-width: 10rem">
                     <div class="flex justify-between items-center">
-                        Status
+                        {{ 'sectionList.headers.status' | translate }}
                         <p-columnFilter field="isDeleted" matchMode="equals" display="menu">
                             <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                                 <p-select 
                                     [ngModel]="value" 
                                     [options]="statuses" 
                                     (onChange)="filter($event.value)" 
-                                    placeholder="Any" 
+                                    [placeholder]="'sectionList.filters.any' | translate" 
                                     [style]="{ 'min-width': '12rem' }"
                                 >
                                     <ng-template let-option pTemplate="item">
@@ -113,12 +111,12 @@
                 <!-- Created Date Header -->
                 <th style="min-width: 10rem">
                     <div class="flex justify-between items-center">
-                        Created Date
+                        {{ 'sectionList.headers.createdDate' | translate }}
                         <p-columnFilter type="date" field="creationDate" display="menu" placeholder="mm/dd/yyyy"></p-columnFilter>
                     </div>
                 </th>
 
-                <th style="min-width: 8rem">Actions</th>
+                <th style="min-width: 8rem">{{ 'sectionList.headers.actions' | translate }}</th>
             </tr>
         </ng-template>
         
@@ -128,11 +126,11 @@
                 <td>{{ section.name }}</td>
                 <td>{{ section.nameSE }}</td>
                 <td>{{ section.parent?.name || '-' }}</td>
-                <td>{{ section.sectionType || '-' }}</td>
+                <td>{{ section.sectionType?.name || '-' }}</td>
                 
                 <td>
                     <p-tag 
-                        [value]="getStatus(section) === 'active' ? 'Active' : 'Inactive'" 
+                        [value]="('sectionList.statusValues.' + getStatus(section)) | translate" 
                         [severity]="getSeverity(getStatus(section))"
                     ></p-tag>
                 </td>
@@ -158,13 +156,13 @@
         
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="8">No sections found</td>
+                <td colspan="8">{{ 'sectionList.messages.empty' | translate }}</td>
             </tr>
         </ng-template>
         
         <ng-template pTemplate="loadingbody">
             <tr>
-                <td colspan="8">Loading sections...</td>
+                <td colspan="8">{{ 'sectionList.messages.loading' | translate }}</td>
             </tr>
         </ng-template>
     </p-table>

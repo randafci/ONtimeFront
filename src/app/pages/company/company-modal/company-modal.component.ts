@@ -14,6 +14,8 @@ import { CompanyType } from '../../../interfaces/company-type.interface';
 import { Organization } from '../../../interfaces/organization.interface';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 
 @Component({
   selector: 'app-company-modal',
@@ -24,7 +26,8 @@ import { AuthService } from '../../../auth/auth.service';
     DialogModule,
     InputTextModule,
     SelectModule,
-    ButtonModule
+    ButtonModule,
+    TranslatePipe
   ],
   providers: [MessageService],
   templateUrl: './company-modal.component.html',
@@ -45,6 +48,7 @@ export class CompanyModalComponent implements OnInit, OnChanges {
 
   companyForm: FormGroup;
   mainCompanies: Company[] = [];
+  private translations: any = {};
 
   constructor(
     private fb: FormBuilder,
@@ -52,12 +56,16 @@ export class CompanyModalComponent implements OnInit, OnChanges {
     private companyTypeService: CompanyTypeService,
     private organizationService: LookupService,
     private messageService: MessageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private translationService: TranslationService
   ) {
     this.companyForm = this.createForm();
   }
 
   ngOnInit() {
+    this.translationService.translations$.subscribe(trans => {
+      this.translations = trans;
+    });
     this.updateMainCompanies();
   }
 
@@ -154,8 +162,8 @@ export class CompanyModalComponent implements OnInit, OnChanges {
       next: (response: ApiResponse<Company>) => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Success',
-          detail: 'Company created successfully'
+          summary: this.translations.common?.success || 'Success',
+          detail: this.translations.companies?.formPage?.toasts?.createSuccess || 'Company created successfully'
         });
         this.onSave.emit(response.data);
         this.closeDialog();
@@ -163,8 +171,8 @@ export class CompanyModalComponent implements OnInit, OnChanges {
       error: (error) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to create company'
+          summary: this.translations.common?.error || 'Error',
+          detail: this.translations.companies?.formPage?.toasts?.createError || 'Failed to create company'
         });
       }
     });
@@ -175,8 +183,8 @@ export class CompanyModalComponent implements OnInit, OnChanges {
       next: (response: ApiResponse<Company>) => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Success',
-          detail: 'Company updated successfully'
+          summary: this.translations.common?.success || 'Success',
+          detail: this.translations.companies?.formPage?.toasts?.updateSuccess || 'Company updated successfully'
         });
         this.onSave.emit(response.data);
         this.closeDialog();
@@ -184,8 +192,8 @@ export class CompanyModalComponent implements OnInit, OnChanges {
       error: (error) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to update company'
+          summary: this.translations.common?.error || 'Error',
+          detail: this.translations.companies?.formPage?.toasts?.updateError || 'Failed to update company'
         });
       }
     });

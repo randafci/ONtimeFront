@@ -70,7 +70,8 @@ export class MenuComponent implements OnInit {
                             { label: this.t('menu.organization.event'), icon: 'pi pi-fw pi-sitemap', routerLink: ['/events/list'] },
                             { label: this.t('menu.organization.family'), icon: 'pi pi-fw pi-users', routerLink: ['/families'] },
                             { label: this.t('menu.organization.grade'), icon: 'pi pi-fw pi-star', routerLink: ['/grades'] },
-                            { label: this.t('menu.organization.costCenter'), icon: 'pi pi-fw pi-dollar', routerLink: ['/cost-centers/list'] }
+                            { label: this.t('menu.organization.costCenter'), icon: 'pi pi-fw pi-dollar', routerLink: ['/cost-centers/list'] },
+                            { label: this.t('menu.organization.shiftType'), icon: 'pi pi-fw pi-clone', routerLink: ['/shift-types/list'] }
                         ]
                     },
                     {
@@ -96,10 +97,10 @@ export class MenuComponent implements OnInit {
                         ]
                     },
                     {
-                        label: 'HR Management',
+                        label: this.t('menu.hr.groupLabel'),
                         items: [
-                            { label: 'Holidays', icon: 'pi pi-fw pi-calendar', routerLink: ['/holidays/list'] },
-                            { label: 'Holiday Types', icon: 'pi pi-fw pi-tags', routerLink: ['/holiday-types/list'] }
+                            { label: this.t('menu.hr.holidays'), icon: 'pi pi-fw pi-calendar', routerLink: ['/holidays/list'] },
+                            { label: this.t('menu.hr.holidayTypes'), icon: 'pi pi-fw pi-tags', routerLink: ['/holiday-types/list'] }
                         ]
                     }
                     ,

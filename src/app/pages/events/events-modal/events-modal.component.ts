@@ -13,6 +13,7 @@ import { LocationService } from '../../location/location.service';
 import { Organization } from '../../../interfaces/organization.interface';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-events-modal',
@@ -23,7 +24,8 @@ import { AuthService } from '../../../auth/auth.service';
     DialogModule,
     InputTextModule,
     SelectModule,
-    ButtonModule
+    ButtonModule,
+    TranslatePipe
   ],
   providers: [MessageService],
   templateUrl: './events-modal.component.html'
@@ -156,7 +158,7 @@ export class EventsModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Event created successfully'
+          detail: 'eventsForm.toasts.createSuccess'
         });
         this.onSave.emit(response.data);
         this.closeDialog();
@@ -165,7 +167,7 @@ export class EventsModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to create event'
+          detail: 'eventsForm.toasts.createError'
         });
         this.loading = false;
       }
@@ -178,7 +180,7 @@ export class EventsModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Event updated successfully'
+          detail: 'eventsForm.toasts.updateSuccess'
         });
         this.onSave.emit(response.data);
         this.closeDialog();
@@ -187,7 +189,7 @@ export class EventsModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to update event'
+          detail: 'eventsForm.toasts.updateError'
         });
         this.loading = false;
       }

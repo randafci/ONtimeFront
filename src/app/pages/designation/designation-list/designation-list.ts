@@ -13,7 +13,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { Designation } from '../../../interfaces/designation.interface';
 import { DesignationService } from '../DesignationService';
 import { DesignationTypeService } from '../DesignationTypeService';
@@ -25,6 +25,8 @@ import { DatePipe } from '@angular/common';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
 import { DesignationModalComponent } from '../designation-modal/designation-modal.component';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 
 @Component({
   selector: 'app-designation-list',
@@ -45,19 +47,22 @@ import { DesignationModalComponent } from '../designation-modal/designation-moda
     ToastModule,
     RouterModule,
     DatePipe,
-    DesignationModalComponent
+    DesignationModalComponent,
+    TranslatePipe
   ],
-  providers: [MessageService],
+  providers: [MessageService, TranslatePipe, ConfirmationService],
   templateUrl: './designation-list.html',
   styleUrl: './designation-list.scss'
 })
 export class DesignationListComponent implements OnInit {
   designations: Designation[] = [];
   loading: boolean = true;
-  statuses: any[] = [
-    { label: 'Active', value: 'active' },
-    { label: 'Inactive', value: 'inactive' }
-  ];
+  // statuses: any[] = [
+  //   { label: 'Active', value: 'active' },
+  //   { label: 'Inactive', value: 'inactive' }
+  // ];
+
+  statuses: any[] = [];
 
   integrationOptions: any[] = [
     { label: 'Yes', value: true },
@@ -74,6 +79,7 @@ export class DesignationListComponent implements OnInit {
   designationTypes: DesignationType[] = [];
   mainDesignations: Designation[] = [];
   isSuperAdmin = false;
+  private translations: any = {};
 
   @ViewChild('dt') table!: Table;
   @ViewChild('filter') filter!: ElementRef;
@@ -84,11 +90,22 @@ export class DesignationListComponent implements OnInit {
     private organizationService: LookupService,
     private messageService: MessageService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private translationService: TranslationService,
+    private translatePipe: TranslatePipe,
+    private confirmationService: ConfirmationService,
   ) {}
 
   ngOnInit() {
     this.isSuperAdmin = this.checkIsSuperAdmin();
+    this.translationService.translations$.subscribe(trans => {
+        this.translations = trans;
+        this.statuses = [
+            { label: this.translations.designationList?.statusValues?.active || 'Active', value: 'active' },
+            { label: this.translations.designationList?.statusValues?.inactive || 'Inactive', value: 'inactive' }
+        ];
+    });
+
     this.loadDesignations();
     this.loadOrganizations();
     this.loadDesignationTypes();
@@ -196,12 +213,14 @@ export class DesignationListComponent implements OnInit {
 
 
   deleteDesignation(designation: Designation) {
-    console.log('Deleting designation:', designation);
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Delete',
-      detail: `Are you sure you want to delete ${designation.name}?`,
-      life: 3000
+    const message = this.translatePipe.transform('designationList.messages.deleteConfirm').replace('{name}', designation.name);
+    this.confirmationService.confirm({
+      message: message,
+      header: this.translatePipe.transform('common.deleteHeader'),
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        // Implement actual delete logic here
+      }
     });
   }
 

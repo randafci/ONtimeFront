@@ -117,8 +117,8 @@ export class OrganizationListComponent implements OnInit {
         } else {
           this.messageService.add({
             severity: 'error',
-            summary: 'Error',
-            detail: response.message || 'Failed to load organizations'
+            summary: this.translations.common?.error || 'Error',
+            detail: response.message || this.translations.organizations?.formPage?.toasts?.loadError || 'Failed to load organizations'
           });
         }
         this.loading = false;
@@ -127,8 +127,8 @@ export class OrganizationListComponent implements OnInit {
         console.error('Error loading organizations:', error);
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load organizations'
+          summary: this.translations.common?.error || 'Error',
+          detail: this.translations.organizations?.formPage?.toasts?.loadError || 'Failed to load organizations'
         });
         this.loading = false;
       }
@@ -203,8 +203,8 @@ export class OrganizationListComponent implements OnInit {
       next: (response: ApiResponse<Organization>) => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Success',
-          detail: 'Organization created successfully'
+          summary: this.translations.common?.success || 'Success',
+          detail: this.translations.organizations?.formPage?.toasts?.createSuccess || 'Organization created successfully'
         });
         this.closeDialog();
         this.loadOrganizations();
@@ -212,8 +212,8 @@ export class OrganizationListComponent implements OnInit {
       error: (error) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to create organization'
+          summary: this.translations.common?.error || 'Error',
+          detail: this.translations.organizations?.formPage?.toasts?.createError || 'Failed to create organization'
         });
         this.loading = false;
       }

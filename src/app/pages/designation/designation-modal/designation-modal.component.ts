@@ -13,6 +13,7 @@ import { DesignationType } from '../../../interfaces/designation-type.interface'
 import { Organization } from '../../../interfaces/organization.interface';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-designation-modal',
@@ -23,7 +24,8 @@ import { AuthService } from '../../../auth/auth.service';
     DialogModule,
     InputTextModule,
     SelectModule,
-    ButtonModule
+    ButtonModule,
+    TranslatePipe
   ],
   providers: [MessageService],
   templateUrl: './designation-modal.component.html'
@@ -151,7 +153,7 @@ export class DesignationModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Designation created successfully'
+          detail: 'designationForm.toasts.createSuccess'
         });
         this.onSave.emit(response.data);
         this.closeDialog();
@@ -160,7 +162,7 @@ export class DesignationModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to create designation'
+          detail: 'designationForm.toasts.createError'
         });
         this.loading = false;
       }
@@ -173,7 +175,7 @@ export class DesignationModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Designation updated successfully'
+          detail: 'designationForm.toasts.updateSuccess'
         });
         this.onSave.emit(response.data);
         this.closeDialog();
@@ -182,7 +184,7 @@ export class DesignationModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to update designation'
+          detail: 'designationForm.toasts.updateError'
         });
         this.loading = false;
       }

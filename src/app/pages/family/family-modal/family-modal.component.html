@@ -1,6 +1,6 @@
 <p-dialog
   [(visible)]="dialogVisible"
-  [header]="isEditMode ? 'Edit Family' : 'Add Family'"
+  [header]="(isEditMode ? 'familyForm.title.edit' : 'familyForm.title.add') | translate"
   [modal]="true"
   [style]="{width: '50vw'}"
   [draggable]="false"
@@ -11,7 +11,7 @@
       <!-- Code Field -->
       <div class="field">
         <label for="code" class="block text-sm font-medium mb-2">
-          Code <span class="text-red-500">*</span>
+          {{ 'familyForm.labels.code' | translate }} <span class="text-red-500">*</span>
         </label>
         <input
           id="code"
@@ -21,14 +21,14 @@
           formControlName="code"
           [class.ng-invalid]="familyForm.get('code')?.invalid && familyForm.get('code')?.touched" />
         <small class="text-red-500" *ngIf="familyForm.get('code')?.invalid && familyForm.get('code')?.touched">
-          Code is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <!-- Name Field -->
       <div class="field">
         <label for="name" class="block text-sm font-medium mb-2">
-          Name <span class="text-red-500">*</span>
+          {{ 'familyForm.labels.name' | translate }} <span class="text-red-500">*</span>
         </label>
         <input
           id="name"
@@ -38,14 +38,14 @@
           formControlName="name"
           [class.ng-invalid]="familyForm.get('name')?.invalid && familyForm.get('name')?.touched" />
         <small class="text-red-500" *ngIf="familyForm.get('name')?.invalid && familyForm.get('name')?.touched">
-          Name is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <!-- Name SE Field -->
       <div class="field">
         <label for="nameSE" class="block text-sm font-medium mb-2">
-          Name (SE) <span class="text-red-500">*</span>
+          {{ 'familyForm.labels.nameSE' | translate }} <span class="text-red-500">*</span>
         </label>
         <input
           id="nameSE"
@@ -55,14 +55,14 @@
           formControlName="nameSE"
           [class.ng-invalid]="familyForm.get('nameSE')?.invalid && familyForm.get('nameSE')?.touched" />
         <small class="text-red-500" *ngIf="familyForm.get('nameSE')?.invalid && familyForm.get('nameSE')?.touched">
-          Name (SE) is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <!-- Organization Field -->
       <div class="field" *ngIf="isSuperAdmin">
         <label for="organizationId" class="block text-sm font-medium mb-2">
-          Organization <span class="text-red-500">*</span>
+          {{ 'familyForm.labels.organization' | translate }} <span class="text-red-500">*</span>
         </label>
         <p-select
           id="organizationId"
@@ -71,12 +71,12 @@
           [options]="organizations"
           optionLabel="name"
           optionValue="id"
-          placeholder="Select Organization"
+          [placeholder]="'familyForm.placeholders.selectOrganization' | translate"
           appendTo="body"
           [class.ng-invalid]="familyForm.get('organizationId')?.invalid && familyForm.get('organizationId')?.touched">
         </p-select>
         <small class="text-red-500" *ngIf="familyForm.get('organizationId')?.invalid && familyForm.get('organizationId')?.touched">
-          Organization is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
     </div>
@@ -84,18 +84,17 @@
     <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
       <button
         pButton
-        label="Cancel"
+        [label]="'common.buttons.cancel' | translate"
         class="p-button-secondary"
         type="button"
         (click)="onCancel()">
       </button>
       <button
         pButton
-        [label]="isEditMode ? 'Update' : 'Save'"
+        [label]="(isEditMode ? 'common.buttons.update' : 'common.buttons.save') | translate"
         [loading]="loading"
         type="submit">
       </button>
     </div>
   </form>
 </p-dialog>
-

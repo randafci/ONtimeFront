@@ -13,12 +13,13 @@ import { SelectModule } from 'primeng/select';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Grade } from '@/interfaces/grade.interface';
 import { GradeService } from '../GradeService';
-import { TranslatePipe } from '@/core/pipes/translate.pipe';
 import { ApiResponse } from '@/core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
 import { LookupService } from '../../organization/OrganizationService';
 import { Organization } from '../../../interfaces/organization.interface';
 import { GradeModalComponent } from '../grade-modal/grade-modal.component';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 @Component({
     selector: 'app-grade-list',
     standalone: true,
@@ -34,26 +35,29 @@ import { GradeModalComponent } from '../grade-modal/grade-modal.component';
 export class GradeListComponent implements OnInit {
     grades: Grade[] = [];
     loading: boolean = true;
-
-    // Dialog properties
     dialogVisible: boolean = false;
     isEditMode: boolean = false;
     selectedGrade: Grade | null = null;
     organizations: Organization[] = [];
     isSuperAdmin: boolean = false;
+    private translations: any = {};
 
     @ViewChild('dt') table!: Table;
     @ViewChild('filter') filter!: ElementRef;
+
     constructor(
         private gradeService: GradeService,
         private messageService: MessageService,
-        private router: Router,
         private confirmationService: ConfirmationService,
-        private translatePipe: TranslatePipe,
         private authService: AuthService,
-        private organizationService: LookupService
+        private organizationService: LookupService,
+        private translationService: TranslationService
     ) {}
+
     ngOnInit() {
+        this.translationService.translations$.subscribe(translations => {
+            this.translations = translations;
+        });
         this.isSuperAdmin = this.checkIsSuperAdmin();
         if (this.isSuperAdmin) {
             this.loadOrganizations();
@@ -61,29 +65,6 @@ export class GradeListComponent implements OnInit {
         this.loadGrades();
     }
 
-    loadGrades() {
-        this.loading = true;
-        this.gradeService.getAllGrades().subscribe({
-            next: (response: ApiResponse<Grade[]>) => {
-                if (response.succeeded && response.data) {
-                    this.grades = response.data;
-                } else {
-                    this.messageService.add({ severity: 'error', summary: 'Error', detail: response.message || 'Failed to load grades' });
-                }
-                this.loading = false;
-            },
-            error: (err) => {
-                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load grades' });
-                this.loading = false;
-            }
-        });
-    }
-    getStatus(grade: Grade): string {
-        return grade.isDeleted ? 'inactive' : 'active';
-    }
-    getSeverity(status: string): string {
-        return status === 'active' ? 'success' : 'danger';
-    }
     private checkIsSuperAdmin(): boolean {
         const claims = this.authService.getClaims();
         return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
@@ -95,10 +76,39 @@ export class GradeListComponent implements OnInit {
                 if (response.succeeded && response.data) {
                     this.organizations = response.data;
                 } else {
-                    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load organizations.' });
+                    this.showToast('error', this.translations.common?.error, this.translations.gradeList?.toasts?.orgLoadError);
                 }
+            },
+            error: () => {
+                this.showToast('error', this.translations.common?.error, this.translations.gradeList?.toasts?.orgLoadError);
             }
         });
+    }
+
+    loadGrades() {
+        this.loading = true;
+        this.gradeService.getAllGrades().subscribe({
+            next: (response: ApiResponse<Grade[]>) => {
+                if (response.succeeded && response.data) {
+                    this.grades = response.data;
+                } else {
+                    this.showToast('error', this.translations.common?.error, response.message || this.translations.gradeList?.toasts?.loadError);
+                }
+                this.loading = false;
+            },
+            error: (err) => {
+                this.showToast('error', this.translations.common?.error, this.translations.gradeList?.toasts?.loadError);
+                this.loading = false;
+            }
+        });
+    }
+
+    getStatus(grade: Grade): string {
+        return grade.isDeleted ? 'inactive' : 'active';
+    }
+
+    getSeverity(status: string): string {
+        return status === 'active' ? 'success' : 'danger';
     }
 
     openCreateDialog() {
@@ -117,31 +127,39 @@ export class GradeListComponent implements OnInit {
         this.loadGrades();
     }
 
-  
     deleteGrade(grade: Grade) {
-        const message = this.translatePipe.transform('common.deleteConfirm').replace('{name}', grade.name);
+        const commonTrans = this.translations.common || {};
+        const gradeTrans = this.translations.gradeList?.toasts || {};
+        const message = (commonTrans.deleteConfirm || 'Are you sure you want to delete {name}?').replace('{name}', grade.name);
+
         this.confirmationService.confirm({
             message: message,
-            header: this.translatePipe.transform('common.deleteHeader'),
+            header: commonTrans.deleteHeader || 'Confirm Deletion',
             icon: 'pi pi-exclamation-triangle',
             accept: () => {
                 this.gradeService.deleteGrade(grade.id).subscribe({
                     next: () => {
-                        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Grade deleted successfully.' });
+                        this.showToast('success', commonTrans.success, gradeTrans.deleteSuccess);
                         this.loadGrades();
                     },
                     error: (err) => {
-                        this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Failed to delete grade.' });
+                        this.showToast('error', commonTrans.error, err.error?.message || gradeTrans.deleteError);
                     }
                 });
             }
         });
     }
+
     onGlobalFilter(table: Table, event: Event) {
         table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
     }
+
     clear(table: Table) {
         table.clear();
         this.filter.nativeElement.value = '';
+    }
+
+    private showToast(severity: string, summary: string, detail: string): void {
+        this.messageService.add({ severity, summary, detail });
     }
 }

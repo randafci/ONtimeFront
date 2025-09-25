@@ -43,7 +43,7 @@
                 <td>{{ family.name }}</td>
                 <td>{{ family.nameSE }}</td>
                 <td>
-                    <p-tag [value]="getStatus(family)" [severity]="getSeverity(getStatus(family))"></p-tag>
+                    <p-tag [value]="('familyList.statusValues.' + getStatus(family)) | translate" [severity]="getSeverity(getStatus(family))"></p-tag>
                 </td>
                 <td>{{ family.creationDate | date: 'MM/dd/yyyy' }}</td>
                 <td>

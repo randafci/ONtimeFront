@@ -1,10 +1,10 @@
 <div class="card">
     <div class="flex justify-between items-center mb-4">
-        <h2 class="mb-0">{{ 'Cost Centers' | translate }}</h2>
+        <h2 class="mb-0">{{ 'costCenterList.title' | translate }}</h2>
         <div class="flex-grow"></div>
         <button 
             pButton 
-            [label]="'Add Cost Center' | translate"
+            [label]="'costCenterList.addButton' | translate"
             icon="pi pi-plus" 
             class="p-button-sm"
             (click)="openCreateDialog()"
@@ -27,7 +27,7 @@
             <div class="flex justify-between items-center flex-col sm:flex-row">
                 <button 
                     pButton 
-                    [label]="'Clear' | translate"
+                    [label]="'costCenterList.clearButton' | translate"
                     class="p-button-outlined mb-2" 
                     icon="pi pi-filter-slash" 
                     (click)="clear(dt)"
@@ -41,7 +41,7 @@
                         type="text" 
                         #filter
                         (input)="onGlobalFilter(dt, $event)" 
-                        [placeholder]="'Search' | translate"
+                        [placeholder]="'costCenterList.searchPlaceholder' | translate"
                     />
                 </p-iconfield>
             </div>
@@ -50,22 +50,22 @@
         <ng-template pTemplate="header">
             <tr>
                 <th pSortableColumn="code">
-                    {{ 'Code' | translate }}
+                    {{ 'costCenterList.headers.code' | translate }}
                     <p-sortIcon field="code"></p-sortIcon>
                 </th>
                 <th pSortableColumn="name">
-                    {{ 'Name' | translate }}
+                    {{ 'costCenterList.headers.name' | translate }}
                     <p-sortIcon field="name"></p-sortIcon>
                 </th>
                 <th pSortableColumn="nameSE">
-                    {{ 'Name (SE)' | translate }}
+                    {{ 'costCenterList.headers.nameSE' | translate }}
                     <p-sortIcon field="nameSE"></p-sortIcon>
                 </th>
                 <th pSortableColumn="organizationName">
-                    {{ 'Organization' | translate }}
+                    {{ 'costCenterList.headers.organization' | translate }}
                     <p-sortIcon field="organizationName"></p-sortIcon>
                 </th>
-                <th style="min-width: 8rem">{{ 'Actions' | translate }}</th>
+                <th style="min-width: 8rem">{{ 'costCenterList.headers.actions' | translate }}</th>
             </tr>
         </ng-template>
         
@@ -94,7 +94,7 @@
 
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="6">{{ 'No cost centers found' | translate }}</td>
+                <td colspan="5">{{ 'costCenterList.messages.empty' | translate }}</td>
             </tr>
         </ng-template>
     </p-table>

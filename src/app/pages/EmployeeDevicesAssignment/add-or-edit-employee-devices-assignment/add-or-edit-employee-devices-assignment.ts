@@ -66,7 +66,8 @@ import { TranslationService } from '@/pages/translation-manager/translation-mana
     TooltipModule,
     DialogModule,
     StepperModule,
-    DividerModule
+    DividerModule,
+    TranslatePipe
 ],
 providers: [ConfirmationService, MessageService, TranslatePipe],
   templateUrl: './add-or-edit-employee-devices-assignment.html',
@@ -120,7 +121,7 @@ export class AddOrEditEmployeeDevicesAssignment implements OnInit {
       { field: 'name', header: 'Name' },
       { field: 'location', header: 'Location' }
     ];
-     this.translationService.translations$.subscribe(translations => {
+     this.translationService.translations$.subscribe((translations: any) => {
       this.translations = translations;
       
     });
@@ -154,7 +155,7 @@ export class AddOrEditEmployeeDevicesAssignment implements OnInit {
       };
       
       this.deviceService.getDevices(request).subscribe({
-        next: (response) => {
+        next: (response: { succeeded: any; data: { items: Device[]; totalCount: number; }; }) => {
           if (response.succeeded && response.data) {
             this.devices = response.data.items;
             this.totalRecords = response.data.totalCount;
@@ -204,7 +205,7 @@ export class AddOrEditEmployeeDevicesAssignment implements OnInit {
     }
 
     this.deviceService.getDevices(request).subscribe({
-      next: (response) => {
+      next: (response: { succeeded: any; data: { items: Device[]; totalCount: number; }; }) => {
         if (response.succeeded && response.data) {
           this.devices = response.data.items;
           this.totalRecords = response.data.totalCount;
@@ -246,7 +247,7 @@ export class AddOrEditEmployeeDevicesAssignment implements OnInit {
         }
         this.loading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading employees:', error);
         this.messageService.add({
           severity: 'error',
@@ -296,7 +297,7 @@ export class AddOrEditEmployeeDevicesAssignment implements OnInit {
         }
         this.loading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading locations:', error);
         this.messageService.add({
           severity: 'error',

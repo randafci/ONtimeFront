@@ -25,6 +25,7 @@ import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
 import { HolidayModalComponent } from '../holiday-modal/holiday-modal.component';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-holiday-list',
@@ -47,9 +48,10 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     RouterModule,
     DatePipe,
     ConfirmDialogModule,
-    HolidayModalComponent
+    HolidayModalComponent,
+    TranslatePipe
   ],
-  providers: [MessageService, ConfirmationService],
+  providers: [MessageService, ConfirmationService, TranslatePipe],
   templateUrl: './holiday-list.html'
 })
 export class HolidayListComponent implements OnInit {
@@ -71,7 +73,8 @@ export class HolidayListComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private translatePipe: TranslatePipe
   ) {}
 
   ngOnInit() {
@@ -95,7 +98,7 @@ export class HolidayListComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: response.message || 'Failed to load holidays'
+            detail: this.translatePipe.transform('holidayList.messages.loadError')
           });
         }
         this.loading = false;
@@ -104,7 +107,7 @@ export class HolidayListComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to load holidays'
+          detail: this.translatePipe.transform('holidayList.messages.loadError')
         });
         this.loading = false;
       }
@@ -146,9 +149,10 @@ export class HolidayListComponent implements OnInit {
   }
 
   deleteHoliday(holiday: Holiday) {
+    const message = this.translatePipe.transform('holidayList.messages.deleteConfirm').replace('{name}', holiday.symbol);
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete ${holiday.symbol}?`,
-      header: 'Confirm Delete',
+      message: message,
+      header: this.translatePipe.transform('common.deleteHeader'),
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.holidayService.deleteHoliday(holiday.id).subscribe({
@@ -157,14 +161,14 @@ export class HolidayListComponent implements OnInit {
               this.messageService.add({
                 severity: 'success',
                 summary: 'Success',
-                detail: 'Holiday deleted successfully'
+                detail: this.translatePipe.transform('holidayList.messages.deleteSuccess')
               });
               this.loadHolidays();
             } else {
               this.messageService.add({
                 severity: 'error',
                 summary: 'Error',
-                detail: response.message || 'Failed to delete holiday'
+                detail: response.message || this.translatePipe.transform('holidayList.messages.deleteError')
               });
             }
           },
@@ -172,7 +176,7 @@ export class HolidayListComponent implements OnInit {
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
-              detail: 'Failed to delete holiday'
+              detail: this.translatePipe.transform('holidayList.messages.deleteError')
             });
           }
         });

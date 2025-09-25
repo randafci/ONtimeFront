@@ -13,6 +13,7 @@ import { SectionType } from '../../../interfaces/section-type.interface';
 import { Organization } from '../../../interfaces/organization.interface';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-section-modal',
@@ -23,7 +24,8 @@ import { AuthService } from '../../../auth/auth.service';
     DialogModule,
     InputTextModule,
     SelectModule,
-    ButtonModule
+    ButtonModule,
+    TranslatePipe
   ],
   providers: [MessageService],
   templateUrl: './section-modal.component.html'
@@ -109,23 +111,10 @@ export class SectionModalComponent implements OnInit, OnChanges {
     const formData = this.sectionForm.getRawValue(); // Use getRawValue to include disabled fields
 
     if (this.isEditMode) {
-      const editData: EditSection = {
-        id: formData.id,
-        code: formData.code,
-        name: formData.name,
-        nameSE: formData.nameSE,
-        organizationId: formData.organizationId,
-        sectionTypeLookupId: formData.sectionTypeLookupId
-      };
+      const editData: EditSection = { ...formData };
       this.updateSection(editData);
     } else {
-      const createData: CreateSection = {
-        code: formData.code,
-        name: formData.name,
-        nameSE: formData.nameSE,
-        organizationId: formData.organizationId,
-        sectionTypeLookupId: formData.sectionTypeLookupId
-      };
+      const createData: CreateSection = formData;
       this.createSection(createData);
     }
   }
@@ -136,7 +125,7 @@ export class SectionModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Section created successfully'
+          detail: 'sectionForm.toasts.createSuccess'
         });
         this.onSave.emit(response.data);
         this.closeDialog();
@@ -145,7 +134,7 @@ export class SectionModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to create section'
+          detail: 'sectionForm.toasts.createError'
         });
         this.loading = false;
       }
@@ -158,7 +147,7 @@ export class SectionModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Section updated successfully'
+          detail: 'sectionForm.toasts.updateSuccess'
         });
         this.onSave.emit(response.data);
         this.closeDialog();
@@ -167,7 +156,7 @@ export class SectionModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to update section'
+          detail: 'sectionForm.toasts.updateError'
         });
         this.loading = false;
       }

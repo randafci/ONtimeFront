@@ -26,6 +26,8 @@ import { DatePipe } from '@angular/common';
 import { ApiResponse } from '@/core/models/api-response.model';
 import { AuthService } from '@/auth/auth.service';
 import { SectionModalComponent } from '../section-modal/section-modal.component';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 
 @Component({
@@ -47,9 +49,10 @@ import { SectionModalComponent } from '../section-modal/section-modal.component'
     ToastModule,
     RouterModule,
     SectionModalComponent,
-    DatePipe
+    DatePipe,
+    TranslatePipe
   ],
-  providers: [MessageService, ConfirmationService],
+  providers: [MessageService, ConfirmationService, TranslatePipe],
   templateUrl: './section-list.html',
   styleUrl: './section-list.scss'
 })
@@ -64,11 +67,14 @@ export class SectionListComponent implements OnInit {
   sectionTypes: SectionType[] = [];
   isSuperAdmin = false;
 
-  statuses: any[] = [
-    { label: 'Active', value: 'active' },
-    { label: 'Inactive', value: 'inactive' }
-  ];
+  // statuses: any[] = [
+  //   { label: 'Active', value: 'active' },
+  //   { label: 'Inactive', value: 'inactive' }
+  // ];
 
+  statuses: any[] = [];
+  
+  private translations: any = {};
   integrationOptions: any[] = [
     { label: 'Yes', value: true },
     { label: 'No', value: false }
@@ -86,11 +92,20 @@ export class SectionListComponent implements OnInit {
     private messageService: MessageService,
     private router: Router,
     private confirmationService: ConfirmationService,
-    private authService: AuthService
+    private authService: AuthService,
+    private translationService: TranslationService, 
+    private translatePipe: TranslatePipe
   ) {}
 
   ngOnInit() {
     this.isSuperAdmin = this.checkIsSuperAdmin();
+    this.translationService.translations$.subscribe(trans => {
+        this.translations = trans;
+        this.statuses = [
+            { label: this.translations.sectionList?.statusValues?.active || 'Active', value: 'active' },
+            { label: this.translations.sectionList?.statusValues?.inactive || 'Inactive', value: 'inactive' }
+        ];
+    });
     this.loadSections();
     this.loadOrganizations();
     this.loadSectionTypes();
@@ -193,11 +208,10 @@ export class SectionListComponent implements OnInit {
   }
 
   deleteSection(section: Section) {
-    const message = `Are you sure you want to delete ${section.name}?`;
-
+    const message = this.translatePipe.transform('sectionList.messages.deleteConfirm').replace('{name}', section.name);
     this.confirmationService.confirm({
       message: message,
-      header: 'Confirm Deletion',
+      header: this.translatePipe.transform('common.deleteHeader'),
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
       }

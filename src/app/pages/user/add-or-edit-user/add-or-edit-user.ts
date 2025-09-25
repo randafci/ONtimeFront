@@ -20,6 +20,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { SelectModule } from 'primeng/select';
 import { Organization } from '@/interfaces/organization.interface';
 import { AuthService } from '@/auth/auth.service';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 
 @Component({
   selector: 'app-add-or-edit-user',
@@ -58,142 +59,118 @@ export class AddOrEditUser implements OnInit {
   loading = false;
   submitted = false;
   employees: Employee[] = [];
-  organization: Organization[] = [];
+  organizations: Organization[] = [];
   isSuperAdmin = false;
-
   loadingEmployees = false;
-  loadinOgrganiztions = false;
+  loadingOrganizations = false;
+  private translations: any = {};
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private userService: UserService,
     private messageService: MessageService,
-   private authService: AuthService
-    
+    private authService: AuthService,
+    private translationService: TranslationService
   ) {
     this.userForm = this.fb.group({
       userName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', this.isEditMode ? [] : [Validators.required]], // required only in create mode
+      password: ['', Validators.required],
       isLdapUser: [false],
       extraEmployeesView: [''],
       employeeId: [null],
-      organizationId: [null]   // ✅ added
-
+      organizationId: [null]
     });
-
   }
 
   ngOnInit(): void {
+    this.translationService.translations$.subscribe(translations => {
+      this.translations = translations;
+    });
+
     this.isSuperAdmin = this.checkIsSuperAdmin();
-this.isSuperAdmin = true;
     this.loadEmployees();
-    this.loadOrganiztions();
+    if (this.isSuperAdmin) {
+      this.loadOrganizations();
+    }
+
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode = true;
         this.userId = params['id'];
+        this.userForm.get('password')?.clearValidators();
+        this.userForm.get('password')?.updateValueAndValidity();
         this.loadUser(this.userId!);
       }
     });
-    this.userForm.get('isLdapUser')?.valueChanges.subscribe((isLdap: boolean) => {
-      if (isLdap) {
-        // Remove validators when LDAP user
-        this.userForm.get('userName')?.clearValidators();
-        this.userForm.get('email')?.clearValidators();
-      } else {
-        // Add validators back for non-LDAP user
-        this.userForm.get('userName')?.setValidators([Validators.required]);
-        this.userForm.get('email')?.setValidators([Validators.required, Validators.email]);
-      }
-      this.userForm.get('userName')?.updateValueAndValidity();
-      this.userForm.get('email')?.updateValueAndValidity();
-    });
 
+    this.userForm.get('isLdapUser')?.valueChanges.subscribe((isLdap: boolean) => {
+      this.toggleLdapValidators(isLdap);
+    });
+  }
+
+  private toggleLdapValidators(isLdap: boolean): void {
+    const fieldsToValidate = ['userName', 'email'];
+    if (isLdap) {
+      fieldsToValidate.forEach(field => this.userForm.get(field)?.clearValidators());
+    } else {
+      this.userForm.get('userName')?.setValidators([Validators.required]);
+      this.userForm.get('email')?.setValidators([Validators.required, Validators.email]);
+    }
+    fieldsToValidate.forEach(field => this.userForm.get(field)?.updateValueAndValidity());
   }
 
   loadUser(id: string): void {
-
-
     this.loading = true;
     this.userService.getById(id).subscribe({
       next: (response: ApiResponse<UserDto>) => {
-        if (response.statusCode === 200 && response.data) {
-          this.userForm.patchValue({
-            userName: response.data.userName,
-            email: response.data.email,
-            isLdapUser: response.data.isLdapUser,
-            extraEmployeesView: response.data.extraEmployeesView,
-            employeeId: response.data.employeeId,
-            organizationId:response.data.organizationId
-          });
-          // Hide password on edit
-          this.userForm.get('password')?.clearValidators();
-          this.userForm.get('password')?.updateValueAndValidity();
+        if (response.succeeded && response.data) {
+          this.userForm.patchValue(response.data);
+        } else {
+          this.showToast('error', 'Error', this.translations.users?.formPage?.toasts?.loadError);
         }
         this.loading = false;
       },
-      error: () => this.loading = false
+      error: () => {
+        this.showToast('error', 'Error', this.translations.users?.formPage?.toasts?.loadError);
+        this.loading = false;
+      }
     });
   }
+
   loadEmployees(): void {
     this.loadingEmployees = true;
     this.userService.getEmployees().subscribe({
       next: (response: ApiResponse<Employee[]>) => {
-        if (response.succeeded) {
-          this.employees = response.data || [];
-        } else {
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'Warning',
-            detail: 'Failed to load employees list'
-          });
-        }
+        if (response.succeeded) this.employees = response.data || [];
         this.loadingEmployees = false;
       },
       error: (error) => {
-        console.error('Error loading employees:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load employees'
-        });
         this.loadingEmployees = false;
       }
     });
   }
+
   private checkIsSuperAdmin(): boolean {
     const claims = this.authService.getClaims();
     return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
   }
 
-  loadOrganiztions(): void {
-    this.loadinOgrganiztions = true;
+  loadOrganizations(): void {
+    this.loadingOrganizations = true;
     this.userService.getOrganizations().subscribe({
       next: (response: ApiResponse<Organization[]>) => {
-        if (response.succeeded) {
-          this.organization = response.data || [];
-        } else {
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'Warning',
-            detail: 'Failed to load organizations list'
-          });
-        }
-        this.loadinOgrganiztions = false;
+        if (response.succeeded) this.organizations = response.data || [];
+        this.loadingOrganizations = false;
       },
       error: (error) => {
-        console.error('Error loading organizations:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load organizations'
-        });
-        this.loadinOgrganiztions = false;
+        this.loadingOrganizations = false;
       }
     });
   }
+
   onSubmit(): void {
     this.submitted = true;
     if (this.userForm.invalid) {
@@ -205,56 +182,42 @@ this.isSuperAdmin = true;
     const formData = this.userForm.value;
 
     if (this.isEditMode && this.userId) {
-      const updateDto: UpdateUserDto = {
-        id: this.userId,
-        userName: formData.userName,
-        email: formData.email,
-        isLdapUser: formData.isLdapUser,
-        extraEmployeesView: formData.extraEmployeesView,
-        employeeId: formData.employeeId,
-        organizationId : formData.organizationId
-
-      };
-      if (formData.password) (updateDto as any).password = formData.password; // optional password update
-
-      this.userService.update(updateDto).subscribe({
-        next: () => {
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'User updated successfully' });
-          this.router.navigate(['/users']);
-        },
-        error: () => this.loading = false
-      });
+      const updateDto: UpdateUserDto = { id: this.userId, ...formData };
+      if (!formData.password) delete (updateDto as any).password;
+      
+      this.userService.update(updateDto).subscribe(this.getObserver('update'));
     } else {
-      const createDto: CreateUserDto = {
-        userName: formData.userName,
-        email: formData.email,
-        password: formData.password,
-        isLdapUser: formData.isLdapUser,
-        extraEmployeesView: formData.extraEmployeesView,
-        employeeId: formData.employeeId,
-        organizationId : formData.organizationId
-      };
-
-      this.userService.create(createDto).subscribe({
-        next: () => {
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'User created successfully' });
-          this.router.navigate(['/users']);
-        },
-        error: () => this.loading = false
-      });
+      this.userService.create(formData as CreateUserDto).subscribe(this.getObserver('create'));
     }
+  }
+
+  private getObserver(action: 'create' | 'update') {
+    const toastKey = `${action}Success`;
+    return {
+      next: () => {
+        this.showToast('success', 'Success', this.translations.users?.formPage?.toasts[toastKey]);
+        this.router.navigate(['/users']);
+      },
+      error: () => {
+        const errorKey = `${action}Error`;
+        this.showToast('error', 'Error', this.translations.users?.formPage?.toasts[errorKey]);
+        this.loading = false;
+      }
+    };
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
-      if (control instanceof FormGroup) {
-        this.markFormGroupTouched(control);
-      }
+      if (control instanceof FormGroup) this.markFormGroupTouched(control);
     });
   }
-
+  
   onCancel(): void {
     this.router.navigate(['/users']);
+  }
+
+  private showToast(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 }

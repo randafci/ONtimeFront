@@ -43,7 +43,7 @@
                 <td>{{ grade.name }}</td>
                 <td>{{ grade.nameSE }}</td>
                 <td>
-                    <p-tag [value]="getStatus(grade)" [severity]="getSeverity(getStatus(grade))"></p-tag>
+                    <p-tag [value]="('gradeList.statusValues.' + getStatus(grade)) | translate" [severity]="getSeverity(getStatus(grade))"></p-tag>
                 </td>
                 <td>{{ grade.creationDate | date: 'MM/dd/yyyy' }}</td>
                 <td>
