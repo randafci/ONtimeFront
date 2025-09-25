@@ -12,7 +12,11 @@ export interface RoleDto {
   id: string;
   name: string;
   isDefaultRole: boolean;
-  isHRRole: boolean;
+  isHRRole: boolean;  
+  isSuperAdmin: boolean;
+  isHRManager: boolean;
+  isHRAdministrator: boolean;
+  isHRSpecialist: boolean;
 }
 
 @Injectable({

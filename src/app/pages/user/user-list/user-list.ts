@@ -35,7 +35,8 @@ import { ApiResponse } from '../../../core/models/api-response.model';
     IconFieldModule,
     InputIconModule,
     SelectModule,
-    TableModule
+    TableModule,
+    TranslatePipe
 ],
   templateUrl: './user-list.html',
   styleUrl: './user-list.scss',

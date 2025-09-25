@@ -43,4 +43,8 @@ export class DesignationService {
       },this.headers
     );
   }
+
+  deleteDesignation(id: number): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.apiUrl}/Lookup/Designations/${id}`, this.headers);
+  }
 }

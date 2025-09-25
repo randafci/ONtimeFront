@@ -180,6 +180,20 @@ export const appRoutes: Routes = [
             (m) => m.HOLIDAY_TYPE_ROUTES
           )
       },
+      {
+        path: 'leave-types',
+        loadChildren: () =>
+          import('./app/pages/leave-type/leave-type.routes').then(
+            (m) => m.LEAVE_TYPE_ROUTES
+          )
+      },
+      {
+        path: 'ramadan-periods',
+        loadChildren: () =>
+          import('./app/pages/ramadan-period/ramadan-period.routes').then(
+            (m) => m.RAMADAN_PERIOD_ROUTES
+          )
+      },
         {
         path: 'employeeDevicesAssignment',
         loadChildren: () =>
@@ -194,6 +208,14 @@ export const appRoutes: Routes = [
             (m) => m.TEAM_ROUTES
           )
       },
+      {
+        path: 'employees/reportingmanager',
+        loadChildren: () =>
+          import('./app/pages/employeeReportingManager/employeeReportingManager.routes').then(
+            (m) => m.EMPLOYEEREPORTINGMANAGER_ROUTES
+          )
+      },
+
       { path: 'test', component: Layout },
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
       {

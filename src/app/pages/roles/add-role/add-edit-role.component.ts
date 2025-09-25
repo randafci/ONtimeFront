@@ -10,6 +10,7 @@ import { RippleModule } from 'primeng/ripple';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { AuthService } from '@/auth/auth.service';
 
 // Custom Services and Pipes
 import { TranslatePipe } from '@/core/pipes/translate.pipe';
@@ -38,30 +39,36 @@ export class AddEditRoleComponent implements OnInit {
   isSaving = false;
   isEditMode = false;
   private roleId: string | null = null;
+   isAdmin: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private roleService: RoleService,
     private router: Router,
     private route: ActivatedRoute, // Inject ActivatedRoute
-    private messageService: MessageService
+    private messageService: MessageService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.roleId = this.route.snapshot.paramMap.get('id');
     this.isEditMode = !!this.roleId; // Set edit mode based on ID presence
-    
+    this.isAdmin=this.checkIsSuperAdmin();
     this.initializeForm();
 
     if (this.isEditMode && this.roleId) {
       this.loadRoleData(this.roleId);
     }
   }
-
+ 
   initializeForm(): void {
     this.roleForm = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(200)]],
       isHRRole: [false, Validators.required],
+        isSuperAdmin: [false, Validators.required],
+  isHRManager: [false, Validators.required],
+  isHRAdministrator: [false, Validators.required],
+  isHRSpecialist: [false, Validators.required],
       // Add isDefaultRole to the form for editing
       isDefaultRole: [false] 
     });
@@ -121,7 +128,10 @@ export class AddEditRoleComponent implements OnInit {
    get formControls() {
     return this.roleForm.controls;
   }
-  
+  private checkIsSuperAdmin(): boolean {
+    const claims = this.authService.getClaims();
+    return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
+  }
 
   // --- Getters ---
   get name(): AbstractControl { return this.roleForm.get('name')!; }

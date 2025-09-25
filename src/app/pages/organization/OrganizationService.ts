@@ -48,4 +48,9 @@ updateOrganization(data: EditOrganization): Observable<ApiResponse<Organization>
     { name: data.name, nameSE: data.nameSE },{headers}
   );
 }
+
+deleteOrganization(id: number): Observable<ApiResponse<boolean>> {
+  const headers = this.authService.getHeaders();
+  return this.http.delete<ApiResponse<boolean>>(`${this.apiUrl}/Lookup/Organization/${id}`, { headers });
+}
 }

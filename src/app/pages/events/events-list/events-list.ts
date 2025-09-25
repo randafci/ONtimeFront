@@ -13,6 +13,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -49,6 +50,7 @@ import { EventsModalComponent } from '../events-modal/events-modal.component';
     IconFieldModule,
     SelectModule,
     ToastModule,
+    ConfirmDialogModule,
     DialogModule,
     RouterModule,
     DatePipe,
@@ -354,7 +356,32 @@ export class EventsListComponent implements OnInit {
       header: this.translatePipe.transform('common.deleteHeader'),
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        console.log('Deleting event:', event);
+        this.eventsService.deleteEvents(event.id).subscribe({
+          next: (response: ApiResponse<boolean>) => {
+            if (response.succeeded) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: `Event ${event.name} deleted successfully`
+              });
+              this.loadEvents();
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: response.message || 'Failed to delete event'
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting event:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to delete event'
+            });
+          }
+        });
       }
     });
   }

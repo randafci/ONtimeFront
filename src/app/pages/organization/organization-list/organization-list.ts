@@ -14,6 +14,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Organization, CreateOrganization, EditOrganization } from '../../../interfaces/organization.interface';
@@ -42,6 +43,7 @@ import { TranslationService } from '../../translation-manager/translation-manage
     IconFieldModule,
     SelectModule,
     ToastModule,
+    ConfirmDialogModule,
     DialogModule,
     RouterModule,
     DatePipe,
@@ -261,12 +263,31 @@ export class OrganizationListComponent implements OnInit {
       header: commonTrans?.confirmDelete || 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        
-        console.log('Deleting organization:', organization);
-        this.messageService.add({
-          severity: 'success',
-          summary: commonTrans?.success || 'Success',
-          detail: trans?.deleteSuccess || 'Organization deleted successfully'
+        this.lookupService.deleteOrganization(organization.id).subscribe({
+          next: (response: ApiResponse<boolean>) => {
+            if (response.succeeded) {
+              this.messageService.add({
+                severity: 'success',
+                summary: commonTrans?.success || 'Success',
+                detail: trans?.deleteSuccess || 'Organization deleted successfully'
+              });
+              this.loadOrganizations();
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: commonTrans?.error || 'Error',
+                detail: response.message || 'Failed to delete organization'
+              });
+            }
+          },
+          error: (error: any) => {
+            console.error('Error deleting organization:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: commonTrans?.error || 'Error',
+              detail: 'Failed to delete organization'
+            });
+          }
         });
       }
     });

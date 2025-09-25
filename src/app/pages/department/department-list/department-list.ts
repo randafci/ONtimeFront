@@ -13,6 +13,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Department } from '@/interfaces/department.interface';
@@ -47,6 +48,7 @@ import { DepartmentModalComponent } from '../department-modal/department-modal.c
     IconFieldModule,
     SelectModule,
     ToastModule,
+    ConfirmDialogModule,
     RouterModule,
     DatePipe,
     TranslatePipe,
@@ -231,11 +233,31 @@ export class DepartmentListComponent implements OnInit {
       header: trans?.deleteHeader || commonTrans?.deleteHeader || 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        // Implement delete logic here
-        this.messageService.add({
-            severity: 'success',
-            summary: commonTrans?.success || 'Success',
+        this.departmentService.deleteDepartment(department.id).subscribe({
+          next: (response: ApiResponse<boolean>) => {
+            if (response.succeeded) {
+              this.messageService.add({
+                severity: 'success',
+                summary: commonTrans?.success || 'Success',
             detail: trans?.deleteSuccess || 'Department deleted successfully.'
+              });
+              this.loadDepartments();
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: response.message || 'Failed to delete department'
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting department:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to delete department'
+            });
+          }
         });
       }
     });

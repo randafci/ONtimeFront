@@ -45,6 +45,11 @@ export class EventsService {
         end: data?.end,
         locationId: data?.locationId
       },
+      this.headers
     );
+  }
+
+  deleteEvents(id: number): Observable<ApiResponse<boolean>> {
+    return this.http.delete<ApiResponse<boolean>>(`${this.apiUrl}/Lookup/Events/${id}`, this.headers);
   }
 }

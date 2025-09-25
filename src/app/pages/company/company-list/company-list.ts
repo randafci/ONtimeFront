@@ -13,7 +13,8 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { Company } from '../../../interfaces/company.interface';
 import { CompanyService } from '../CompanyService';
 import { CompanyTypeService } from '../CompanyTypeService';
@@ -45,6 +46,7 @@ import { TranslationService } from '../../translation-manager/translation-manage
     IconFieldModule,
     SelectModule,
     ToastModule,
+    ConfirmDialogModule,
     RouterModule,
     DatePipe,
     TranslatePipe,
@@ -86,10 +88,10 @@ export class CompanyListComponent implements OnInit {
     private companyTypeService: CompanyTypeService,
     private organizationService: LookupService,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
     private router: Router,
     private authService: AuthService,
     private translationService: TranslationService,
-    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit() {
@@ -209,7 +211,7 @@ export class CompanyListComponent implements OnInit {
 
 
 
-  deleteCompany(company: Company): void {
+  deleteCompany(company: Company) {
     const trans = this.translations.companies?.listPage?.messages;
     const commonTrans = this.translations.common;
 
@@ -218,14 +220,33 @@ export class CompanyListComponent implements OnInit {
       header: trans?.deleteHeader || commonTrans?.confirmDelete || 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        // call the method to delete the company
-        this.messageService.add({
-          severity: 'success',
-          summary: commonTrans?.success || 'Success',
+        this.companyService.deleteCompany(company.id).subscribe({
+          next: (response: ApiResponse<boolean>) => {
+            if (response.succeeded) {
+              this.messageService.add({
+                severity: 'success',
+                summary: commonTrans?.success || 'Success',
           detail: trans?.deleteSuccess || 'Company deleted successfully'
+              });
+              this.loadCompanies();
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: response.message || 'Failed to delete company'
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting company:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to delete company'
+            });
+          }
         });
-      },
-      reject: () => {}
+      }
     });
   }
 

@@ -55,7 +55,48 @@
                     {{ 'addRole.hrRoleLabel' | translate }}
                 </label>
             </div>
+              <div class="field-checkbox col-12 md:col-6 flex align-items-center mt-4" *ngIf="isAdmin">
+                <p-checkbox
+                    formControlName="isSuperAdmin"
+                    [binary]="true"
+                    inputId="isSuperAdmin">
+                </p-checkbox>
+                <label for="isSuperAdmin" class="ml-2 font-semibold">
+                    {{ 'addRole.isSuperAdmin' | translate }}
+                </label>
+            </div>
+                 <div class="field-checkbox col-12 md:col-6 flex align-items-center mt-4">
+                <p-checkbox
+                    formControlName="isHRManager"
+                    [binary]="true"
+                    inputId="isHRManager">
+                </p-checkbox>
+                <label for="isHRManager" class="ml-2 font-semibold">
+                    {{ 'addRole.isHRManager' | translate }}
+                </label>
+            </div>
+                 <div class="field-checkbox col-12 md:col-6 flex align-items-center mt-4">
+                <p-checkbox
+                    formControlName="isHRAdministrator"
+                    [binary]="true"
+                    inputId="isHRAdministrator">
+                </p-checkbox>
+                <label for="isHRAdministrator" class="ml-2 font-semibold">
+                    {{ 'addRole.isHRAdministrator' | translate }}
+                </label>
+            </div>
+                <div class="field-checkbox col-12 md:col-6 flex align-items-center mt-4">
+                <p-checkbox
+                    formControlName="isHRSpecialist"
+                    [binary]="true"
+                    inputId="isHRSpecialist">
+                </p-checkbox>
+                <label for="isHRSpecialist" class="ml-2 font-semibold">
+                    {{ 'addRole.isHRSpecialist' | translate }}
+                </label>
+            </div>
         </div>
+        
 
         <!-- Submit Button -->
         <div class="mt-5">

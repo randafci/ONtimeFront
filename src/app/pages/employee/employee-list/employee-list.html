@@ -103,8 +103,8 @@
       <tr (click)="navigateToEmployments(employee)" class='cursor-pointer '>
         <td>{{ employee.employeeCode }}</td>  
         <td>{{ getFullName(employee) }}</td>
-        <td>{{ employee.employeeType || 'N/A' }}</td>
-        <td>{{ employee.department || 'N/A' }}</td>
+        <td>{{ employee.employeeType || 'N/A' }}</td>ame
+        <td>{{ employee.departmentName || 'N/A' }}</td>
         <td>
           <p-tag class="uppercase"
             [value]="('employees.listPage.statuses.' + getStatus(employee)) | translate"
