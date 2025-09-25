@@ -181,6 +181,13 @@ export const appRoutes: Routes = [
           )
       },
       {
+        path: 'leave-types',
+        loadChildren: () =>
+          import('./app/pages/leave-type/leave-type.routes').then(
+            (m) => m.LEAVE_TYPE_ROUTES
+          )
+      },
+      {
         path: 'ramadan-periods',
         loadChildren: () =>
           import('./app/pages/ramadan-period/ramadan-period.routes').then(

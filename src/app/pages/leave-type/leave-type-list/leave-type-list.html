@@ -1,0 +1,142 @@
+<div class="card">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="mb-0">Leave Types</h2>
+        <div class="flex-grow"></div>
+        <button 
+            pButton 
+            label="Add Leave Type"
+            icon="pi pi-plus" 
+            class="p-button-sm"
+            (click)="openCreateDialog()"
+        ></button>
+    </div>
+    
+    <p-table
+        #dt
+        [value]="leaveTypes"
+        dataKey="id"
+        [rows]="10"
+        [loading]="loading"
+        [rowHover]="true"
+        [showGridlines]="true"
+        [paginator]="true"
+        [globalFilterFields]="['code', 'name', 'nameSE', 'symbol']"
+        responsiveLayout="scroll"
+    >
+        <ng-template pTemplate="caption">
+            <div class="flex justify-between items-center flex-col sm:flex-row">
+                <button 
+                    pButton 
+                    label="Clear"
+                    class="p-button-outlined mb-2" 
+                    icon="pi pi-filter-slash" 
+                    (click)="clear(dt)"
+                ></button>
+                <p-iconfield iconPosition="left" class="ml-auto">
+                    <p-inputicon>
+                        <i class="pi pi-search"></i>
+                    </p-inputicon>
+                    <input 
+                        pInputText 
+                        type="text" 
+                        #filter
+                        (input)="onGlobalFilter(dt, $event)" 
+                        placeholder="Search leave types..."
+                    />
+                </p-iconfield>
+            </div>
+        </ng-template>
+        
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="code">
+                    Code
+                    <p-sortIcon field="code"></p-sortIcon>
+                </th>
+                <th pSortableColumn="name">
+                    Name
+                    <p-sortIcon field="name"></p-sortIcon>
+                </th>
+                <th pSortableColumn="nameSE">
+                    Name (SE)
+                    <p-sortIcon field="nameSE"></p-sortIcon>
+                </th>
+                <th pSortableColumn="symbol">
+                    Symbol
+                    <p-sortIcon field="symbol"></p-sortIcon>
+                </th>
+                <th pSortableColumn="organizationName">
+                    Organization
+                    <p-sortIcon field="organizationName"></p-sortIcon>
+                </th>
+                <th>Requirements</th>
+                <th style="min-width: 8rem">Actions</th>
+            </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="body" let-leaveType>
+            <tr>
+                <td>
+                    <p-tag [value]="leaveType.code" severity="info"></p-tag>
+                </td>
+                <td>{{ leaveType.name }}</td>
+                <td>{{ leaveType.nameSE }}</td>
+                <td>
+                    <p-tag [value]="leaveType.symbol" severity="success"></p-tag>
+                </td>
+                <td>{{ leaveType.organizationName || 'N/A' }}</td>
+                <td>
+                    <div class="flex flex-col gap-1">
+                        <p-tag 
+                            *ngIf="leaveType.isAttachmentRequired" 
+                            value="Attachment" 
+                            severity="warning" 
+                            class="text-xs">
+                        </p-tag>
+                        <p-tag 
+                            *ngIf="leaveType.isCommentRequired" 
+                            value="Comment" 
+                            severity="info" 
+                            class="text-xs">
+                        </p-tag>
+                    </div>
+                </td>
+                <td>
+                    <button 
+                        pButton 
+                        icon="pi pi-pencil" 
+                        class="p-button-rounded p-button-text p-button-sm"
+                        (click)="openEditDialog(leaveType)"
+                    ></button>
+                    <button 
+                        pButton 
+                        icon="pi pi-trash" 
+                        class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                        (click)="deleteLeaveType(leaveType)"
+                    ></button>
+                </td>
+            </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="7">No leave types found.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<!-- Leave Type Modal Component -->
+<app-leave-type-modal
+  [(dialogVisible)]="dialogVisible"
+  [isEditMode]="isEditMode"
+  [leaveType]="selectedLeaveType"
+  [organizations]="organizations"
+  [isSuperAdmin]="isSuperAdmin"
+  [loading]="loading"
+  (onSave)="onLeaveTypeSaved($event)"
+>
+</app-leave-type-modal>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
