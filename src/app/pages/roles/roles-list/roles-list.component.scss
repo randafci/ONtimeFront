@@ -1,0 +1,31 @@
+// Role list component styles
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.actions-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.p-button-rounded {
+  margin: 0 2px;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .table-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .actions-cell {
+    .p-button-rounded {
+      margin: 1px;
+    }
+  }
+}
+
