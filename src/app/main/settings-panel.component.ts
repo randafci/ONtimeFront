@@ -9,6 +9,7 @@ import Nora from '@primeuix/themes/nora';
 import { PrimeNG } from 'primeng/config';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { LayoutService } from '../service/layout.service';
+import { SettingsService, OrganizationSettingDto } from '@/service/layout.SettingsService';
 
 const presets = {
     Aura,
@@ -155,6 +156,8 @@ export class AppSettingsPanel {
     router = inject(Router);
     platformId = inject(PLATFORM_ID);
     layoutService = inject(LayoutService);
+    settingsService = inject(SettingsService);
+    
     primeng = inject(PrimeNG);
 
     panelPosition = computed(() => {
@@ -358,10 +361,14 @@ export class AppSettingsPanel {
 
     toggleDarkMode(value: boolean) {
         this.layoutService.layoutConfig.update((s) => ({ ...s, darkTheme: value }));
+        this.saveSetting("darkTheme", value.toString());
+
     }
 
     toggleHeader(value: boolean) {
         this.layoutService.layoutConfig.update((config) => ({ ...config, header: value }));
+        this.saveSetting("header", value.toString());
+
     }
 
     changeNavigation(value: 'side' | 'top') {
@@ -402,7 +409,8 @@ export class AppSettingsPanel {
     switchDir(value: 'rtl' | 'ltr') {
         this.layoutService.layoutConfig.update((s) => ({ ...s, direction: value }));
         document.documentElement.setAttribute('dir', value);
-        
+        this.saveSetting("direction", value);
+
         if (value === 'rtl') {
             this.applyRTLFormStyles();
         } else {
@@ -485,10 +493,13 @@ export class AppSettingsPanel {
     updateColors(event: any, type: string, color: any) {
         if (type === 'primary') {
             this.layoutService.layoutConfig.update((state) => ({ ...state, primary: color.name }));
+                console.log("updateColors " , color)
+
         } else if (type === 'surface') {
             this.layoutService.layoutConfig.update((state) => ({ ...state, surface: color.name }));
         }
         this.applyTheme(type, color);
+        this.saveSetting(type, color.name);
 
         event.stopPropagation();
     }
@@ -501,11 +512,34 @@ export class AppSettingsPanel {
         }
     }
 
+    private saveSetting(type: string,value: string) {
+    const settingDto: OrganizationSettingDto = {
+        type: 2, // Replace with your actual SettingType value for color settings
+        settings: [
+            {
+                key: type, // 'primary' or 'surface'
+                value: value // color name
+            }
+        ]
+    };
+
+    this.settingsService.saveOrUpdateSettings(settingDto)
+        .subscribe({
+            next: (result) => {
+                console.log('Color setting saved successfully', result);
+            },
+            error: (error) => {
+                console.error('Error saving color setting', error);
+            }
+        });
+}
+
     onPresetChange(event: any) {
         this.layoutService.layoutConfig.update((state) => ({ ...state, preset: event }));
         const preset = presets[event as KeyOfType<typeof presets>];
         const surfacePalette = this.surfaces.find((s) => s.name === this.selectedSurfaceColor())?.palette;
         $t().preset(preset).preset(this.getPresetExt()).surfacePalette(surfacePalette).use({ useDefaultOptions: true });
+        this.saveSetting("preset", event);
     }
 
     onMenuModeChange(event: string) {

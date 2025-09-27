@@ -4,6 +4,15 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from '@/auth/auth.service';
 import { AppConfigService } from '@/pages/service/app-config.service';
+export interface OrganizationSettingDto {
+  type: number;
+  settings: KeyValuePair[];
+}
+
+export interface KeyValuePair {
+  key: string;
+  value: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -23,5 +32,9 @@ export class SettingsService {
   getOrgLayoutSettings(type: number): Observable<any> {
     var headers = this.headers;
     return this.http.get<any>(`${this.apiUrl}/${type}`,headers);
+  }
+
+ saveOrUpdateSettings(dto: OrganizationSettingDto): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}`, dto, this.headers);
   }
 }
