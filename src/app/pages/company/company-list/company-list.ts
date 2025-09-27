@@ -27,6 +27,7 @@ import { ApiResponse } from '../../../core/models/api-response.model';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { AuthService } from '../../../auth/auth.service';
 import { CompanyModalComponent } from '../../company/company-modal/company-modal.component';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 
 @Component({
   selector: 'app-company-list',
@@ -58,10 +59,12 @@ import { CompanyModalComponent } from '../../company/company-modal/company-modal
 export class CompanyListComponent implements OnInit {
   companies: Company[] = [];
   loading: boolean = true;
-  statuses: any[] = [
-    { label: 'Active', value: 'active' },
-    { label: 'Inactive', value: 'inactive' }
-  ];
+  // statuses: any[] = [
+  //   { label: 'Active', value: 'active' },
+  //   { label: 'Inactive', value: 'inactive' }
+  // ];
+  statuses: any[] = [];
+  private translations: any = {};
 
   integrationOptions: any[] = [
     { label: 'Yes', value: true },
@@ -87,14 +90,26 @@ export class CompanyListComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private translationService: TranslationService,
   ) {}
 
   ngOnInit() {
+    this.translationService.translations$.subscribe(trans => {
+      this.translations = trans;
+      this.initializeStatuses();
+    });
     this.isSuperAdmin = this.checkIsSuperAdmin();
     this.loadCompanies();
     this.loadOrganizations();
     this.loadCompanyTypes();
+  }
+  initializeStatuses(): void {
+    const statusTrans = this.translations.companies?.listPage?.statuses;
+    this.statuses = [
+      { label: statusTrans?.active || 'Active', value: 'active' },
+      { label: statusTrans?.inactive || 'Inactive', value: 'inactive' }
+    ];
   }
 
 
@@ -112,8 +127,8 @@ export class CompanyListComponent implements OnInit {
         } else {
           this.messageService.add({
             severity: 'error',
-            summary: 'Error',
-            detail: response.message || 'Failed to load companies'
+            summary: this.translations.common?.error || 'Error',
+            detail: response.message || this.translations.companies?.listPage?.messages?.loadError || 'Failed to load companies'
           });
         }
         this.loading = false;
@@ -122,8 +137,8 @@ export class CompanyListComponent implements OnInit {
         console.error('Error loading companies:', error);
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load companies'
+          summary: this.translations.common?.error || 'Error',
+          detail: this.translations.companies?.listPage?.messages?.loadError || 'Failed to load companies'
         });
         this.loading = false;
       }
@@ -197,9 +212,12 @@ export class CompanyListComponent implements OnInit {
 
 
   deleteCompany(company: Company) {
+    const trans = this.translations.companies?.listPage?.messages;
+    const commonTrans = this.translations.common;
+
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete ${company.name}?`,
-      header: 'Confirm Deletion',
+      message: (trans?.deleteConfirm || 'Are you sure you want to delete {name}?').replace('{name}', company.name),
+      header: trans?.deleteHeader || commonTrans?.confirmDelete || 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.companyService.deleteCompany(company.id).subscribe({
@@ -207,8 +225,8 @@ export class CompanyListComponent implements OnInit {
             if (response.succeeded) {
               this.messageService.add({
                 severity: 'success',
-                summary: 'Success',
-                detail: `Company ${company.name} deleted successfully`
+                summary: commonTrans?.success || 'Success',
+          detail: trans?.deleteSuccess || 'Company deleted successfully'
               });
               this.loadCompanies();
             } else {

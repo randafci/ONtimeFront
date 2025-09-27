@@ -1,6 +1,6 @@
 <p-dialog
   [(visible)]="dialogVisible"
-  [header]="isEditMode ? 'Edit Country' : 'Add Country'"
+  [header]="(isEditMode ? 'countryForm.title.edit' : 'countryForm.title.add') | translate"
   [modal]="true"
   [style]="{width: '50vw'}"
   [draggable]="false"
@@ -11,7 +11,7 @@
       <!-- Country Code Field -->
       <div class="field">
         <label for="id" class="block text-sm font-medium mb-2">
-          Country Code <span class="text-red-500">*</span>
+          {{ 'countryForm.labels.code' | translate }} <span class="text-red-500">*</span>
         </label>
         <input
           id="id"
@@ -23,15 +23,15 @@
           [disabled]="isEditMode"
           maxlength="2"/>
         <small class="text-red-500" *ngIf="countryForm.get('id')?.invalid && countryForm.get('id')?.touched">
-          <span *ngIf="countryForm.get('id')?.errors?.['required']">Country code is required</span>
-          <span *ngIf="countryForm.get('id')?.errors?.['maxlength']">Country code must be 2 characters</span>
+          <span *ngIf="countryForm.get('id')?.errors?.['required']">{{ 'common.validation.required' | translate }}</span>
+          <span *ngIf="countryForm.get('id')?.errors?.['maxlength']">{{ 'countryForm.validation.maxLength' | translate }}</span>
         </small>
       </div>
 
       <!-- Name Field -->
       <div class="field">
         <label for="name" class="block text-sm font-medium mb-2">
-          Name <span class="text-red-500">*</span>
+          {{ 'countryForm.labels.name' | translate }} <span class="text-red-500">*</span>
         </label>
         <input
           id="name"
@@ -41,14 +41,14 @@
           formControlName="name"
           [class.ng-invalid]="countryForm.get('name')?.invalid && countryForm.get('name')?.touched"/>
         <small class="text-red-500" *ngIf="countryForm.get('name')?.invalid && countryForm.get('name')?.touched">
-          Name is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <!-- NameSE Field -->
       <div class="field">
         <label for="nameSE" class="block text-sm font-medium mb-2">
-          Name (SE) <span class="text-red-500">*</span>
+          {{ 'countryForm.labels.nameSE' | translate }} <span class="text-red-500">*</span>
         </label>
         <input
           id="nameSE"
@@ -58,14 +58,14 @@
           formControlName="nameSE"
           [class.ng-invalid]="countryForm.get('nameSE')?.invalid && countryForm.get('nameSE')?.touched"/>
         <small class="text-red-500" *ngIf="countryForm.get('nameSE')?.invalid && countryForm.get('nameSE')?.touched">
-          Name (SE) is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <!-- Nationality Field -->
       <div class="field">
         <label for="nationality" class="block text-sm font-medium mb-2">
-          Nationality <span class="text-red-500">*</span>
+          {{ 'countryForm.labels.nationality' | translate }} <span class="text-red-500">*</span>
         </label>
         <input
           id="nationality"
@@ -75,14 +75,14 @@
           formControlName="nationality"
           [class.ng-invalid]="countryForm.get('nationality')?.invalid && countryForm.get('nationality')?.touched"/>
         <small class="text-red-500" *ngIf="countryForm.get('nationality')?.invalid && countryForm.get('nationality')?.touched">
-          Nationality is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <!-- NationalitySE Field -->
       <div class="field">
         <label for="nationalitySEName" class="block text-sm font-medium mb-2">
-          Nationality (SE) <span class="text-red-500">*</span>
+          {{ 'countryForm.labels.nationalitySE' | translate }} <span class="text-red-500">*</span>
         </label>
         <input
           id="nationalitySEName"
@@ -92,7 +92,7 @@
           formControlName="nationalitySEName"
           [class.ng-invalid]="countryForm.get('nationalitySEName')?.invalid && countryForm.get('nationalitySEName')?.touched"/>
         <small class="text-red-500" *ngIf="countryForm.get('nationalitySEName')?.invalid && countryForm.get('nationalitySEName')?.touched">
-          Nationality (SE) is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
     </div>
@@ -100,18 +100,17 @@
     <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
       <button
         pButton
-        label="Cancel"
+        [label]="'common.buttons.cancel' | translate"
         class="p-button-secondary"
         type="button"
         (click)="onCancel()">
       </button>
       <button
         pButton
-        [label]="isEditMode ? 'Update' : 'Save'"
+        [label]="(isEditMode ? 'common.buttons.update' : 'common.buttons.save') | translate"
         [loading]="loading"
         type="submit">
       </button>
     </div>
   </form>
 </p-dialog>
-

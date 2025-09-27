@@ -1,7 +1,6 @@
-<!-- Create/Edit Dialog -->
 <p-dialog 
   [(visible)]="dialogVisible" 
-  [header]="isEditMode ? 'Edit Holiday' : 'Add Holiday'"
+  [header]="(isEditMode ? 'holidayForm.title.edit' : 'holidayForm.title.add') | translate"
   [modal]="true" 
   [style]="{width: '50vw'}"
   [draggable]="false" 
@@ -12,7 +11,7 @@
       <!-- Symbol Field -->
       <div class="field">
         <label for="symbol" class="block text-sm font-medium mb-2">
-          Symbol <span class="text-red-500">*</span>
+          {{ 'holidayForm.labels.symbol' | translate }} <span class="text-red-500">*</span>
         </label>
         <input 
           id="symbol" 
@@ -20,18 +19,19 @@
           pInputText 
           class="w-full"
           formControlName="symbol" 
-          placeholder="Enter symbol (max 3 characters)"
+          [placeholder]="'holidayForm.placeholders.symbol' | translate"
           [class.ng-invalid]="holidayForm.get('symbol')?.invalid && holidayForm.get('symbol')?.touched"
         />
         <small class="text-red-500" *ngIf="holidayForm.get('symbol')?.invalid && holidayForm.get('symbol')?.touched">
-          Symbol is required and must be maximum 3 characters
+          <span *ngIf="holidayForm.get('symbol')?.errors?.['required']">{{ 'holidayForm.validation.symbolRequired' | translate }}</span>
+          <span *ngIf="holidayForm.get('symbol')?.errors?.['maxlength']">{{ 'holidayForm.validation.symbolMaxLength' | translate }}</span>
         </small>
       </div>
 
       <!-- Holiday Type Field -->
       <div class="field">
         <label for="holidayTypeId" class="block text-sm font-medium mb-2">
-          Holiday Type <span class="text-red-500">*</span>
+          {{ 'holidayForm.labels.holidayType' | translate }} <span class="text-red-500">*</span>
         </label>
         <p-select 
           id="holidayTypeId" 
@@ -39,20 +39,20 @@
           [options]="holidayTypes" 
           optionLabel="name" 
           optionValue="id"
-          placeholder="Select Holiday Type"
+          [placeholder]="'holidayForm.placeholders.selectType' | translate"
           class="w-full"
           appendTo="body"
           [class.ng-invalid]="holidayForm.get('holidayTypeId')?.invalid && holidayForm.get('holidayTypeId')?.touched"
         ></p-select>
         <small class="text-red-500" *ngIf="holidayForm.get('holidayTypeId')?.invalid && holidayForm.get('holidayTypeId')?.touched">
-          Holiday type is required
+          {{ 'holidayForm.validation.typeRequired' | translate }}
         </small>
       </div>
 
       <!-- Start Date Field -->
       <div class="field">
         <label for="start" class="block text-sm font-medium mb-2">
-          Start Date <span class="text-red-500">*</span>
+          {{ 'holidayForm.labels.startDate' | translate }} <span class="text-red-500">*</span>
         </label>
         <input 
           id="start" 
@@ -63,14 +63,14 @@
           [class.ng-invalid]="holidayForm.get('start')?.invalid && holidayForm.get('start')?.touched"
         />
         <small class="text-red-500" *ngIf="holidayForm.get('start')?.invalid && holidayForm.get('start')?.touched">
-          Start date is required
+          {{ 'holidayForm.validation.startRequired' | translate }}
         </small>
       </div>
 
       <!-- End Date Field -->
       <div class="field">
         <label for="end" class="block text-sm font-medium mb-2">
-          End Date <span class="text-red-500">*</span>
+          {{ 'holidayForm.labels.endDate' | translate }} <span class="text-red-500">*</span>
         </label>
         <input 
           id="end" 
@@ -81,7 +81,7 @@
           [class.ng-invalid]="holidayForm.get('end')?.invalid && holidayForm.get('end')?.touched"
         />
         <small class="text-red-500" *ngIf="holidayForm.get('end')?.invalid && holidayForm.get('end')?.touched">
-          End date is required
+          {{ 'holidayForm.validation.endRequired' | translate }}
         </small>
       </div>
     </div>
@@ -89,14 +89,14 @@
     <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
       <button 
         pButton 
-        label="Cancel" 
+        [label]="'common.buttons.cancel' | translate" 
         class="p-button-secondary" 
         type="button"
         (click)="onCancel()">
       </button>
       <button 
         pButton 
-        [label]="isEditMode ? 'Update' : 'Save'" 
+        [label]="(isEditMode ? 'common.buttons.update' : 'common.buttons.save') | translate" 
         [loading]="loading"
         type="submit">
       </button>

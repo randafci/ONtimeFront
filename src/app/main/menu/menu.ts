@@ -71,6 +71,7 @@ export class MenuComponent implements OnInit {
                             { label: this.t('menu.organization.family'), icon: 'pi pi-fw pi-users', routerLink: ['/families'] },
                             { label: this.t('menu.organization.grade'), icon: 'pi pi-fw pi-star', routerLink: ['/grades'] },
                             { label: this.t('menu.organization.costCenter'), icon: 'pi pi-fw pi-dollar', routerLink: ['/cost-centers/list'] },
+                            { label: this.t('menu.organization.shiftType'), icon: 'pi pi-fw pi-clone', routerLink: ['/shift-types/list'] },
                             { label: this.t('menu.teams.teams'), icon: 'pi pi-fw pi-users', routerLink: ['/teams'] },
                             { label: 'Holiday Types', icon: 'pi pi-fw pi-tags', routerLink: ['/holiday-types/list'] }
                         ]
@@ -98,7 +99,7 @@ export class MenuComponent implements OnInit {
                         ]
                     },
                     {
-                        label: 'HR Management',
+                        label: this.t('menu.hr.groupLabel'),
                         items: [
                             { label: 'Holidays', icon: 'pi pi-fw pi-calendar', routerLink: ['/holidays/list'] },
                             { label: 'Leave Types', icon: 'pi pi-fw pi-calendar-plus', routerLink: ['/leave-types/list'] },
@@ -111,7 +112,6 @@ export class MenuComponent implements OnInit {
                         items: [
                             { label: this.t('menu.users.employee'), icon: 'pi pi-fw pi-users', routerLink: ['/employees'] },
                             { label: this.t('menu.employeeDevicesAssignment.employeeDevicesAssignment'), icon: 'pi pi-fw pi-map-marker', routerLink: ['/employeeDevicesAssignment'] },
-                            { label: this.t('menu.employee.teams'), icon: 'pi pi-fw pi-map-marker', routerLink: ['/teams'] },
                             { label: this.t('menu.employee.reportingmanager'), icon: 'pi pi-fw pi-map-marker', routerLink: ['/employees/reportingmanager/add'] },
 
 

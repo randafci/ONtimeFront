@@ -44,23 +44,10 @@ export class AddEditEmployeeComponent implements OnInit {
   profileImageUrl: string | null = null;
 
   // Dropdown options
-  // genderOptions = [
-  //   { label: 'Male', value: 'M' },
-  //   { label: 'Female', value: 'F' }
-  // ];
-
-  // employeeStatusOptions = [
-  //   { label: 'Active', value: 'active' },
-  //   { label: 'Inactive', value: 'inactive' },
-  //   { label: 'On Leave', value: 'on leave' },
-  //   { label: 'Terminated', value: 'terminated' },
-  //   { label: 'Suspended', value: 'suspended' },
-  //   { label: 'Probation', value: 'probation' }
-  // ];
-
   genderOptions: any[] = [];
   employeeStatusOptions: any[] = [];
   private translations: any = {};
+
   constructor(
     private fb: FormBuilder,
     private employeeService: EmployeeService,
@@ -84,6 +71,19 @@ export class AddEditEmployeeComponent implements OnInit {
       this.loadEmployee(this.employeeId);
     }
   }
+  
+  // Helper function to safely get nested translation values
+  private getTranslation(key: string, fallback: string): string {
+    const keys = key.split('.');
+    let result = this.translations;
+    for (const k of keys) {
+        result = result?.[k];
+        if (result === undefined || result === null) {
+            return fallback;
+        }
+    }
+    return result as string || fallback;
+  }
 
   initializeDropdowns(): void {
     const genderTrans = this.translations.employees?.common;
@@ -105,7 +105,7 @@ export class AddEditEmployeeComponent implements OnInit {
 
   createForm(): FormGroup {
     return this.fb.group({
-      // General Information - matches backend DTO
+      // General Information
       employeeCode: ['', [Validators.required]],
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
@@ -114,9 +114,9 @@ export class AddEditEmployeeComponent implements OnInit {
       religionType: [''],
       isSpecialNeeds: [false],
       employeeType: [''],
-      employeeStatus: ['active'], // Default to active for new employees
+      employeeStatus: ['active'],
       
-      // Contact Information - matches backend DTO
+      // Contact Information
       contact: this.fb.group({
         personalEmail: [''],
         officialEmail: [''],
@@ -129,7 +129,7 @@ export class AddEditEmployeeComponent implements OnInit {
         state: ['']
       }),
 
-      // Document Information - matches backend DTO
+      // Document Information
       document: this.fb.group({
         passportNumber: [''],
         passportExpirationDate: [''],
@@ -137,10 +137,10 @@ export class AddEditEmployeeComponent implements OnInit {
         visaExpirationDate: ['']
       }),
 
-      // Display Settings (for UI only)
+      // Display Settings
       displayInReport: [true],
       displayInReportsDashboard: [true],
-      imageUrl: [''] // Add imageUrl to the form
+      imageUrl: ['']
     });
   }
 
@@ -153,8 +153,8 @@ export class AddEditEmployeeComponent implements OnInit {
         } else {
           this.messageService.add({
             severity: 'error',
-            summary: 'Error',
-            detail: response.message || 'Failed to load employee'
+            summary: this.getTranslation('employees.formPage.messages.errorSummary', 'Error'),
+            detail: response.message || this.getTranslation('employees.formPage.messages.loadError', 'Failed to load employee')
           });
         }
         this.loading = false;
@@ -163,8 +163,8 @@ export class AddEditEmployeeComponent implements OnInit {
         console.error('Error loading employee:', error);
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load employee'
+          summary: this.getTranslation('employees.formPage.messages.errorSummary', 'Error'),
+          detail: this.getTranslation('employees.formPage.messages.loadError', 'Failed to load employee')
         });
         this.loading = false;
       }
@@ -187,13 +187,10 @@ export class AddEditEmployeeComponent implements OnInit {
       document: employee.document || {}
     });
     
-    // Set profile image URL for display
     if (employee.imageUrl) {
-      // Only set the image URL if it's a valid URL or base64 data
       if (employee.imageUrl.startsWith('data:') || employee.imageUrl.startsWith('http')) {
         this.profileImageUrl = employee.imageUrl;
       } else {
-        // If it's just a filename or invalid URL, don't set it
         this.profileImageUrl = null;
       }
     } else {
@@ -204,41 +201,37 @@ export class AddEditEmployeeComponent implements OnInit {
   onImageUpload(event: any) {
     const file = event.target.files[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Please select an image file'
+          summary: this.getTranslation('employees.formPage.messages.errorSummary', 'Error'),
+          detail: this.getTranslation('employees.formPage.messages.invalidFile', 'Please select an image file')
         });
         return;
       }
 
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Image size should be less than 5MB'
+          summary: this.getTranslation('employees.formPage.messages.errorSummary', 'Error'),
+          detail: this.getTranslation('employees.formPage.messages.fileTooLarge', 'Image size should be less than 5MB')
         });
         return;
       }
 
-      // Convert image to base64 and create data URL
       const reader = new FileReader();
       reader.onload = (e: any) => {
         const base64String = e.target.result;
         this.profileImageUrl = base64String;
         
-        // Update form with the base64 image data
         this.employeeForm.patchValue({
           imageUrl: base64String
         });
         
         this.messageService.add({
           severity: 'success',
-          summary: 'Success',
-          detail: 'Image uploaded successfully'
+          summary: this.getTranslation('employees.formPage.messages.successSummary', 'Success'),
+          detail: this.getTranslation('employees.formPage.messages.imageUploadSuccess', 'Image uploaded successfully')
         });
       };
       reader.readAsDataURL(file);
@@ -246,7 +239,7 @@ export class AddEditEmployeeComponent implements OnInit {
   }
 
   removeImage(event: Event) {
-    event.stopPropagation(); // Prevent triggering the file input
+    event.stopPropagation();
     this.profileImageUrl = null;
     this.employeeForm.patchValue({
       imageUrl: ''
@@ -256,19 +249,22 @@ export class AddEditEmployeeComponent implements OnInit {
   onSubmit() {
     this.submitted = true;
     if (this.employeeForm.invalid) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Please fill all required fields' });
+      this.messageService.add({ 
+        severity: 'error', 
+        summary: this.getTranslation('employees.formPage.messages.errorSummary', 'Error'), 
+        detail: this.getTranslation('employees.formPage.validation.fillRequired', 'Please fill all required fields') 
+      });
       return;
     }
 
     this.loading = true;
     const formData = this.employeeForm.value;
 
-    // Prepare data exactly as expected by backend EmployeeDto
     const backendData = {
       employeeCode: formData.employeeCode,
       firstName: formData.firstName,
       lastName: formData.lastName,
-      gender: formData.gender ? formData.gender.charAt(0) : null, // Convert to char
+      gender: formData.gender ? formData.gender.charAt(0) : null,
       nationality: formData.nationality,
       religionType: formData.religionType,
       isSpecialNeeds: formData.isSpecialNeeds,
@@ -279,7 +275,6 @@ export class AddEditEmployeeComponent implements OnInit {
       document: {
         passportNumber: formData.document.passportNumber,
         visaNumber: formData.document.visaNumber,
-        // Convert string dates to DateTime or null
         passportExpirationDate: formData.document.passportExpirationDate ? 
           new Date(formData.document.passportExpirationDate) : null,
         visaExpirationDate: formData.document.visaExpirationDate ? 
@@ -288,29 +283,9 @@ export class AddEditEmployeeComponent implements OnInit {
     };
 
     if (this.isEditMode && this.employeeId) {
-      // Send complete data including Contact and Document for update
-      const editData = {
+      const editData: EditEmployee = {
         id: this.employeeId,
-        employeeCode: formData.employeeCode,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        gender: formData.gender ? formData.gender.charAt(0) : null,
-        nationality: formData.nationality,
-        religionType: formData.religionType,
-        isSpecialNeeds: formData.isSpecialNeeds,
-        imageUrl: formData.imageUrl,
-        employeeType: formData.employeeType,
-        employeeStatus: formData.employeeStatus,
-        contact: formData.contact,
-        document: {
-          passportNumber: formData.document.passportNumber,
-          visaNumber: formData.document.visaNumber,
-          // Convert string dates to DateTime or null
-          passportExpirationDate: formData.document.passportExpirationDate ? 
-            new Date(formData.document.passportExpirationDate) : null,
-          visaExpirationDate: formData.document.visaExpirationDate ? 
-            new Date(formData.document.visaExpirationDate) : null
-        }
+        ...backendData
       };
 
       console.log('Sending complete employee update data:', JSON.stringify(editData, null, 2));
@@ -318,16 +293,28 @@ export class AddEditEmployeeComponent implements OnInit {
       this.employeeService.updateEmployee(this.employeeId, editData).subscribe({
         next: (response: ApiResponse<Employee>) => {
           if (response.succeeded) {
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Employee updated successfully' });
+            this.messageService.add({ 
+              severity: 'success', 
+              summary: this.getTranslation('employees.formPage.messages.successSummary', 'Success'), 
+              detail: this.getTranslation('employees.formPage.messages.updateSuccess', 'Employee updated successfully') 
+            });
             this.router.navigate(['/employees']);
           } else {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: response.message || 'Failed to update employee' });
+            this.messageService.add({ 
+              severity: 'error', 
+              summary: this.getTranslation('employees.formPage.messages.errorSummary', 'Error'), 
+              detail: response.message || this.getTranslation('employees.formPage.messages.updateError', 'Failed to update employee') 
+            });
           }
           this.loading = false;
         },
         error: (error) => {
           console.error('Error updating employee:', error);
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to update employee' });
+          this.messageService.add({ 
+            severity: 'error', 
+            summary: this.getTranslation('employees.formPage.messages.errorSummary', 'Error'), 
+            detail: this.getTranslation('employees.formPage.messages.updateError', 'Failed to update employee') 
+          });
           this.loading = false;
         }
       });
@@ -339,16 +326,28 @@ export class AddEditEmployeeComponent implements OnInit {
       this.employeeService.createEmployee(createData).subscribe({
         next: (response: ApiResponse<Employee>) => {
           if (response.succeeded) {
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Employee created successfully' });
+            this.messageService.add({ 
+              severity: 'success', 
+              summary: this.getTranslation('employees.formPage.messages.successSummary', 'Success'), 
+              detail: this.getTranslation('employees.formPage.messages.createSuccess', 'Employee created successfully') 
+            });
             this.router.navigate(['/employees']);
           } else {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: response.message || 'Failed to create employee' });
+            this.messageService.add({ 
+              severity: 'error', 
+              summary: this.getTranslation('employees.formPage.messages.errorSummary', 'Error'), 
+              detail: response.message || this.getTranslation('employees.formPage.messages.createError', 'Failed to create employee') 
+            });
           }
           this.loading = false;
         },
         error: (error) => {
           console.error('Error creating employee:', error);
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to create employee' });
+          this.messageService.add({ 
+            severity: 'error', 
+            summary: this.getTranslation('employees.formPage.messages.errorSummary', 'Error'), 
+            detail: this.getTranslation('employees.formPage.messages.createError', 'Failed to create employee') 
+          });
           this.loading = false;
         }
       });

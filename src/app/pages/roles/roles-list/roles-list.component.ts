@@ -18,6 +18,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { PagedListRequest } from '../../../core/models/api-response.model';
 import { ToastModule } from 'primeng/toast';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 
 // Define an interface for our mock data
 export interface IRole {
@@ -52,53 +53,46 @@ export class RolesListComponent implements OnInit {
   rolesList: RoleDto[] = [];
   cols: any[] = [];
   loading = true;
-
-  // State for server-side pagination
   totalRecords = 0;
   rows = 10;
   first = 0;
-  
-  // State for searching
   searchValue = '';
+  private translations: any = {};
 
   constructor(
     private roleService: RoleService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private router: Router
+    private router: Router,
+    private translationService: TranslationService
   ) {}
 
   ngOnInit(): void {
+    this.translationService.translations$.subscribe(translations => {
+      this.translations = translations;
+    });
+
     this.cols = [
       { field: 'name', headerKey: 'rolesList.headers.name' },
       { field: 'isDefaultRole', headerKey: 'rolesList.headers.isDefault' },
       { field: 'isHRRole', headerKey: 'rolesList.headers.isHR' },
       { field: 'actions', headerKey: 'rolesList.headers.actions' }
     ];
-    // Initial load is handled by the table's (onLazyLoad) event
   }
 
   loadRoles(event: TableLazyLoadEvent): void {
     this.loading = true;
-    
     const page = (event.first || 0) / (event.rows || 10) + 1;
-    const sortField = event.sortField as string || 'Id';
-    const sortDirection = event.sortOrder === 1 ? 1 : -1;
-
     const request: PagedListRequest = {
       page: page,
       pageSize: event.rows || 10,
       filter: {
-        sortField: sortField,
-        sortDirection: sortDirection,
+        sortField: event.sortField as string || 'Id',
+        sortDirection: event.sortOrder === 1 ? 1 : -1,
+        logic: 'or',
+        filters: this.searchValue ? [{ field: 'Name', operator: 'contains', value: this.searchValue }] : []
       }
     };
-    
-    // Add search filter if there's a search value
-    if (this.searchValue) {
-        request.filter.logic = 'or';
-        request.filter.filters = [{ field: 'Name', operator: 'contains', value: this.searchValue }];
-    }
 
     this.roleService.getRolesWithPagination(request).subscribe({
       next: (response) => {
@@ -110,18 +104,16 @@ export class RolesListComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load roles.' });
+        this.showToast('error', this.translations.common?.error, this.translations.rolesList?.messages?.loadError);
       }
     });
   }
   
   onSearch(table: Table): void {
-    // Reset paginator to the first page and trigger a lazy load
     table.reset();
   }
 
   clear(table: Table) {
-    table.clear();
     this.searchValue = '';
     table.reset();
   }
@@ -130,23 +122,27 @@ export class RolesListComponent implements OnInit {
     this.router.navigate(['/roles/edit', role.id]);
   }
 
-  editPermitions(role: RoleDto) {
+  editPermissions(role: RoleDto) {
     this.router.navigate(['/permitions/edit', role.id]);
   }
+
   deleteRole(role: RoleDto) {
+    const messages = this.translations.rolesList?.messages || {};
+    const common = this.translations.common || {};
+    const message = (messages.deleteConfirm || "Are you sure you want to delete the role '{name}'?").replace('{name}', role.name);
+
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete the role '${role.name}'?`,
-      header: 'Confirm Deletion',
+      message: message,
+      header: common.confirmDelete || 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.roleService.deleteRole(role.id).subscribe({
           next: () => {
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Role deleted successfully.' });
-            // Refresh the table
+            this.showToast('success', common.success, messages.deleteSuccess);
             this.loadRoles({ first: this.first, rows: this.rows }); 
           },
           error: (err) => {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Failed to delete role.' });
+            this.showToast('error', common.error, err.error?.message || messages.deleteError);
           }
         });
       }
@@ -159,13 +155,16 @@ export class RolesListComponent implements OnInit {
 
     this.roleService.updateRole(role.id, updatedRole).subscribe({
       next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Role updated.' });
-        // Refresh the table to show updated status for all roles
+        this.showToast('success', this.translations.common?.success, this.translations.rolesList?.messages?.updateSuccess);
         this.loadRoles({ first: this.first, rows: this.rows }); 
       },
       error: (err) => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Failed to update role.' });
+        this.showToast('error', this.translations.common?.error, err.error?.message || this.translations.rolesList?.messages?.updateError);
       }
     });
+  }
+
+  private showToast(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 }

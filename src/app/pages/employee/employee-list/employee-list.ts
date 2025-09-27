@@ -56,21 +56,10 @@ import { TranslationService } from '../../translation-manager/translation-manage
   styleUrl: './employee-list.scss'
 })
 export class EmployeeListComponent implements OnInit {
-  employees: Employee[] = [];
+employees: Employee[] = [];
   loading: boolean = true;
-  // statuses: any[] = [
-  //   { label: 'Active', value: 'active' },
-  //   { label: 'Inactive', value: 'inactive' },
-  //   { label: 'On Leave', value: 'on leave' },
-  //   { label: 'Terminated', value: 'terminated' },
-  //   { label: 'Suspended', value: 'suspended' },
-  //   { label: 'Probation', value: 'probation' }
-  // ];
-
   statuses: any[] = [];
-  private translations: any = {}; // Store translations
-
-  activityValues: number[] = [0, 100];
+  private translations: any = {};
 
   @ViewChild('dt') table!: Table;
   @ViewChild('filter') filter!: ElementRef;
@@ -86,96 +75,65 @@ export class EmployeeListComponent implements OnInit {
   ngOnInit() {
     this.translationService.translations$.subscribe(trans => {
       this.translations = trans;
-      this.initializeStatuses(); // Initialize statuses when translations load
+      this.initializeStatuses();
     });
     this.loadEmployees();
-    
-    // Reload employees when navigating back to this component
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: NavigationEnd) => {
-      // Only reload if we're on the employee list page
-      if (event.url === '/employees' || event.url.startsWith('/employees')) {
-        console.log('Navigation detected, reloading employees...');
-        this.loadEmployees();
-      }
-    });
+
+    this.router.events.pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        if (event.url.startsWith('/employees')) {
+          this.loadEmployees();
+        }
+      });
   }
+
   initializeStatuses(): void {
     const statusKeys = ['active', 'inactive', 'onLeave', 'terminated', 'suspended', 'probation'];
-    this.statuses = statusKeys.map(key => ({
-      label: this.translations.employees?.listPage?.statuses?.[key] || key,
-      value: key
-    }));
+    const statusTrans = this.translations.employees?.listPage?.statuses;
+    if (statusTrans) {
+      this.statuses = statusKeys.map(key => ({
+        label: statusTrans[key] || key,
+        value: key
+      }));
+    }
   }
 
   loadEmployees() {
-    console.log('Loading employees...');
     this.loading = true;
     this.employeeService.getAllEmployees().subscribe({
       next: (response: ApiResponse<Employee[]>) => {
         if (response.succeeded) {
-          console.log('Employees loaded successfully:', response.data.length, 'employees');
           this.employees = response.data;
         } else {
-          console.error('Failed to load employees:', response.message);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: response.message || 'Failed to load employees'
-          });
+          this.showToast('error', 'Error', response.message || this.translations.employees?.listPage?.messages?.loadError);
         }
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading employees:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load employees'
-        });
+        this.showToast('error', 'Error', this.translations.employees?.listPage?.messages?.loadError);
         this.loading = false;
       }
     });
   }
 
   getStatus(employee: Employee): string {
-    // First check if employee is deleted (soft delete)
-    if (employee.isDeleted) {
-      return 'inactive';
-    }
-    
-    // Then check the actual employeeStatus field
-    if (employee.employeeStatus) {
-      return employee.employeeStatus.toLowerCase();
-    }
-    
-    // Default to active if no status is set
-    return 'active';
+    if (employee.isDeleted) return 'inactive';
+    return employee.employeeStatus?.toLowerCase() || 'active';
   }
 
   getFullName(employee: Employee): string {
-    if (employee.firstName && employee.lastName) {
-      return `${employee.firstName} ${employee.lastName}`;
-    } else if (employee.firstName) {
-      return employee.firstName;
-    } else if (employee.lastName) {
-      return employee.lastName;
-    } else {
-      return 'N/A';
-    }
+    return `${employee.firstName || ''} ${employee.lastName || ''}`.trim() || 'N/A';
   }
 
-  getSeverity(status: string) {
-    if (!status) return 'info';
-    
-    switch (status.toLowerCase()) {
-      case 'active':
-        return 'success';
-      case 'inactive':
-        return 'danger';
-      default:
-        return 'info';
+  getSeverity(status: string): string {
+    switch (status?.toLowerCase()) {
+      case 'active': return 'success';
+      case 'inactive': return 'danger';
+      case 'onleave': return 'warning';
+      case 'terminated': return 'danger';
+      case 'suspended': return 'warning';
+      case 'probation': return 'info';
+      default: return 'info';
     }
   }
 
@@ -186,58 +144,39 @@ export class EmployeeListComponent implements OnInit {
   navigateToEdit(id: number) {
     this.router.navigate(['/employees/edit', id]);
   }
-
+  
   navigateToEmployments(employee: Employee) {
     const employeeName = this.getFullName(employee);
     this.router.navigate(['/employees/employments', employee.id, employeeName]);
   }
 
   deleteEmployee(employee: Employee) {
-    const trans = this.translations.employees?.listPage?.messages;
-    const commonTrans = this.translations.employees?.common;
+    const trans = this.translations.employees?.listPage?.messages || {};
+    const commonTrans = this.translations.common || {};
+    const message = (trans.deleteConfirm || 'Are you sure you want to delete {name}?').replace('{name}', this.getFullName(employee));
 
     this.confirmationService.confirm({
-      message: (trans?.deleteConfirm || 'Are you sure you want to delete {name}?')
-               .replace('{name}', this.getFullName(employee)),
-      header: commonTrans?.confirmDelete || 'Confirm Deletion',
+      message: message,
+      header: commonTrans.confirmDelete || 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: commonTrans?.yes || 'Yes',
-      rejectLabel: commonTrans?.no || 'No',
+      acceptLabel: commonTrans.yes || 'Yes',
+      rejectLabel: commonTrans.no || 'No',
       accept: () => {
         this.employeeService.deleteEmployee(employee.id).subscribe({
           next: (response: ApiResponse<boolean>) => {
             if (response.succeeded) {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: `Employee ${this.getFullName(employee)} deleted successfully.`
-              });
-              this.loadEmployees(); // Reload employees after deletion
+              const successMsg = (trans.deleteSuccess || 'Employee {name} deleted successfully.').replace('{name}', this.getFullName(employee));
+              this.showToast('success', commonTrans.success, successMsg);
+              this.loadEmployees();
             } else {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: response.message || 'Failed to delete employee'
-              });
+              this.showToast('error', commonTrans.error, response.message || trans.deleteError);
             }
           },
-          error: (error) => {
-            console.error('Error deleting employee:', error);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to delete employee'
-            });
-          }
+          error: () => this.showToast('error', commonTrans.error, trans.deleteError)
         });
       },
       reject: () => {
-        // User cancelled the deletion
-        this.messageService.add({
-          severity: 'info',
-          summary: commonTrans?.cancelled || 'Cancelled',
-          detail: trans?.deleteCancelled || 'Delete operation cancelled'
-        });
+        this.showToast('info', trans.cancelled || 'Cancelled', trans.deleteCancelled);
       }
     });
   }
@@ -249,5 +188,9 @@ export class EmployeeListComponent implements OnInit {
   clear(table: Table) {
     table.clear();
     this.filter.nativeElement.value = '';
+  }
+
+  private showToast(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 }

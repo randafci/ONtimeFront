@@ -11,6 +11,7 @@ import { CostCenterService } from '../CostCenterService';
 import { Organization } from '../../../interfaces/organization.interface';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-cost-center-modal',
@@ -21,9 +22,10 @@ import { AuthService } from '../../../auth/auth.service';
     DialogModule,
     InputTextModule,
     SelectModule,
-    ButtonModule
+    ButtonModule,
+    TranslatePipe
   ],
-  providers: [MessageService],
+  providers: [MessageService, TranslatePipe],
   templateUrl: './cost-center-modal.component.html'
 })
 export class CostCenterModalComponent implements OnInit, OnChanges {
@@ -44,7 +46,8 @@ export class CostCenterModalComponent implements OnInit, OnChanges {
     private fb: FormBuilder,
     private costCenterService: CostCenterService,
     private messageService: MessageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private translatePipe: TranslatePipe
   ) {
     this.costCenterForm = this.createForm();
   }
@@ -129,7 +132,7 @@ export class CostCenterModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Cost center created successfully'
+          detail: 'costCenterForm.toasts.createSuccess'
         });
         this.onSave.emit(response.data);
         this.closeDialog();
@@ -138,7 +141,7 @@ export class CostCenterModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to create cost center'
+          detail: 'costCenterForm.toasts.createError'
         });
         this.loading = false;
       }
@@ -151,7 +154,7 @@ export class CostCenterModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Cost center updated successfully'
+          detail: 'costCenterForm.toasts.updateSuccess'
         });
         this.onSave.emit(response.data);
         this.closeDialog();
@@ -160,7 +163,7 @@ export class CostCenterModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to update cost center'
+          detail: 'costCenterForm.toasts.updateError'
         });
         this.loading = false;
       }

@@ -48,11 +48,8 @@ export class UserList implements OnInit {
 
   users: UserDto[] = [];
   loading: boolean = true;
-  statuses: any[] = [];
-
-  // Store the current translations
+  integrationOptions: any[] = [];
   private translations: any = {};
-integrationOptions: any[]|undefined;
 
   constructor(
     private userService: UserService,
@@ -63,57 +60,36 @@ integrationOptions: any[]|undefined;
   ) {}
 
   ngOnInit(): void {
-    // Subscribe to translation changes
     this.translationService.translations$.subscribe(translations => {
       this.translations = translations;
-      this.initializeStatuses();
+      this.initializeTranslatedArrays();
     });
-
     this.loadUsers();
   }
 
   loadUsers(): void {
     this.loading = true;
-this.userService.getAll().subscribe({
-  next: (response: ApiResponse<UserDto[]>) => {
-    if (response.succeeded) {
-      this.users = response.data || [];
-    } else {
-      const errorMessage = response.message || 
-                          (response.errors ? JSON.stringify(response.errors) : null) ||
-                          this.translations.userList?.messages?.loadError ||
-                          'Failed to load users';
-      
-      this.messageService.add({
-        severity: 'error',
-        summary: this.translations.common?.error || 'Error',
-        detail: errorMessage
-      });
-    }
-    this.loading = false;
-  },
-  error: (error) => {
-    console.error('Error loading users:', error);
-    this.messageService.add({
-      severity: 'error',
-      summary: this.translations.common?.error || 'Error',
-      detail: this.translations.userList?.messages?.loadError || 'Failed to load users'
+    this.userService.getAll().subscribe({
+      next: (response: ApiResponse<UserDto[]>) => {
+        if (response.succeeded) {
+          this.users = response.data || [];
+        } else {
+          this.showToast('error', this.translations.common?.error, response.message || this.translations.users?.listPage?.messages?.loadError);
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        this.showToast('error', this.translations.common?.error, this.translations.users?.listPage?.messages?.loadError);
+        this.loading = false;
+      }
     });
-    this.loading = false;
-  }
-});
   }
 
-  initializeStatuses(): void {
-    this.statuses = [
-      { 
-        label: this.translations.userList?.statusValues?.active || 'Active', 
-        value: true 
-      },
-      { 
-        label: this.translations.userList?.statusValues?.inactive || 'Inactive', 
-        value: false 
-      }
+  initializeTranslatedArrays(): void {
+    const commonTrans = this.translations.common;
+    this.integrationOptions = [
+      { label: commonTrans?.yes || 'Yes', value: true },
+      { label: commonTrans?.no || 'No', value: false }
     ];
   }
 
@@ -129,8 +105,8 @@ this.userService.getAll().subscribe({
     }
   }
 
-  getSeverity(status: boolean): string {
-    return status ? 'success' : 'danger';
+  getSeverity(isLdap: boolean): string {
+    return isLdap ? 'success' : 'info';
   }
 
   navigateToAdd(): void {
@@ -142,41 +118,33 @@ this.userService.getAll().subscribe({
   }
 
   deleteUser(user: UserDto): void {
-    const message = (this.translations.userList?.messages?.deleteConfirm || 'Are you sure you want to delete user {name}?')
-                    .replace('{name}', user.userName);
+    const messages = this.translations.users?.listPage?.messages || {};
+    const common = this.translations.common || {};
+    const message = (messages.deleteConfirm || 'Are you sure you want to delete user {name}?').replace('{name}', user.userName);
 
     this.confirmationService.confirm({
       message: message,
-      header: this.translations.common?.confirmDelete || 'Confirm Deletion',
+      header: common.confirmDelete || 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.userService.delete(user.id).subscribe({
           next: (response: ApiResponse<boolean>) => {
             if (response.succeeded) {
-              this.messageService.add({
-                severity: 'success',
-                summary: this.translations.common?.success || 'Success',
-                detail: this.translations.userList?.messages?.deleteSuccess || 'User deleted successfully'
-              });
+              this.showToast('success', common.success, messages.deleteSuccess);
               this.loadUsers();
             } else {
-              this.messageService.add({
-                severity: 'error',
-                summary: this.translations.common?.error || 'Error',
-                detail: response.message || this.translations.userList?.messages?.deleteError
-              });
+              this.showToast('error', common.error, response.message || messages.deleteError);
             }
           },
           error: (error) => {
-            console.error('Error deleting user:', error);
-            this.messageService.add({
-              severity: 'error',
-              summary: this.translations.common?.error || 'Error',
-              detail: this.translations.userList?.messages?.deleteError || 'Failed to delete user'
-            });
+            this.showToast('error', common.error, messages.deleteError);
           }
         });
       }
     });
+  }
+  
+  private showToast(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 }

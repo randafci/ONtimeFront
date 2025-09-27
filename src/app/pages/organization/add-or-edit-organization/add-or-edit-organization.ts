@@ -10,6 +10,7 @@ import { Organization, CreateOrganization, EditOrganization } from '../../../int
 import { CommonModule } from '@angular/common';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 
 @Component({
   selector: 'app-add-or-edit-organization',
@@ -33,13 +34,15 @@ export class AddOrEditOrganization implements OnInit {
   organizationId: number | null = null;
   loading = false;
   submitted = false;
+  private translations: any = {};
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private lookupService: LookupService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private translationService: TranslationService
   ) {
     this.organizationForm = this.fb.group({
       name: ['', Validators.required],
@@ -48,6 +51,10 @@ export class AddOrEditOrganization implements OnInit {
   }
 
   ngOnInit(): void {
+    this.translationService.translations$.subscribe(trans => {
+      this.translations = trans;
+    });
+
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode = true;
@@ -66,14 +73,20 @@ export class AddOrEditOrganization implements OnInit {
             name: response.data.name,
             nameSE: response.data.nameSE
           });
+        } else {
+           this.messageService.add({
+            severity: 'error',
+            summary: this.translations.common?.error || 'Error',
+            detail: this.translations.organizations?.formPage?.toasts?.loadError || 'Failed to load organization data'
+          });
         }
         this.loading = false;
       },
       error: (error) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load organization data'
+          summary: this.translations.common?.error || 'Error',
+            detail: this.translations.organizations?.formPage?.toasts?.loadError || 'Failed to load organization data'
         });
         this.loading = false;
       }
@@ -110,16 +123,16 @@ export class AddOrEditOrganization implements OnInit {
       next: (response: ApiResponse<Organization>) => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Success',
-          detail: 'Organization created successfully'
+          summary: this.translations.common?.success || 'Success',
+          detail: this.translations.organizations?.formPage?.toasts?.createSuccess || 'Organization created successfully'
         });
         this.router.navigate(['/organizations']);
       },
       error: (error) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to create organization'
+          summary: this.translations.common?.error || 'Error',
+          detail: this.translations.organizations?.formPage?.toasts?.createError || 'Failed to create organization'
         });
         this.loading = false;
       }
@@ -131,16 +144,16 @@ export class AddOrEditOrganization implements OnInit {
       next: (response: ApiResponse<Organization>) => {
         this.messageService.add({
           severity: 'success',
-          summary: 'Success',
-          detail: 'Organization updated successfully'
+          summary: this.translations.common?.success || 'Success',
+          detail: this.translations.organizations?.formPage?.toasts?.updateSuccess || 'Organization updated successfully'
         });
         this.router.navigate(['/organizations']);
       },
       error: (error) => {
         this.messageService.add({
           severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to update organization'
+          summary: this.translations.common?.error || 'Error',
+          detail: this.translations.organizations?.formPage?.toasts?.updateError || 'Failed to update organization'
         });
         this.loading = false;
       }

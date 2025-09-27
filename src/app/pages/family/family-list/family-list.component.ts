@@ -19,6 +19,7 @@ import { TranslatePipe } from '@/core/pipes/translate.pipe';
 import { AuthService } from '@/auth/auth.service';
 import { ApiResponse } from '@/core/models/api-response.model';
 import { FamilyModalComponent } from '../family-modal/family-modal.component';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 
 @Component({
   selector: 'app-family-list',
@@ -42,6 +43,7 @@ export class FamilyListComponent implements OnInit {
   
   organizations: Organization[] = [];
   isSuperAdmin: boolean = false;
+  private translations: any = {};
 
   @ViewChild('dt') table!: Table;
   @ViewChild('filter') filter!: ElementRef;
@@ -53,11 +55,15 @@ export class FamilyListComponent implements OnInit {
     private router: Router,
     private confirmationService: ConfirmationService,
     private translatePipe: TranslatePipe,
-    private authService: AuthService
+    private authService: AuthService,
+    private translationService: TranslationService
   ) {}
 
   ngOnInit() {
     this.isSuperAdmin = this.checkIsSuperAdmin();
+    this.translationService.translations$.subscribe(translations => {
+      this.translations = translations;
+    });
     this.loadFamilies();
     this.loadOrganizations();
   }
@@ -88,12 +94,12 @@ export class FamilyListComponent implements OnInit {
         if (response.succeeded && response.data) {
           this.families = response.data;
         } else {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: response.message || 'Failed to load families' });
+          this.showToast('error', this.translations.common?.error, response.message || this.translations.familyList?.toasts?.loadError);
         }
         this.loading = false;
       },
       error: (err) => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load families' });
+        this.showToast('error', this.translations.common?.error, this.translations.familyList?.toasts?.loadError);
         this.loading = false;
       }
     });
@@ -124,24 +130,29 @@ export class FamilyListComponent implements OnInit {
   }
 
   deleteFamily(family: Family) {
-    const message = this.translatePipe.transform('common.deleteConfirm').replace('{name}', family.name);
+    const commonTrans = this.translations.common || {};
+    const familyTrans = this.translations.familyList?.toasts || {};
+
+    const message = (commonTrans.deleteConfirm || 'Are you sure you want to delete {name}?').replace('{name}', family.name);
+    
     this.confirmationService.confirm({
       message: message,
-      header: this.translatePipe.transform('common.deleteHeader'),
+      header: commonTrans.deleteHeader || 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.familyService.deleteFamily(family.id).subscribe({
             next: () => {
-                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Family deleted successfully.' });
+                this.showToast('success', commonTrans.success, familyTrans.deleteSuccess);
                 this.loadFamilies(); 
             },
             error: (err) => {
-                this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error?.message || 'Failed to delete family.' });
+                this.showToast('error', commonTrans.error, err.error?.message || familyTrans.deleteError);
             }
         });
       }
     });
   }
+
 
   onGlobalFilter(table: Table, event: Event) {
     table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
@@ -150,5 +161,9 @@ export class FamilyListComponent implements OnInit {
   clear(table: Table) {
     table.clear();
     this.filter.nativeElement.value = '';
+  }
+
+  private showToast(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 }

@@ -11,6 +11,7 @@ import { HolidayTypeList } from '../../../interfaces/holiday-type.interface';
 import { HolidayService } from '../HolidayService';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-holiday-modal',
@@ -22,6 +23,7 @@ import { AuthService } from '../../../auth/auth.service';
     InputTextModule,
     SelectModule,
     ButtonModule,
+    TranslatePipe
   ],
   providers: [MessageService],
   templateUrl: './holiday-modal.component.html',
@@ -133,7 +135,7 @@ export class HolidayModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Holiday created successfully'
+          detail: 'holidayForm.toasts.createSuccess'
         });
         this.onSave.emit(response.data);
         this.closeDialog();
@@ -142,7 +144,7 @@ export class HolidayModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to create holiday'
+          detail: 'holidayForm.toasts.createError'
         });
       }
     });
@@ -154,7 +156,7 @@ export class HolidayModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Holiday updated successfully'
+          detail: 'holidayForm.toasts.updateSuccess'
         });
         this.onSave.emit(response.data);
         this.closeDialog();
@@ -163,7 +165,7 @@ export class HolidayModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to update holiday'
+          detail: 'holidayForm.toasts.updateError'
         });
       }
     });

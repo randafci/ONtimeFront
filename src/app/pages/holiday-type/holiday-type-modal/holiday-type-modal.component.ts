@@ -11,6 +11,7 @@ import { HolidayTypeService, CreateHolidayType, EditHolidayType } from '../Holid
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
 import { Organization } from '../../../interfaces/organization.interface';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-holiday-type-modal',
@@ -22,6 +23,7 @@ import { Organization } from '../../../interfaces/organization.interface';
     InputTextModule,
     SelectModule,
     ButtonModule,
+    TranslatePipe
   ],
   providers: [MessageService],
   templateUrl: './holiday-type-modal.component.html',
@@ -126,7 +128,7 @@ export class HolidayTypeModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Holiday type created successfully'
+          detail: 'holidayTypeForm.toasts.createSuccess'
         });
         this.onSave.emit(response.data);
         this.closeDialog();
@@ -135,7 +137,7 @@ export class HolidayTypeModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to create holiday type'
+          detail: 'holidayTypeForm.toasts.createError'
         });
       }
     });
@@ -147,7 +149,7 @@ export class HolidayTypeModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Holiday type updated successfully'
+          detail: 'holidayTypeForm.toasts.updateSuccess'
         });
         this.onSave.emit(response.data);
         this.closeDialog();
@@ -156,7 +158,7 @@ export class HolidayTypeModalComponent implements OnInit, OnChanges {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Failed to update holiday type'
+          detail: 'holidayTypeForm.toasts.updateError'
         });
       }
     });

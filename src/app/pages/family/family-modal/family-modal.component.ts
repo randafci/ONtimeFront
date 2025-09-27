@@ -11,6 +11,8 @@ import { FamilyService } from '../FamilyService';
 import { Organization } from '../../../interfaces/organization.interface';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-family-modal',
@@ -21,7 +23,8 @@ import { AuthService } from '../../../auth/auth.service';
     DialogModule,
     InputTextModule,
     SelectModule,
-    ButtonModule
+    ButtonModule,
+    TranslatePipe
   ],
   providers: [MessageService],
   templateUrl: './family-modal.component.html'
@@ -39,24 +42,31 @@ export class FamilyModalComponent implements OnInit, OnChanges {
   @Output() onCancelEvent = new EventEmitter<void>();
 
   familyForm: FormGroup;
+  private translations: any = {};
 
   constructor(
     private fb: FormBuilder,
     private familyService: FamilyService,
     private messageService: MessageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private translationService: TranslationService
   ) {
     this.familyForm = this.createForm();
   }
 
   ngOnInit(): void {
+    this.translationService.translations$.subscribe(translations => {
+      this.translations = translations;
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['dialogVisible'] && this.dialogVisible && this.isEditMode && this.family) {
-      this.patchForm(this.family);
-    } else if (changes['dialogVisible'] && this.dialogVisible && !this.isEditMode) {
-      this.resetFormForCreate();
+    if (changes['dialogVisible'] && this.dialogVisible) {
+      if (this.isEditMode && this.family) {
+        this.patchForm(this.family);
+      } else {
+        this.resetFormForCreate();
+      }
     }
   }
 
@@ -71,13 +81,7 @@ export class FamilyModalComponent implements OnInit, OnChanges {
   }
 
   patchForm(family: Family): void {
-    this.familyForm.patchValue({
-      id: family.id,
-      code: family.code,
-      name: family.name,
-      nameSE: family.nameSE,
-      organizationId: family.organizationId
-    });
+    this.familyForm.patchValue(family);
   }
 
   resetFormForCreate(): void {
@@ -100,46 +104,22 @@ export class FamilyModalComponent implements OnInit, OnChanges {
     }
 
     this.loading = true;
-    const formData = this.familyForm.getRawValue(); 
+    const formData = this.familyForm.getRawValue();
 
     if (this.isEditMode) {
-      const editData: EditFamily = {
-        id: formData.id,
-        code: formData.code,
-        name: formData.name,
-        nameSE: formData.nameSE,
-        organizationId: formData.organizationId
-      };
-      this.updateFamily(editData);
+      this.updateFamily(formData as EditFamily);
     } else {
-      const createData: CreateFamily = {
-        code: formData.code,
-        name: formData.name,
-        nameSE: formData.nameSE,
-        organizationId: formData.organizationId
-      };
-      this.createFamily(createData);
+      this.createFamily(formData as CreateFamily);
     }
   }
 
   createFamily(data: CreateFamily): void {
     this.familyService.createFamily(data).subscribe({
       next: (response: ApiResponse<Family>) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Family created successfully'
-        });
-        this.onSave.emit(response.data);
-        this.closeDialog();
+        this.handleSuccess(this.translations.familyForm?.toasts?.createSuccess, response.data);
       },
       error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to create family'
-        });
-        this.loading = false;
+        this.handleError(this.translations.familyForm?.toasts?.createError);
       }
     });
   }
@@ -147,28 +127,35 @@ export class FamilyModalComponent implements OnInit, OnChanges {
   updateFamily(data: EditFamily): void {
     this.familyService.updateFamily(data).subscribe({
       next: (response: ApiResponse<Family>) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Family updated successfully'
-        });
-        this.onSave.emit(response.data);
-        this.closeDialog();
+        this.handleSuccess(this.translations.familyForm?.toasts?.updateSuccess, response.data);
       },
       error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to update family'
-        });
-        this.loading = false;
+        this.handleError(this.translations.familyForm?.toasts?.updateError);
       }
     });
   }
 
+  private handleSuccess(detailKey: string, data: Family): void {
+    this.messageService.add({
+      severity: 'success',
+      summary: this.translations.common?.success || 'Success',
+      detail: detailKey || 'Operation successful'
+    });
+    this.onSave.emit(data);
+    this.closeDialog();
+  }
+
+  private handleError(detailKey: string): void {
+    this.messageService.add({
+      severity: 'error',
+      summary: this.translations.common?.error || 'Error',
+      detail: detailKey || 'An error occurred'
+    });
+    this.loading = false;
+  }
+
   closeDialog(): void {
     this.dialogVisibleChange.emit(false);
-    this.familyForm.get('organizationId')?.enable();
   }
 
   onCancel(): void {
@@ -179,7 +166,6 @@ export class FamilyModalComponent implements OnInit, OnChanges {
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
-
       if (control instanceof FormGroup) {
         this.markFormGroupTouched(control);
       }

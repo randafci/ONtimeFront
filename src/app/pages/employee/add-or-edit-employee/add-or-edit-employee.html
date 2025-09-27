@@ -23,7 +23,7 @@
           <img 
             *ngIf="profileImageUrl" 
             [src]="profileImageUrl" 
-            alt="Profile Picture"
+            [alt]="'employees.formPage.profile.alt' | translate"
             class="w-full h-full rounded-full object-cover">
           <!-- Show default icon if no image -->
           <i 
@@ -57,7 +57,7 @@
         <p class="text-gray-600 text-lg mb-2">{{ jobTitle || ('employees.formPage.profile.jobTitle' | translate) }}</p>
         <div class="flex items-center justify-center gap-4">
           <span class="text-sm text-gray-500">{{ 'employees.formPage.profile.employeeId' | translate }}: {{ employeeForm.get('employeeCode')?.value || 'N/A' }}</span>
-          <span class="text-sm text-gray-500">{{ 'employees.formPage.profile.status' | translate }}: {{ employeeForm.get('employeeStatus')?.value || 'Active' }}</span>
+          <span class="text-sm text-gray-500">{{ 'employees.formPage.profile.status' | translate }}: {{ employeeForm.get('employeeStatus')?.value || ('employees.listPage.statuses.active' | translate) }}</span>
         </div>
       </div>
     </div>
@@ -139,7 +139,7 @@
               id="employeeCode"
               pInputText 
               formControlName="employeeCode"
-              placeholder="Employee ID"
+              [placeholder]="'employees.formPage.placeholders.employeeId' | translate"
               class="w-full"
               [class.ng-invalid]="employeeForm.get('employeeCode')?.invalid && employeeForm.get('employeeCode')?.touched">
             <small class="text-red-500" *ngIf="employeeForm.get('employeeCode')?.invalid && employeeForm.get('employeeCode')?.touched">
@@ -170,7 +170,7 @@
               id="employeeType"
               pInputText 
               formControlName="employeeType"
-              placeholder="Enter Employee Type"
+              [placeholder]="'employees.formPage.placeholders.employeeType' | translate"
               class="w-full">
           </div>
         </div>
@@ -188,7 +188,7 @@
               id="firstName"
               pInputText 
               formControlName="firstName"
-              placeholder="First Name"
+              [placeholder]="'employees.formPage.placeholders.firstName' | translate"
               class="w-full"
               [class.ng-invalid]="employeeForm.get('firstName')?.invalid && employeeForm.get('firstName')?.touched">
             <small class="text-red-500" *ngIf="employeeForm.get('firstName')?.invalid && employeeForm.get('firstName')?.touched">
@@ -204,7 +204,7 @@
               id="lastName"
               pInputText 
               formControlName="lastName"
-              placeholder="Family Name"
+              [placeholder]="'employees.formPage.placeholders.familyName' | translate"
               class="w-full"
               [class.ng-invalid]="employeeForm.get('lastName')?.invalid && employeeForm.get('lastName')?.touched">
             <small class="text-red-500" *ngIf="employeeForm.get('lastName')?.invalid && employeeForm.get('lastName')?.touched">
@@ -239,7 +239,7 @@
               id="nationality"
               pInputText 
               formControlName="nationality"
-              placeholder="Enter Nationality"
+              [placeholder]="'employees.formPage.placeholders.nationality' | translate"
               class="w-full">
           </div>
 
@@ -251,7 +251,7 @@
               id="religionType"
               pInputText 
               formControlName="religionType"
-              placeholder="Enter Religion"
+              [placeholder]="'employees.formPage.placeholders.religion' | translate"
               class="w-full">
           </div>
 
@@ -328,7 +328,7 @@
                  id="personalEmail"
                  pInputText 
                  formControlName="personalEmail"
-                 placeholder="Personal Email"
+                 [placeholder]="'employees.formPage.placeholders.personalEmail' | translate"
                  class="w-full">
              </div>
 
@@ -341,7 +341,7 @@
                  id="personalPhone"
                  pInputText 
                  formControlName="personalPhone"
-                 placeholder="Personal Phone"
+                 [placeholder]="'employees.formPage.placeholders.personalPhone' | translate"
                  class="w-full">
              </div>
 
@@ -354,7 +354,7 @@
                  id="personalMobile"
                  pInputText 
                  formControlName="personalMobile"
-                 placeholder="Personal Mobile Phone"
+                 [placeholder]="'employees.formPage.placeholders.personalMobile' | translate"
                  class="w-full">
              </div>
            </div>
@@ -374,7 +374,7 @@
                  id="officialEmail"
                  pInputText 
                  formControlName="officialEmail"
-                 placeholder="Official Email"
+                 [placeholder]="'employees.formPage.placeholders.officialEmail' | translate"
                  class="w-full">
              </div>
 
@@ -387,7 +387,7 @@
                  id="officialPhone"
                  pInputText 
                  formControlName="officialPhone"
-                 placeholder="Official Phone"
+                 [placeholder]="'employees.formPage.placeholders.officialPhone' | translate"
                  class="w-full">
                </div>
 
@@ -400,7 +400,7 @@
                  id="officialMobile"
                  pInputText 
                  formControlName="officialMobile"
-                 placeholder="Official Mobile Phone"
+                 [placeholder]="'employees.formPage.placeholders.officialMobile' | translate"
                  class="w-full">
              </div>
            </div>
@@ -420,7 +420,7 @@
                  id="address"
                  pInputText 
                  formControlName="address"
-                 placeholder="Full Address"
+                 [placeholder]="'employees.formPage.placeholders.address' | translate"
                  class="w-full">
              </div>
 
@@ -433,7 +433,7 @@
                  id="city"
                  pInputText 
                  formControlName="city"
-                 placeholder="City"
+                 [placeholder]="'employees.formPage.placeholders.city' | translate"
                  class="w-full">
              </div>
 
@@ -446,7 +446,7 @@
                  id="state"
                  pInputText 
                  formControlName="state"
-                 placeholder="State"
+                 [placeholder]="'employees.formPage.placeholders.state' | translate"
                  class="w-full">
              </div>
            </div>
@@ -461,13 +461,13 @@
           <i class="pi pi-building text-2xl text-gray-400"></i>
         </div>
         <h3 class="text-lg font-medium text-gray-900 mb-2">{{ 'employees.formPage.tabs.organizational' | translate }}</h3>
-        <p class="text-gray-500">Organizational settings will be available soon</p>
+        <p class="text-gray-500">{{ 'employees.formPage.organizational.comingSoon' | translate }}</p>
       </div>
     </div>
 
          <!-- Documents Tab -->
      <div *ngIf="activeTabIndex === 3" class="tab-content">
-       <h3 class="text-lg font-medium mb-6 text-gray-900">{{ 'employees.formPage.documents.title' | translate }}</h3>
+       <h3 class="text-lg font-medium mb-6 text-gray-900 text-center">{{ 'employees.formPage.documents.title' | translate }}</h3>
        <div formGroupName="document" class="grid grid-cols-1 md:grid-cols-2 gap-8">
          
          <div class="field">
@@ -478,7 +478,7 @@
              id="passportNumber"
              pInputText 
              formControlName="passportNumber"
-             placeholder="Passport Number"
+             [placeholder]="'employees.formPage.placeholders.passportNumber' | translate"
              class="w-full">
          </div>
 
@@ -490,7 +490,7 @@
              id="visaNumber"
              pInputText 
              formControlName="visaNumber"
-             placeholder="Visa Number"
+             [placeholder]="'employees.formPage.placeholders.visaNumber' | translate"
              class="w-full">
          </div>
 
@@ -525,7 +525,7 @@
           <i class="pi pi-users text-2xl text-gray-400"></i>
         </div>
         <h3 class="text-lg font-medium text-gray-900 mb-2">{{ 'employees.formPage.tabs.reportManagers' | translate }}</h3>
-        <p class="text-gray-500">Report Managers configuration will be added here</p>
+        <p class="text-gray-500">{{ 'employees.formPage.reportManagers.comingSoon' | translate }}</p>
       </div>
     </div>
 
@@ -536,7 +536,7 @@
           <i class="pi pi-calendar text-2xl text-gray-400"></i>
         </div>
         <h3 class="text-lg font-medium text-gray-900 mb-2">{{ 'employees.formPage.tabs.assignSchedule' | translate }}</h3>
-        <p class="text-gray-500">Schedule assignment configuration will be added here</p>
+        <p class="text-gray-500">{{ 'employees.formPage.assignSchedule.comingSoon' | translate }}</p>
       </div>
     </div>
 

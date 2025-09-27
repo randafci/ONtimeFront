@@ -99,17 +99,28 @@ export class DepartmentListComponent implements OnInit {
     this.isSuperAdmin = this.checkIsSuperAdmin();
 
     // Subscribe to translation changes to build dynamic arrays
-    this.translationService.translations$.subscribe(translations => {
+     this.translationService.translations$.subscribe((translations: any) => {
       this.translations = translations;
-      this.statuses = [
-        { label: translations.departmentList?.statusValues?.active || 'Active', value: 'active' },
-        { label: translations.departmentList?.statusValues?.inactive || 'Inactive', value: 'inactive' }
-      ];
+      this.initializeTranslatedArrays();
     });
 
     this.loadDepartments();
     this.loadOrganizations();
     this.loadCompanies();
+  }
+
+  private initializeTranslatedArrays(): void {
+    const statusTrans = this.translations.departmentList?.statusValues;
+    this.statuses = [
+      { label: statusTrans?.active || 'Active', value: 'active' },
+      { label: statusTrans?.inactive || 'Inactive', value: 'inactive' }
+    ];
+
+    const commonTrans = this.translations.common;
+    this.integrationOptions = [
+      { label: commonTrans?.yes || 'Yes', value: true },
+      { label: commonTrans?.no || 'No', value: false }
+    ];
   }
 
   private checkIsSuperAdmin(): boolean {
@@ -214,12 +225,12 @@ export class DepartmentListComponent implements OnInit {
   }
 
   deleteDepartment(department: Department) {
-    const message = (this.translations.departmentList?.messages?.deleteConfirm || 'Are you sure you want to delete {name}?')
-                    .replace('{name}', department.name);
+    const trans = this.translations.departmentList?.messages;
+    const commonTrans = this.translations.common;
 
     this.confirmationService.confirm({
-      message: message,
-      header: this.translations.departmentList?.messages?.deleteHeader || 'Confirm Deletion',
+      message: (trans?.deleteConfirm || 'Are you sure you want to delete ${name}?').replace('${name}', department.name),
+      header: trans?.deleteHeader || commonTrans?.deleteHeader || 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.departmentService.deleteDepartment(department.id).subscribe({
@@ -227,8 +238,8 @@ export class DepartmentListComponent implements OnInit {
             if (response.succeeded) {
               this.messageService.add({
                 severity: 'success',
-                summary: 'Success',
-                detail: `Department ${department.name} deleted successfully`
+                summary: commonTrans?.success || 'Success',
+            detail: trans?.deleteSuccess || 'Department deleted successfully.'
               });
               this.loadDepartments();
             } else {
@@ -251,7 +262,6 @@ export class DepartmentListComponent implements OnInit {
       }
     });
   }
-
   onGlobalFilter(table: Table, event: Event) {
     table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }

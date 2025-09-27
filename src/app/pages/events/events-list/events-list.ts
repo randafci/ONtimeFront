@@ -57,7 +57,7 @@ import { EventsModalComponent } from '../events-modal/events-modal.component';
     TranslatePipe,
     EventsModalComponent
   ],
-  providers: [MessageService, ConfirmationService],
+  providers: [MessageService, ConfirmationService, TranslatePipe],
   templateUrl: './events-list.html',
   styleUrl: './events-list.scss'
 })
@@ -92,7 +92,8 @@ export class EventsListComponent implements OnInit {
     private translationService: TranslationService, 
     private confirmationService: ConfirmationService,
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private translatePipe: TranslatePipe
   ) {
     this.eventsForm = this.createForm();
   }
@@ -348,12 +349,11 @@ export class EventsListComponent implements OnInit {
   }
 
   deleteEvents(event: Events) {
-    const message = (this.translations.eventsList?.messages?.deleteConfirm || 'Are you sure you want to delete {name}?')
-                    .replace('{name}', event.name);
+    const message = this.translatePipe.transform('eventsList.messages.deleteConfirm').replace('{name}', event.name);
 
     this.confirmationService.confirm({
       message: message,
-      header: this.translations.eventsList?.messages?.deleteHeader || 'Confirm Deletion',
+      header: this.translatePipe.transform('common.deleteHeader'),
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.eventsService.deleteEvents(event.id).subscribe({

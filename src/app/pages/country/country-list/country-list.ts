@@ -48,17 +48,16 @@ import { CountryModalComponent } from '../country-modal/country-modal.component'
     ConfirmDialogModule,
     CountryModalComponent
   ],
-  providers: [MessageService, ConfirmationService, TranslationService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './country-list.html'
 })
 export class CountryListComponent implements OnInit {
   countries: Country[] = [];
   loading: boolean = true;
-
-  // Dialog properties
   dialogVisible: boolean = false;
   isEditMode: boolean = false;
   selectedCountry: Country | null = null;
+  private translations: any = {};
 
   @ViewChild('dt') table!: Table;
   @ViewChild('filter') filter!: ElementRef;
@@ -67,11 +66,13 @@ export class CountryListComponent implements OnInit {
     private countryService: CountryService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private router: Router,
-    private authService: AuthService
+    private translationService: TranslationService
   ) {}
 
   ngOnInit() {
+    this.translationService.translations$.subscribe(translations => {
+      this.translations = translations;
+    });
     this.loadCountries();
   }
 
@@ -82,21 +83,12 @@ export class CountryListComponent implements OnInit {
         if (response.succeeded) {
           this.countries = response.data;
         } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: response.message || 'Failed to load countries'
-          });
+          this.showToast('error', this.translations.common?.error, this.translations.countryList?.messages?.loadError);
         }
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading countries:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load countries'
-        });
+        this.showToast('error', this.translations.common?.error, this.translations.countryList?.messages?.loadError);
         this.loading = false;
       }
     });
@@ -118,39 +110,28 @@ export class CountryListComponent implements OnInit {
     this.loadCountries();
   }
 
-  onCountryModalCancel() {
-    // Handle modal cancellation if needed
-  }
-
   deleteCountry(country: Country) {
+    const messages = this.translations.countryList?.messages || {};
+    const common = this.translations.common || {};
+    
+    const message = (messages.deleteConfirm || 'Are you sure you want to delete {name}?').replace('{name}', country.name);
+
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete ${country.name}?`,
-      header: 'Confirm Delete',
+      message: message,
+      header: common.deleteHeader || 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.countryService.deleteCountry(country.id).subscribe({
           next: (response: ApiResponse<boolean>) => {
             if (response.succeeded) {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: 'Country deleted successfully'
-              });
+              this.showToast('success', common.success, messages.deleteSuccess);
               this.loadCountries();
             } else {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: response.message || 'Failed to delete country'
-              });
+              this.showToast('error', common.error, response.message || messages.deleteError);
             }
           },
           error: (error) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to delete country'
-            });
+            this.showToast('error', common.error, messages.deleteError);
           }
         });
       }
@@ -165,8 +146,8 @@ export class CountryListComponent implements OnInit {
     table.clear();
     this.filter.nativeElement.value = '';
   }
-
-  getIntegrationSeverity(fromIntegration: boolean): string {
-    return fromIntegration ? 'success' : 'info';
+  
+  private showToast(severity: string, summary: string, detail: string): void {
+      this.messageService.add({ severity, summary, detail });
   }
 }
