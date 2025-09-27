@@ -1,0 +1,109 @@
+<p-dialog 
+  [(visible)]="dialogVisible" 
+  [header]="(isEditMode ? 'shiftTypeForm.title.edit' : 'shiftTypeForm.title.add') | translate"
+  [modal]="true" 
+  [style]="{width: '50vw'}"
+  [draggable]="false" 
+  [resizable]="false"
+  (onHide)="onDialogHide()">
+  <form [formGroup]="shiftTypeForm" (ngSubmit)="onSubmit()">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <!-- Name Field -->
+      <div class="field">
+        <label for="name" class="block text-sm font-medium mb-2">
+          {{ 'shiftTypeForm.labels.name' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <input 
+          id="name" 
+          type="text" 
+          pInputText 
+          class="w-full"
+          formControlName="name" 
+          [placeholder]="'shiftTypeForm.placeholders.name' | translate"
+          [class.ng-invalid]="shiftTypeForm.get('name')?.invalid && shiftTypeForm.get('name')?.touched"
+        />
+        <small class="text-red-500" *ngIf="shiftTypeForm.get('name')?.invalid && shiftTypeForm.get('name')?.touched">
+          <span *ngIf="shiftTypeForm.get('name')?.errors?.['required']">{{ 'shiftTypeForm.validation.nameRequired' | translate }}</span>
+          <span *ngIf="shiftTypeForm.get('name')?.errors?.['maxlength']">{{ 'shiftTypeForm.validation.nameMaxLength' | translate }}</span>
+        </small>
+      </div>
+
+      <!-- Name SE Field -->
+      <div class="field">
+        <label for="nameSE" class="block text-sm font-medium mb-2">
+          {{ 'shiftTypeForm.labels.nameSE' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <input 
+          id="nameSE" 
+          type="text" 
+          pInputText 
+          class="w-full"
+          formControlName="nameSE" 
+          [placeholder]="'shiftTypeForm.placeholders.nameSE' | translate"
+          [class.ng-invalid]="shiftTypeForm.get('nameSE')?.invalid && shiftTypeForm.get('nameSE')?.touched"
+        />
+        <small class="text-red-500" *ngIf="shiftTypeForm.get('nameSE')?.invalid && shiftTypeForm.get('nameSE')?.touched">
+          <span *ngIf="shiftTypeForm.get('nameSE')?.errors?.['required']">{{ 'shiftTypeForm.validation.nameSERequired' | translate }}</span>
+          <span *ngIf="shiftTypeForm.get('nameSE')?.errors?.['maxlength']">{{ 'shiftTypeForm.validation.nameSEMaxLength' | translate }}</span>
+        </small>
+      </div>
+
+      <!-- Priority Field -->
+      <div class="field">
+        <label for="priority" class="block text-sm font-medium mb-2">
+          {{ 'shiftTypeForm.labels.priority' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <p-inputNumber 
+          id="priority" 
+          formControlName="priority" 
+          [min]="1"
+          [max]="999"
+          [placeholder]="'shiftTypeForm.placeholders.priority' | translate"
+          class="w-full"
+          [class.ng-invalid]="shiftTypeForm.get('priority')?.invalid && shiftTypeForm.get('priority')?.touched"
+        ></p-inputNumber>
+        <small class="text-red-500" *ngIf="shiftTypeForm.get('priority')?.invalid && shiftTypeForm.get('priority')?.touched">
+          <span *ngIf="shiftTypeForm.get('priority')?.errors?.['required']">{{ 'shiftTypeForm.validation.priorityRequired' | translate }}</span>
+          <span *ngIf="shiftTypeForm.get('priority')?.errors?.['min']">{{ 'shiftTypeForm.validation.priorityMin' | translate }}</span>
+        </small>
+      </div>
+
+      <!-- Organization Field -->
+      <div class="field" *ngIf="isSuperAdmin">
+        <label for="organizationId" class="block text-sm font-medium mb-2">
+          {{ 'shiftTypeForm.labels.organization' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <p-select 
+          id="organizationId" 
+          formControlName="organizationId" 
+          [options]="organizations" 
+          optionLabel="name" 
+          optionValue="id"
+          [placeholder]="'shiftTypeForm.placeholders.selectOrganization' | translate"
+          class="w-full"
+          appendTo="body"
+          [class.ng-invalid]="shiftTypeForm.get('organizationId')?.invalid && shiftTypeForm.get('organizationId')?.touched"
+        ></p-select>
+        <small class="text-red-500" *ngIf="shiftTypeForm.get('organizationId')?.invalid && shiftTypeForm.get('organizationId')?.touched">
+          {{ 'shiftTypeForm.validation.organizationRequired' | translate }}
+        </small>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+      <button 
+        pButton 
+        [label]="'common.buttons.cancel' | translate" 
+        class="p-button-secondary" 
+        type="button"
+        (click)="onCancel()">
+      </button>
+      <button 
+        pButton 
+        [label]="(isEditMode ? 'common.buttons.update' : 'common.buttons.save') | translate" 
+        [loading]="loading"
+        type="submit">
+      </button>
+    </div>
+  </form>
+</p-dialog>
