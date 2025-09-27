@@ -141,6 +141,7 @@ export interface LayoutConfig {
   direction?: 'ltr' | 'rtl';
   header?: boolean;
   navigation?: 'side' | 'top';
+  language?: 'en'|'ar';
 }
 
 interface LayoutState {
@@ -242,15 +243,19 @@ export class LayoutService {
         menuMode: settings.menuMode || 'static',
         direction: (settings.direction?.toLowerCase() === 'rtl' ? 'rtl' : 'ltr') as 'ltr' | 'rtl',
         header: toBoolean(settings.header ?? true),
-        navigation: (settings.navigation === 'top' ? 'top' : 'side') as 'side' | 'top'
+        navigation: (settings.navigation === 'top' ? 'top' : 'side') as 'side' | 'top',
+        language:settings.language
+
       },
       state: {
         staticMenuDesktopInactive: toBoolean(settings.staticMenuDesktopInactive),
         overlayMenuActive: toBoolean(settings.overlayMenuActive),
         configSidebarVisible: toBoolean(settings.configSidebarVisible),
         staticMenuMobileActive: toBoolean(settings.staticMenuMobileActive),
-        menuHoverActive: toBoolean(settings.menuHoverActive)
-      }
+        menuHoverActive: toBoolean(settings.menuHoverActive),
+      },
+      
+
     };
   }
 
@@ -258,7 +263,7 @@ export class LayoutService {
     try {
       const response = await firstValueFrom(this.settingsService.getOrgLayoutSettings(type));
       const normalized = this.normalizeSettings(response.data);
-
+console.log("getOrgLayoutSettings " , normalized)
       // Use individual setter methods with proper default values
       this.setPreset(normalized.config.preset || 'Aura');
       this.setPrimaryColor(normalized.config.primary || 'emerald');
@@ -268,7 +273,9 @@ export class LayoutService {
       this.setDirection(normalized.config.direction || 'ltr');
       this.setHeader(normalized.config.header ?? true);
       this.setNavigation(normalized.config.navigation || 'side');
+      this.setLanguage(normalized.config.language || 'en');
 
+//
       // Update layout state
       this.layoutState.set(normalized.state);
 
@@ -413,10 +420,13 @@ export class LayoutService {
     this.onConfigUpdate();
   }
 
+   
+
   setPrimaryColor(primary: string) {
     this.layoutConfig.update((cfg) => ({ ...cfg, primary }));
     this.applyThemePreset(); // Re-apply with new primary
     this.onConfigUpdate();
+    console.log("primary " , primary)
   }
 
   setSurface(surface: string | null) {
@@ -445,6 +455,26 @@ export class LayoutService {
       }
     }
   }
+  // Add this method to your LayoutService class
+setLanguage(language: 'en' | 'ar') {
+    this.layoutConfig.update((cfg) => ({ ...cfg, language }));
+    this.applyLanguage(language);
+    this.onConfigUpdate();
+}
+
+// Add this private method to apply language changes
+private applyLanguage(language: 'en' | 'ar') {
+    // Set the language direction based on the language
+    const direction = language === 'ar' ? 'rtl' : 'ltr';
+    this.setDirection(direction);
+    
+    // Set the lang attribute on the html element
+    document.documentElement.setAttribute('lang', language);
+    
+    // You might also want to trigger translation loading here
+    // this.loadTranslations(language); // Uncomment if you have translation loading logic
+}
+
 
   // Get preset extension with custom primary and surface configurations
   private getPresetExt() {
