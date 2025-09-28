@@ -1,6 +1,7 @@
 <p-toast></p-toast>
-<div class="card">
-    <!-- Header -->
+<!-- 1. Replaced PrimeFlex classes with a single 'form-container' class -->
+<div class="card form-container">
+    <!-- Header (No changes needed here) -->
     <div class="flex justify-content-between align-items-center mb-5 border-bottom-1 pb-3">
         <h1 class="font-semibold text-xl m-0">
             {{ (isEditMode ? 'devices.editForm.pageTitle' : 'devices.addForm.pageTitle') | translate }}
@@ -16,15 +17,17 @@
 
     <!-- Form -->
     <form [formGroup]="deviceForm" (ngSubmit)="onSubmit()">
-        <div class="grid p-fluid">
+        <!-- 2. Replaced 'grid p-fluid gap-*' with our custom 'form-grid' class -->
+        <div class="form-grid">
             <!-- Code Field -->
-            <div class="field col-12 md:col-6">
+            <!-- 3. Replaced 'col-12 md:col-6' with our custom 'form-col' class -->
+            <div class="field form-col">
                 <label for="code">{{ 'devices.form.labels.code' | translate }} <span class="required-star">*</span></label>
-                <input 
-                  id="code" 
-                  pInputText 
+                <input
+                  id="code"
+                  pInputText
                   formControlName="code"
-                  [ngClass]="{'field-error': f['code'].invalid && (f['code'].touched || submitted)}"
+                  [ngClass]="{'ng-invalid ng-dirty': f['code'].invalid && (f['code'].touched || submitted)}"
                 />
                 <small *ngIf="f['code'].invalid && (f['code'].touched || submitted)" class="p-error block mt-1">
                   {{ 'common.validation.required' | translate }}
@@ -32,13 +35,13 @@
             </div>
 
             <!-- Name Field -->
-            <div class="field col-12 md:col-6">
+            <div class="field form-col">
                 <label for="name">{{ 'devices.form.labels.name' | translate }} <span class="required-star">*</span></label>
-                <input 
-                  id="name" 
-                  pInputText 
+                <input
+                  id="name"
+                  pInputText
                   formControlName="name"
-                  [ngClass]="{'field-error': f['name'].invalid && (f['name'].touched || submitted)}"
+                  [ngClass]="{'ng-invalid ng-dirty': f['name'].invalid && (f['name'].touched || submitted)}"
                 />
                 <small *ngIf="f['name'].invalid && (f['name'].touched || submitted)" class="p-error block mt-1">
                   {{ 'common.validation.required' | translate }}
@@ -46,13 +49,13 @@
             </div>
 
             <!-- IP Address Field -->
-            <div class="field col-12 md:col-6">
+            <div class="field form-col">
                 <label for="ipAddress">{{ 'devices.form.labels.ipAddress' | translate }} <span class="required-star">*</span></label>
-                <input 
-                  id="ipAddress" 
-                  pInputText 
+                <input
+                  id="ipAddress"
+                  pInputText
                   formControlName="ipAddress"
-                  [ngClass]="{'field-error': f['ipAddress'].invalid && (f['ipAddress'].touched || submitted)}"
+                  [ngClass]="{'ng-invalid ng-dirty': f['ipAddress'].invalid && (f['ipAddress'].touched || submitted)}"
                 />
                 <small *ngIf="f['ipAddress'].invalid && (f['ipAddress'].touched || submitted)" class="p-error block mt-1">
                   {{ 'common.validation.required' | translate }}
@@ -60,16 +63,16 @@
             </div>
 
             <!-- Location Field -->
-            <div class="field col-12 md:col-6">
+            <div class="field form-col">
                 <label for="locationId">{{ 'devices.form.labels.location' | translate }} <span class="required-star">*</span></label>
-                <p-select 
-                  id="locationId" 
-                  formControlName="locationId" 
-                  [options]="locationsList" 
-                  [placeholder]="'devices.form.placeholders.location' | translate" 
-                  optionLabel="name" 
+                <p-select
+                  id="locationId"
+                  formControlName="locationId"
+                  [options]="locationsList"
+                  [placeholder]="'devices.form.placeholders.location' | translate"
+                  optionLabel="name"
                   optionValue="id"
-                  [ngClass]="{'field-error': f['locationId'].invalid && (f['locationId'].touched || submitted)}"
+                  [ngClass]="{'ng-invalid ng-dirty': f['locationId'].invalid && (f['locationId'].touched || submitted)}"
                 ></p-select>
                 <small *ngIf="f['locationId'].invalid && (f['locationId'].touched || submitted)" class="p-error block mt-1">
                   {{ 'common.validation.required' | translate }}
@@ -77,7 +80,7 @@
             </div>
 
             <!-- Organization Field -->
-            <div class="field col-12 md:col-6" *ngIf="isSuperAdmin">
+            <div class="field form-col" *ngIf="isSuperAdmin">
                 <label for="organizationId">{{ 'devices.form.labels.organization' | translate }} <span class="required-star">*</span></label>
                 <p-select
                     id="organizationId"
@@ -86,39 +89,38 @@
                     optionLabel="name"
                     optionValue="id"
                     [placeholder]="'devices.form.placeholders.organization' | translate"
-                    [ngClass]="{'field-error': f['organizationId'].invalid && (f['organizationId'].touched || submitted)}">
+                    [ngClass]="{'ng-invalid ng-dirty': f['organizationId'].invalid && (f['organizationId'].touched || submitted)}">
                 </p-select>
                 <small *ngIf="f['organizationId'].invalid && (f['organizationId'].touched || submitted)" class="p-error block mt-1">
                     {{ 'common.validation.required' | translate }}
                 </small>
             </div>
 
-            <!-- THE CORRECTED CHECKBOX STRUCTURE -->
             <!-- Disabled Checkbox -->
-            <div class="field col-12 md:col-6">
-                <div class="field-checkbox-container">
+            <div class="form-col">
+                <div class="field-checkbox">
                     <p-checkbox formControlName="disabled" [binary]="true" inputId="disabled"></p-checkbox>
-                    <label for="disabled" class="ml-2 mb-0">{{ 'devices.form.labels.disabled' | translate }}</label>
+                    <label for="disabled" class="ml-2">{{ 'devices.form.labels.disabled' | translate }}</label>
                 </div>
             </div>
 
             <!-- Download Logs Checkbox -->
-            <div class="field col-12 md:col-6">
-                <div class="field-checkbox-container">
+            <div class="form-col">
+                <div class="field-checkbox">
                     <p-checkbox formControlName="download" [binary]="true" inputId="download"></p-checkbox>
-                    <label for="download" class="ml-2 mb-0">{{ 'devices.form.labels.downloadLogs' | translate }}</label>
+                    <label for="download" class="ml-2">{{ 'devices.form.labels.downloadLogs' | translate }}</label>
                 </div>
             </div>
         </div>
 
-        <!-- Action Buttons -->
+        <!-- Action Buttons (No changes needed here) -->
         <div class="flex justify-content-start gap-2 mt-5">
-            <button 
+            <button
                 pButton pRipple
-                type="button" 
-                [label]="'common.buttons.cancel' | translate" 
-                class="p-button-secondary" 
-                (click)="onCancel()" 
+                type="button"
+                [label]="'common.buttons.cancel' | translate"
+                class="p-button-secondary"
+                (click)="onCancel()"
                 [disabled]="isSaving">
             </button>
             <button pButton pRipple type="submit" [disabled]="isSaving">

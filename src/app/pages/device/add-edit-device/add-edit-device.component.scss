@@ -1,45 +1,77 @@
-// Defines the base card layout and padding
-.card {
-  padding: 1.5rem;
-  border-radius: 6px;
-}
+// Use :host to ensure styles are scoped to this component and won't affect other pages.
+:host {
+  // --- LAYOUT STYLES ---
 
-// Adds consistent vertical spacing between each form field group
-.field {
-  margin-bottom: 1.5rem;
-}
+  // 1. Center the form and give it a maximum width.
+  .form-container {
+    max-width: 1024px;
+    margin: 0 auto; // Centers the container horizontally
+    padding: 2rem;
+    border-radius: 8px;
+    background-color: #ffffff;
+  }
 
-// Styles for the form field labels
-.field label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: #495057;
-}
+  // 2. Create the flexbox grid container.
+  .form-grid {
+    display: flex;
+    flex-wrap: wrap; // Allows items to wrap to the next line on small screens
+    margin: 0 -1rem; // Negative margin trick to handle padding on columns
+  }
 
-// A helper for the red asterisk on required fields
-.required-star {
-  color: #f44336;
-  font-weight: bold;
-}
+  // 3. Define the columns.
+  .form-col {
+    width: 100%; // Mobile-first: columns are full-width by default.
+    padding: 0 1rem; // Gutter/spacing between columns.
+    box-sizing: border-box;
+    margin-bottom: 1.5rem; // Vertical spacing between rows.
+  }
 
-// This class applies a red border and shadow to an input field when it's invalid
-.field-error {
-  border-color: #f44336 !important;
-  box-shadow: 0 0 0 1px #f44336 !important;
-}
+  // 4. Apply the two-column layout on larger screens (768px and wider).
+  @media (min-width: 768px) {
+    .form-col {
+      width: 50%;
+    }
+  }
 
-// Styles for the validation error message text below the input
-.p-error {
-  color: #f44336;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-}
 
-// A specific container for a checkbox to align it vertically with its label
-.field-checkbox-container {
+  // --- FORM ELEMENT STYLES ---
+
+  // Replicate the p-fluid behavior to make inputs take up 100% of their container's width.
+  ::ng-deep {
+    .p-inputtext,
+    .p-select {
+      width: 100%;
+    }
+
+    // Style invalid PrimeNG inputs with a red border.
+    .ng-invalid.ng-dirty {
+      &.p-inputtext,
+      &.p-select .p-select-trigger {
+        border-color: #f44336; // Red color for errors
+      }
+    }
+  }
+
+  // Styles for the form field labels
+  .field label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  .required-star {
+    color: #f44336;
+  }
+
+  .p-error {
+    color: #f44336;
+  }
+  
+  // Align checkboxes vertically with the text fields.
+  .field-checkbox {
     display: flex;
     align-items: center;
-    // Pushes the label up slightly to align with the text inputs
-    padding-top: 1.75rem; 
+    margin-top: 2.25rem; // Pushes checkboxes down to align with inputs that have labels.
+    height: 40px; // Give it a fixed height to ensure consistent alignment.
+  }
 }

@@ -13,12 +13,8 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
-<<<<<<< HEAD
 import { ConfirmationService, MessageService } from 'primeng/api';
-=======
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { MessageService, ConfirmationService } from 'primeng/api';
->>>>>>> a0691417d48c81e0e0fc2d91a35228f2120c4cfc
 import { Designation } from '../../../interfaces/designation.interface';
 import { DesignationService } from '../DesignationService';
 import { DesignationTypeService } from '../DesignationTypeService';
@@ -32,7 +28,7 @@ import { AuthService } from '../../../auth/auth.service';
 import { DesignationModalComponent } from '../designation-modal/designation-modal.component';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
+
 
 @Component({
   selector: 'app-designation-list',
