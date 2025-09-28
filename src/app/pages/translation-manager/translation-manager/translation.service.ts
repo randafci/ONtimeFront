@@ -4,6 +4,7 @@ import { delay, map, switchMap, tap, catchError } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { AppConfigService } from '../../service/app-config.service';
 import { ApiResponse } from '../../../core/models/api-response.model';
+import { SettingsService, OrganizationSettingDto } from '@/service/layout.SettingsService';
 
 export interface TranslationDto {
   id: number;
@@ -16,7 +17,7 @@ export interface TranslationDto {
 export class TranslationService {
 public apiUrl : string;
 
-constructor(private http: HttpClient, private appConfig: AppConfigService) {
+constructor(private http: HttpClient, private appConfig: AppConfigService , private settingsService :SettingsService) {
   this.apiUrl = this.appConfig.apiUrl+'/api';
  }
 
@@ -83,6 +84,7 @@ constructor(private http: HttpClient, private appConfig: AppConfigService) {
   toggleLanguage(): void {
     const currentLang = this.currentLangSubject.getValue();
     const newLang = currentLang === 'ar' ? 'en' : 'ar';
+    this.saveSetting("language", newLang);
 
     this.loadTranslations(newLang).subscribe({
       next: () => {
@@ -91,5 +93,27 @@ constructor(private http: HttpClient, private appConfig: AppConfigService) {
       error: (err) => console.error('Failed to switch language', err)
     });
   }
+
+      private saveSetting(type: string,value: string) {
+          const settingDto: OrganizationSettingDto = {
+              type: 2, // Replace with your actual SettingType value for color settings
+              settings: [
+                  {
+                      key: type, // 'primary' or 'surface'
+                      value: value // color name
+                  }
+              ]
+          };
+      
+          this.settingsService.saveOrUpdateSettings(settingDto)
+              .subscribe({
+                  next: (result) => {
+                      console.log('Color setting saved successfully', result);
+                  },
+                  error: (error) => {
+                      console.error('Error saving color setting', error);
+                  }
+              });
+      }
 
  }

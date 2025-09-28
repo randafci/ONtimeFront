@@ -1,7 +1,8 @@
-import { Injectable, effect, signal, computed } from '@angular/core';
+import { Injectable, effect, signal, computed, inject } from '@angular/core';
 import { Subject } from 'rxjs';
 import { TranslationService } from '../../pages/translation-manager/translation-manager/translation.service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { OrganizationSettingDto, SettingsService } from '@/service/layout.SettingsService';
 export interface layoutConfig {
     preset?: string;
     primary?: string;
@@ -9,6 +10,7 @@ export interface layoutConfig {
     darkTheme?: boolean;
     menuMode?: string;
     direction?: 'ltr' | 'rtl';
+    language:'en' | 'ar';
 }
 
 interface LayoutState {
@@ -35,7 +37,8 @@ export class LayoutService {
         surface: null,
         darkTheme: false,
         menuMode: 'static',
-        direction: 'rtl'
+        direction: 'rtl',
+        language:'en'
     };
 
     _state: LayoutState = {
@@ -86,6 +89,7 @@ export class LayoutService {
     private initialized = false;
 
 
+    settingsService = inject(SettingsService);
 
     currentLang: () => any;
 
@@ -240,6 +244,7 @@ export class LayoutService {
     toggleDirection() {
         const newDir = this.layoutConfig().direction === 'rtl' ? 'ltr' : 'rtl';
         this.layoutConfig.update(prev => ({ ...prev, direction: newDir }));
+
     }
 
     onConfigUpdate() {
@@ -269,5 +274,27 @@ export class LayoutService {
 
 
     }
+       private saveSetting(type: string,value: string) {
+        const settingDto: OrganizationSettingDto = {
+            type: 2, // Replace with your actual SettingType value for color settings
+            settings: [
+                {
+                    key: type, // 'primary' or 'surface'
+                    value: value // color name
+                }
+            ]
+        };
+    
+        this.settingsService.saveOrUpdateSettings(settingDto)
+            .subscribe({
+                next: (result) => {
+                    console.log('Color setting saved successfully', result);
+                },
+                error: (error) => {
+                    console.error('Error saving color setting', error);
+                }
+            });
+    }
+    
 
 }

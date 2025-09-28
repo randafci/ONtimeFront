@@ -1,10 +1,4 @@
-// Ensures consistent padding within the main card, giving it breathing room.
-.card {
-  padding: 1.5rem;
-  border-radius: 6px;
-}
 
-// Styling for the table header, including title and "Add" button
 .table-header {
   display: flex;
   justify-content: space-between;
@@ -12,19 +6,26 @@
   margin-bottom: 1rem;
 }
 
-// Styling for the table caption, which contains search and clear buttons
-:host ::ng-deep .p-datatable .p-datatable-caption {
-  padding: 1rem;
-  border-width: 1px 1px 0 1px;
+.actions-cell {
+  text-align: center;
+  white-space: nowrap;
+}
 
-  .p-inputtext {
-    width: 250px; // Gives the search bar a decent default width
+.p-button-rounded {
+  margin: 0 2px;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .table-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .actions-cell {
+    .p-button-rounded {
+      margin: 1px;
+    }
   }
 }
 
-// Aligns action buttons (edit, delete) neatly in their cell
-.actions-cell {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center; // Center-aligns the buttons in the column
-}

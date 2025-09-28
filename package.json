@@ -3,9 +3,10 @@
     "version": "20.0.0",
     "scripts": {
         "ng": "ng",
-    "serve:dev": "ng serve --configuration development",
-   "build:production": "ng build --configuration production",
-   "build:development": "ng build --configuration development",        "watch": "ng build --watch --configuration development",
+        "serve:dev": "ng serve --configuration development",
+        "build:production": "ng build --configuration production",
+        "build:development": "ng build --configuration development",
+        "watch": "ng build --watch --configuration development",
         "format": "prettier --write \"**/*.{js,mjs,ts,mts,d.ts,html}\" --cache",
         "test": "ng test"
     },
@@ -28,6 +29,7 @@
         "jsoneditor": "^10.4.1",
         "jwt-decode": "^4.0.0",
         "primeclt": "^0.1.5",
+        "primeflex": "^4.0.0",
         "primeicons": "^7.0.0",
         "primeng": "^20.0.1",
         "rxjs": "~7.8.2",
