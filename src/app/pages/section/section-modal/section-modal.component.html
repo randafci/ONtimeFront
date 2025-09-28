@@ -94,11 +94,29 @@
           optionValue="id"
           [placeholder]="'sectionForm.placeholders.selectType' | translate"
           appendTo="body"
-          [class.ng-invalid]="sectionForm.get('sectionTypeLookupId')?.invalid && sectionForm.get('sectionTypeLookupId')?.touched">
+          [class.ng-invalid]="sectionForm.get('sectionTypeLookupId')?.invalid && sectionForm.get('sectionTypeLookupId')?.touched"
+          (onChange)="onSectionTypeChange($event.value)">
         </p-select>
         <small class="text-red-500" *ngIf="sectionForm.get('sectionTypeLookupId')?.invalid && sectionForm.get('sectionTypeLookupId')?.touched">
           {{ 'common.validation.required' | translate }}
         </small>
+      </div>
+
+      <!-- Parent Section Field - Only shown for Sub Sections -->
+      <div class="field" *ngIf="sectionForm.get('sectionTypeLookupId')?.value === 2">
+        <label for="parentId" class="block text-sm font-medium mb-2">
+          {{ 'sectionForm.labels.parentSection' | translate }}
+        </label>
+        <p-select
+          id="parentId"
+          class="w-full"
+          formControlName="parentId"
+          [options]="mainSections" 
+          optionLabel="name"
+          optionValue="id"
+          [placeholder]="'sectionForm.placeholders.selectParent' | translate"
+          appendTo="body">
+        </p-select>
       </div>
     </div>
 

@@ -8,6 +8,8 @@ import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { Department, CreateDepartment, EditDepartment } from '../../../interfaces/department.interface';
 import { DepartmentService } from '../DepartmentService';
+import { DepartmentTypeService } from '../DepartmentTypeService';
+import { DepartmentType } from '../../../interfaces/department-type.interface';
 import { Organization } from '../../../interfaces/organization.interface';
 import { Company } from '../../../interfaces/company.interface';
 import { ApiResponse } from '../../../core/models/api-response.model';
@@ -36,6 +38,7 @@ export class DepartmentModalComponent implements OnInit, OnChanges {
   @Input() department: Department | null = null;
   @Input() organizations: Organization[] = [];
   @Input() companies: Company[] = [];
+  @Input() departments: Department[] = [];
   @Input() isSuperAdmin: boolean = false;
   @Input() loading: boolean = false;
 
@@ -44,12 +47,15 @@ export class DepartmentModalComponent implements OnInit, OnChanges {
   @Output() onCancelEvent = new EventEmitter<void>();
 
   departmentForm: FormGroup;
+  departmentTypes: DepartmentType[] = [];
+  mainDepartments: Department[] = [];
   private translations: any = {};
 
 
   constructor(
     private fb: FormBuilder,
     private departmentService: DepartmentService,
+    private departmentTypeService: DepartmentTypeService,
     private messageService: MessageService,
     private authService: AuthService,
     private translationService: TranslationService
@@ -61,13 +67,22 @@ export class DepartmentModalComponent implements OnInit, OnChanges {
     this.translationService.translations$.subscribe(translations => {
       this.translations = translations;
     });
+    this.loadDepartmentTypes();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['dialogVisible'] && this.dialogVisible && this.isEditMode && this.department) {
-      this.patchForm(this.department);
-    } else if (changes['dialogVisible'] && this.dialogVisible && !this.isEditMode) {
-      this.resetFormForCreate();
+    if (changes['departments']) {
+      this.updateMainDepartments();
+    }
+    
+    if (changes['dialogVisible'] && this.dialogVisible) {
+      this.loading = false;
+      
+      if (this.isEditMode && this.department) {
+        this.patchForm(this.department);
+      } else if (!this.isEditMode) {
+        this.resetFormForCreate();
+      }
     }
   }
 
@@ -79,7 +94,8 @@ export class DepartmentModalComponent implements OnInit, OnChanges {
       nameSE: ['', Validators.required],
       parentId: [null],
       organizationId: [null, Validators.required],
-      companyId: [null, Validators.required]
+      companyId: [null, Validators.required],
+      departmentTypeLookupId: [null, Validators.required]
     });
   }
 
@@ -91,8 +107,10 @@ export class DepartmentModalComponent implements OnInit, OnChanges {
       nameSE: department.nameSE,
       parentId: department.parentId,
       organizationId: department.organizationId,
-      companyId: department.companyId
+      companyId: department.companyId,
+      departmentTypeLookupId: department.departmentTypeLookupId
     });
+    this.onDepartmentTypeChange(department.departmentTypeLookupId || 0);
   }
 
   resetFormForCreate(): void {
@@ -105,6 +123,32 @@ export class DepartmentModalComponent implements OnInit, OnChanges {
       }
     } else {
       this.departmentForm.get('organizationId')?.enable();
+    }
+  }
+
+  loadDepartmentTypes(): void {
+    this.departmentTypeService.getAllDepartmentTypes().subscribe({
+      next: (response: ApiResponse<DepartmentType[]>) => {
+        if (response.succeeded) {
+          this.departmentTypes = response.data || [];
+        }
+      },
+      error: (error) => {
+        console.error('Error loading department types:', error);
+      }
+    });
+  }
+
+  updateMainDepartments(): void {
+    this.mainDepartments = this.departments.filter(dept => dept.departmentTypeLookupId === 1);
+  }
+
+  onDepartmentTypeChange(departmentTypeLookupId: number): void {
+    if (departmentTypeLookupId === 1) {
+      this.departmentForm.get('parentId')?.setValue(null);
+      this.departmentForm.get('parentId')?.disable();
+    } else if (departmentTypeLookupId === 2) {
+      this.departmentForm.get('parentId')?.enable();
     }
   }
 
@@ -125,7 +169,8 @@ export class DepartmentModalComponent implements OnInit, OnChanges {
         nameSE: formData.nameSE,
         parentId: formData.parentId,
         organizationId: formData.organizationId,
-        companyId: formData.companyId
+        companyId: formData.companyId,
+        departmentTypeLookupId: formData.departmentTypeLookupId
       };
       this.updateDepartment(editData);
     } else {
@@ -135,7 +180,8 @@ export class DepartmentModalComponent implements OnInit, OnChanges {
         nameSE: formData.nameSE,
         parentId: formData.parentId,
         organizationId: formData.organizationId,
-        companyId: formData.companyId
+        companyId: formData.companyId,
+        departmentTypeLookupId: formData.departmentTypeLookupId
       };
       this.createDepartment(createData);
     }
@@ -169,6 +215,7 @@ export class DepartmentModalComponent implements OnInit, OnChanges {
       summary: this.translations.common?.success || 'Success',
       detail: detail
     });
+    this.loading = false;
     this.onSave.emit(data);
     this.closeDialog();
   }

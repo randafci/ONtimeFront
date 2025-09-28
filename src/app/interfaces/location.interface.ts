@@ -21,6 +21,14 @@ export interface CreateLocation {
   organizationId: number;
 }
 
-export interface EditLocation extends CreateLocation {
+export interface EditLocation {
   id: number;
+  code: string;
+  name: string;
+  indexValue: number;
+  long?: number;
+  lat?: number;
+  fence?: number;
+  parentId?: number;
+  organizationId: number;
 }

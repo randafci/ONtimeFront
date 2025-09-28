@@ -76,7 +76,6 @@ export class AddOrEditUser implements OnInit {
   ) {
     this.userForm = this.fb.group({
       userName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
       isLdapUser: [false],
       extraEmployeesView: [''],
@@ -105,19 +104,18 @@ export class AddOrEditUser implements OnInit {
         this.loadUser(this.userId!);
       }
     });
-
+    
     this.userForm.get('isLdapUser')?.valueChanges.subscribe((isLdap: boolean) => {
       this.toggleLdapValidators(isLdap);
     });
   }
 
   private toggleLdapValidators(isLdap: boolean): void {
-    const fieldsToValidate = ['userName', 'email'];
+    const fieldsToValidate = ['userName'];
     if (isLdap) {
       fieldsToValidate.forEach(field => this.userForm.get(field)?.clearValidators());
     } else {
       this.userForm.get('userName')?.setValidators([Validators.required]);
-      this.userForm.get('email')?.setValidators([Validators.required, Validators.email]);
     }
     fieldsToValidate.forEach(field => this.userForm.get(field)?.updateValueAndValidity());
   }

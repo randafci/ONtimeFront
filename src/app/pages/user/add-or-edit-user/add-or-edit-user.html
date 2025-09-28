@@ -26,19 +26,6 @@
         </small>
       </div>
 
-      <!-- Email -->
-      <div class="field" *ngIf="!userForm.get('isLdapUser')?.value">
-        <label for="email">{{ 'users.formPage.labels.email' | translate }} <span class="required-star">*</span></label>
-        <input id="email" type="email" pInputText class="w-full" formControlName="email"
-               [ngClass]="{'field-error': userForm.controls['email'].invalid && (userForm.controls['email'].touched || submitted)}" />
-        <small *ngIf="userForm.controls['email'].hasError('required') && (userForm.controls['email'].touched || submitted)" class="p-error">
-          {{ 'common.validation.required' | translate }}
-        </small>
-        <small *ngIf="userForm.controls['email'].hasError('email') && (userForm.controls['email'].touched || submitted)" class="p-error">
-          {{ 'users.formPage.validation.invalidEmail' | translate }}
-        </small>
-      </div>
-
       <!-- Password -->
       <div class="field" *ngIf="!isEditMode">
         <label for="password">{{ 'users.formPage.labels.password' | translate }} <span class="required-star">*</span></label>

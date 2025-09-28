@@ -21,7 +21,7 @@
 /* RTL Support for sidebar positioning */
 html[dir="rtl"] .layout-sidebar {
     left: auto !important;
-    right: 2rem !important;
+    right: -1rem !important;
 }
 
 .layout-menu {
