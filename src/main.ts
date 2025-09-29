@@ -5,7 +5,18 @@ import axios, { AxiosResponse } from "axios";
 import { environment } from "./environments/environment";
 
 import { SharedAppSettings } from '../src/app/shared/shared-app-settings';
-bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err));
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/public/sw.js')
+    .then(() => console.log('Service Worker Registered'))
+    .catch((error) => console.error('Service Worker Registration Failed:', error));
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/public/sw.js')
+    .then(() => console.log('Service Worker Registered'))
+    .catch((error) => console.error('Service Worker Registration Failed:', error));
+}
+
 axios.get(`/config.${environment.name}.json`).then((result : AxiosResponse)=>{
   const config = result.data;
   SharedAppSettings.apiUrl = config['apiUrl'];
@@ -14,7 +25,6 @@ axios.get(`/config.${environment.name}.json`).then((result : AxiosResponse)=>{
   console.log(err);
 })
 .finally(()=>{
-  bootstrapApplication(AppComponent, appConfig).catch((err) => console.log(err));
+  bootstrapApplication(AppComponent, appConfig).catch((err) => console.log(err)); 
 })
-
 
