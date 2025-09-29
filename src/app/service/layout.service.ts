@@ -263,7 +263,6 @@ export class LayoutService {
     try {
       const response = await firstValueFrom(this.settingsService.getOrgLayoutSettings(type));
       const normalized = this.normalizeSettings(response.data);
-console.log("getOrgLayoutSettings " , normalized)
       // Use individual setter methods with proper default values
       this.setPreset(normalized.config.preset || 'Aura');
       this.setPrimaryColor(normalized.config.primary || 'emerald');

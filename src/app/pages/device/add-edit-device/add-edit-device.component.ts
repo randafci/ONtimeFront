@@ -17,6 +17,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
 import { ButtonModule } from 'primeng/button';
 import { LocationService } from '../../location/location.service';
+import { Location } from '../../../interfaces/location.interface';
 import { LookupService } from '../../organization/OrganizationService';
 import { AuthService } from '../../../auth/auth.service';
 import { Organization } from '../../../interfaces/organization.interface';
@@ -117,7 +118,7 @@ export class AddEditDeviceComponent implements OnInit {
   
   loadLocations(): void {
     this.locationService.getAllLocations().subscribe({
-      next: (response) => {
+      next: (response: ApiResponse<Location[]>) => {
         if (response.succeeded && response.data) {
           this.locationsList = response.data;
         } else {

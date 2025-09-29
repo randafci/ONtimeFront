@@ -20,7 +20,7 @@
         [rowHover]="true"
         [showGridlines]="true"
         [paginator]="true"
-        [globalFilterFields]="['userName', 'email']"
+        [globalFilterFields]="['userName']"
         responsiveLayout="scroll"
     >
         <ng-template pTemplate="caption">
@@ -57,14 +57,6 @@
                     </div>
                 </th>
                 
-                <!-- Email Header -->
-                <th style="min-width: 12rem">
-                    <div class="flex justify-between items-center">
-                        {{ 'users.listPage.headers.email' | translate }}
-                        <p-columnFilter type="text" field="email" display="menu" [placeholder]="'users.listPage.filters.searchByEmail' | translate"></p-columnFilter>
-                    </div>
-                </th>
-                
                 <!-- LDAP User Header -->
                 <th style="min-width: 8rem">
                     <div class="flex justify-between items-center">
@@ -94,7 +86,6 @@
         <ng-template pTemplate="body" let-user>
             <tr>
                 <td>{{ user.userName }}</td>
-                <td>{{ user.email }}</td>
                 <td>
                     <p-tag 
                         [value]="(user.isLdapUser ? 'common.yes' : 'common.no') | translate"

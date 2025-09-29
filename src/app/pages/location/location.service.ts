@@ -5,6 +5,7 @@ import { AuthService } from '@/auth/auth.service';
 import { ApiResponse } from '@/core/models/api-response.model';
 import { AppConfigService } from '../service/app-config.service';
 import { Location, CreateLocation, EditLocation } from '@/interfaces/location.interface';
+import { Organization } from '@/interfaces/organization.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -46,6 +47,11 @@ export class LocationService {
     const headers = this.authService.getHeaders();
 
     return this.http.delete<ApiResponse<boolean>>(`${this.apiUrl}/Location/${id}`, { headers });
+  }
+
+  getOrganizations(): Observable<ApiResponse<Organization[]>> {
+    const headers = this.authService.getHeaders();
+    return this.http.get<ApiResponse<Organization[]>>(`${this.apiUrl}/Lookup/Organization`, { headers });
   }
 
 }

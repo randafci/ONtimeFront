@@ -36,6 +36,7 @@ export class SectionModalComponent implements OnInit, OnChanges {
   @Input() section: Section | null = null;
   @Input() organizations: Organization[] = [];
   @Input() sectionTypes: SectionType[] = [];
+  @Input() sections: Section[] = [];
   @Input() isSuperAdmin: boolean = false;
   @Input() loading: boolean = false;
 
@@ -44,6 +45,7 @@ export class SectionModalComponent implements OnInit, OnChanges {
   @Output() onCancelEvent = new EventEmitter<void>();
 
   sectionForm: FormGroup;
+  mainSections: Section[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -59,10 +61,19 @@ export class SectionModalComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['dialogVisible'] && this.dialogVisible && this.isEditMode && this.section) {
-      this.patchForm(this.section);
-    } else if (changes['dialogVisible'] && this.dialogVisible && !this.isEditMode) {
-      this.resetFormForCreate();
+    if (changes['sections']) {
+      this.updateMainSections();
+    }
+    
+    if (changes['dialogVisible'] && this.dialogVisible) {
+
+      this.loading = false;
+      
+      if (this.isEditMode && this.section) {
+        this.patchForm(this.section);
+      } else if (!this.isEditMode) {
+        this.resetFormForCreate();
+      }
     }
   }
 
@@ -72,6 +83,7 @@ export class SectionModalComponent implements OnInit, OnChanges {
       code: ['', Validators.required],
       name: ['', Validators.required],
       nameSE: ['', Validators.required],
+      parentId: [null],
       organizationId: [null, Validators.required],
       sectionTypeLookupId: [null, Validators.required]
     });
@@ -83,9 +95,11 @@ export class SectionModalComponent implements OnInit, OnChanges {
       code: section.code,
       name: section.name,
       nameSE: section.nameSE,
+      parentId: section.parentId,
       organizationId: section.organizationId,
       sectionTypeLookupId: section.sectionTypeLookupId
     });
+    this.onSectionTypeChange(section.sectionTypeLookupId || 0);
   }
 
   resetFormForCreate(): void {
@@ -98,6 +112,22 @@ export class SectionModalComponent implements OnInit, OnChanges {
       }
     } else {
       this.sectionForm.get('organizationId')?.enable();
+    }
+  }
+
+  updateMainSections(): void {
+    
+    this.mainSections = this.sections.filter(section => section.sectionTypeLookupId === 1);
+  }
+
+  onSectionTypeChange(sectionTypeLookupId: number): void {
+    if (sectionTypeLookupId === 1) {
+   
+      this.sectionForm.get('parentId')?.setValue(null);
+      this.sectionForm.get('parentId')?.disable();
+    } else if (sectionTypeLookupId === 2) {
+
+      this.sectionForm.get('parentId')?.enable();
     }
   }
 
@@ -127,6 +157,7 @@ export class SectionModalComponent implements OnInit, OnChanges {
           summary: 'Success',
           detail: 'sectionForm.toasts.createSuccess'
         });
+        this.loading = false;
         this.onSave.emit(response.data);
         this.closeDialog();
       },
@@ -149,6 +180,7 @@ export class SectionModalComponent implements OnInit, OnChanges {
           summary: 'Success',
           detail: 'sectionForm.toasts.updateSuccess'
         });
+        this.loading = false;
         this.onSave.emit(response.data);
         this.closeDialog();
       },

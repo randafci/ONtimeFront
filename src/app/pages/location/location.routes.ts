@@ -1,15 +1,11 @@
 import { Routes } from '@angular/router';
-import { LocationList } from './location-list/location-list';
-import { AddOrEditLocation } from './add-or-edit-location/add-or-edit-location';
-
+import { LocationListComponent } from './location-list/location-list.component';
 
 export const LOCATION_ROUTES: Routes = [
     { 
         path: '',
         children: [
-            { path: 'list', component: LocationList },
-            { path: 'add', component: AddOrEditLocation },
-            { path: 'edit/:id', component: AddOrEditLocation },
+            { path: 'list', component: LocationListComponent },
             { path: '', redirectTo: 'list', pathMatch: 'full' }
         ]
     }

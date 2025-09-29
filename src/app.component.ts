@@ -7,7 +7,7 @@ import { APP_INITIALIZER, Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 export function initializeApp(appConfig: AppConfigService) {
-  return () => appConfig.loadConfig();
+ // return () => appConfig.loadConfig();
 }
 
 @Component({
@@ -15,13 +15,7 @@ export function initializeApp(appConfig: AppConfigService) {
   standalone: true,
   imports: [RouterModule, CommonModule, HttpClientModule],
   providers: [
-    AppConfigService,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: initializeApp,
-      deps: [AppConfigService],
-      multi: true
-    }
+ 
   ],
   template: `<router-outlet></router-outlet>`
 })
