@@ -105,20 +105,50 @@ export class AddOrEditUser implements OnInit {
       }
     });
     
+    const isLdapInitial = this.userForm.get('isLdapUser')?.value;
+  this.toggleLdapValidators(isLdapInitial);
+
     this.userForm.get('isLdapUser')?.valueChanges.subscribe((isLdap: boolean) => {
       this.toggleLdapValidators(isLdap);
     });
   }
 
-  private toggleLdapValidators(isLdap: boolean): void {
-    const fieldsToValidate = ['userName'];
-    if (isLdap) {
-      fieldsToValidate.forEach(field => this.userForm.get(field)?.clearValidators());
-    } else {
-      this.userForm.get('userName')?.setValidators([Validators.required]);
-    }
-    fieldsToValidate.forEach(field => this.userForm.get(field)?.updateValueAndValidity());
+private toggleLdapValidators(isLdap: boolean): void {
+  const userNameControl = this.userForm.get('userName');
+  const passwordControl = this.userForm.get('password');
+  const employeeControl = this.userForm.get('employeeId');
+
+  if (isLdap) {
+    // 🔹 LDAP: no need for username/password, but employee is required
+    userNameControl?.clearValidators();
+    passwordControl?.clearValidators();
+    employeeControl?.setValidators([Validators.required]);
+  } else {
+    // 🔹 Non-LDAP: username/password required, employee not required
+    userNameControl?.setValidators([
+      Validators.required,
+      Validators.email,
+      Validators.minLength(3),
+      Validators.maxLength(50)
+    ]);
+
+    passwordControl?.setValidators([
+      Validators.required,
+      Validators.minLength(6),
+      Validators.maxLength(30),
+      Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]+$/)
+    ]);
+
+    employeeControl?.clearValidators();
   }
+
+  // 🔹 Refresh validation state
+  userNameControl?.updateValueAndValidity();
+  passwordControl?.updateValueAndValidity();
+  employeeControl?.updateValueAndValidity();
+}
+
+
 
   loadUser(id: string): void {
     this.loading = true;
@@ -178,6 +208,12 @@ export class AddOrEditUser implements OnInit {
 
     this.loading = true;
     const formData = this.userForm.value;
+
+      if (formData.isLdapUser) {
+    formData.userName = null;
+    formData.password = null;
+  }
+
 
     if (this.isEditMode && this.userId) {
       const updateDto: UpdateUserDto = { id: this.userId, ...formData };
