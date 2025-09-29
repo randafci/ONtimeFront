@@ -5,10 +5,11 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
-import { RamadanPeriod, CreateRamadanPeriod, EditRamadanPeriod } from '@/interfaces/ramadan-period.interface';
+import { RamadanPeriod, CreateRamadanPeriod, EditRamadanPeriod } from '../../../interfaces/ramadan-period.interface';
 import { RamadanPeriodService } from '../RamadanPeriodService';
-import { ApiResponse } from '@/core/models/api-response.model';
-import { AuthService } from '@/auth/auth.service';
+import { ApiResponse } from '../../../core/models/api-response.model';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-ramadan-period-modal',
@@ -19,6 +20,7 @@ import { AuthService } from '@/auth/auth.service';
     DialogModule,
     InputTextModule,
     ButtonModule,
+    TranslatePipe
   ],
   providers: [MessageService],
   templateUrl: './ramadan-period-modal.component.html',
@@ -34,17 +36,21 @@ export class RamadanPeriodModalComponent implements OnInit, OnChanges {
   @Output() onCancelEvent = new EventEmitter<void>();
 
   ramadanPeriodForm: FormGroup;
+  private translations: any = {};
 
   constructor(
     private fb: FormBuilder,
     private ramadanPeriodService: RamadanPeriodService,
     private messageService: MessageService,
-    private authService: AuthService
+    private translationService: TranslationService
   ) {
     this.ramadanPeriodForm = this.createForm();
   }
 
   ngOnInit() {
+    this.translationService.translations$.subscribe(translations => {
+      this.translations = translations;
+    });
   }
 
   ngOnChanges() {
@@ -67,25 +73,16 @@ export class RamadanPeriodModalComponent implements OnInit, OnChanges {
 
   loadRamadanPeriodData(): void {
     if (this.ramadanPeriod) {
-      const startDate = new Date(this.ramadanPeriod.start);
-      const endDate = new Date(this.ramadanPeriod.end);
-      
       this.ramadanPeriodForm.patchValue({
-        code: this.ramadanPeriod.code,
-        name: this.ramadanPeriod.name,
-        nameSE: this.ramadanPeriod.nameSE,
-        start: this.formatDateForInput(startDate),
-        end: this.formatDateForInput(endDate)
+        ...this.ramadanPeriod,
+        start: this.formatDateForInput(new Date(this.ramadanPeriod.start)),
+        end: this.formatDateForInput(new Date(this.ramadanPeriod.end))
       });
     }
   }
 
   private formatDateForInput(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    
-    return `${year}-${month}-${day}`;
+    return date.toISOString().split('T')[0];
   }
 
   resetForm(): void {
@@ -99,68 +96,45 @@ export class RamadanPeriodModalComponent implements OnInit, OnChanges {
     }
 
     const formData = this.ramadanPeriodForm.value;
+    const data = {
+      ...formData,
+      start: new Date(formData.start).toISOString(),
+      end: new Date(formData.end).toISOString()
+    };
 
     if (this.isEditMode) {
-      const editData: EditRamadanPeriod = {
-        code: formData.code,
-        name: formData.name,
-        nameSE: formData.nameSE,
-        start: new Date(formData.start).toISOString(),
-        end: new Date(formData.end).toISOString()
-      };
-      this.updateRamadanPeriod(editData);
+      this.updateRamadanPeriod(data);
     } else {
-      const createData: CreateRamadanPeriod = {
-        code: formData.code,
-        name: formData.name,
-        nameSE: formData.nameSE,
-        start: new Date(formData.start).toISOString(),
-        end: new Date(formData.end).toISOString()
-      };
-      this.createRamadanPeriod(createData);
+      this.createRamadanPeriod(data);
     }
   }
 
   createRamadanPeriod(data: CreateRamadanPeriod): void {
     this.ramadanPeriodService.createRamadanPeriod(data).subscribe({
-      next: (response: ApiResponse<RamadanPeriod>) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Ramadan period created successfully'
-        });
-        this.onSave.emit(response.data);
-        this.closeDialog();
-      },
-      error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to create ramadan period'
-        });
-      }
+      next: (response: ApiResponse<RamadanPeriod>) => this.handleSuccess(response, 'createSuccess'),
+      error: () => this.handleError('createError')
     });
   }
 
   updateRamadanPeriod(data: EditRamadanPeriod): void {
     this.ramadanPeriodService.updateRamadanPeriod(this.ramadanPeriod!.id, data).subscribe({
-      next: (response: ApiResponse<RamadanPeriod>) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Ramadan period updated successfully'
-        });
-        this.onSave.emit(response.data);
-        this.closeDialog();
-      },
-      error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to update ramadan period'
-        });
-      }
+      next: (response: ApiResponse<RamadanPeriod>) => this.handleSuccess(response, 'updateSuccess'),
+      error: () => this.handleError('updateError')
     });
+  }
+
+  private handleSuccess(response: ApiResponse<RamadanPeriod>, messageKey: string): void {
+    this.showToast('success', this.translations.common?.success, this.translations.ramadanPeriodForm?.toasts[messageKey]);
+    this.onSave.emit(response.data);
+    this.closeDialog();
+  }
+
+  private handleError(messageKey: string): void {
+    this.showToast('error', this.translations.common?.error, this.translations.ramadanPeriodForm?.toasts[messageKey]);
+  }
+
+  private showToast(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 
   onDialogHide(): void {
@@ -179,10 +153,7 @@ export class RamadanPeriodModalComponent implements OnInit, OnChanges {
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
-
-      if (control instanceof FormGroup) {
-        this.markFormGroupTouched(control);
-      }
+      if (control instanceof FormGroup) this.markFormGroupTouched(control);
     });
   }
 }

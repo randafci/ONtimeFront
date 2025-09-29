@@ -13,6 +13,7 @@ import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
 import { Organization } from '../../../interfaces/organization.interface';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 
 @Component({
   selector: 'app-shift-type-modal',
@@ -43,17 +44,22 @@ export class ShiftTypeModalComponent implements OnInit, OnChanges {
   @Output() onCancelEvent = new EventEmitter<void>();
 
   shiftTypeForm: FormGroup;
+  private translations: any = {};
 
   constructor(
     private fb: FormBuilder,
     private shiftTypeService: ShiftTypeService,
     private messageService: MessageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private translationService: TranslationService
   ) {
     this.shiftTypeForm = this.createForm();
   }
 
   ngOnInit() {
+    this.translationService.translations$.subscribe(translations => {
+      this.translations = translations;
+    });
   }
 
   ngOnChanges() {
@@ -76,21 +82,12 @@ export class ShiftTypeModalComponent implements OnInit, OnChanges {
 
   loadShiftTypeData(): void {
     if (this.shiftType) {
-      this.shiftTypeForm.patchValue({
-        id: this.shiftType.id,
-        name: this.shiftType.name,
-        nameSE: this.shiftType.nameSE,
-        priority: this.shiftType.priority,
-        organizationId: this.shiftType.organizationId
-      });
+      this.shiftTypeForm.patchValue(this.shiftType);
     }
   }
 
   resetForm(): void {
-    this.shiftTypeForm.reset();
-    this.shiftTypeForm.patchValue({
-      priority: 1
-    });
+    this.shiftTypeForm.reset({ priority: 1 });
     if (!this.isSuperAdmin) {
       const orgId = this.authService.getOrgId();
       if (orgId) {
@@ -106,67 +103,35 @@ export class ShiftTypeModalComponent implements OnInit, OnChanges {
     }
 
     const formData = this.shiftTypeForm.value;
-
-    if (this.isEditMode) {
-      const editData: EditShiftType = {
-        id: this.shiftTypeForm.get('id')?.value,
-        name: formData.name,
-        nameSE: formData.nameSE,
-        priority: formData.priority,
-        organizationId: formData.organizationId
-      };
-      this.updateShiftType(editData);
-    } else {
-      const createData: CreateShiftType = {
-        name: formData.name,
-        nameSE: formData.nameSE,
-        priority: formData.priority,
-        organizationId: formData.organizationId
-      };
-      this.createShiftType(createData);
-    }
+    const action = this.isEditMode ? this.updateShiftType(formData) : this.createShiftType(formData);
   }
 
   createShiftType(data: CreateShiftType): void {
     this.shiftTypeService.createShiftType(data).subscribe({
-      next: (response: ApiResponse<ShiftType>) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Shift type created successfully'
-        });
-        this.onSave.emit(response.data);
-        this.closeDialog();
-      },
-      error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to create shift type'
-        });
-      }
+      next: (response: ApiResponse<ShiftType>) => this.handleSuccess(response, 'createSuccess'),
+      error: (error) => this.handleError('createError')
     });
   }
 
   updateShiftType(data: EditShiftType): void {
     this.shiftTypeService.updateShiftType(data).subscribe({
-      next: (response: ApiResponse<ShiftType>) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Shift type updated successfully'
-        });
-        this.onSave.emit(response.data);
-        this.closeDialog();
-      },
-      error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to update shift type'
-        });
-      }
+      next: (response: ApiResponse<ShiftType>) => this.handleSuccess(response, 'updateSuccess'),
+      error: (error) => this.handleError('updateError')
     });
+  }
+
+  private handleSuccess(response: ApiResponse<ShiftType>, messageKey: string): void {
+    this.showToast('success', this.translations.common?.success, this.translations.shiftTypeForm?.toasts[messageKey]);
+    this.onSave.emit(response.data);
+    this.closeDialog();
+  }
+
+  private handleError(messageKey: string): void {
+    this.showToast('error', this.translations.common?.error, this.translations.shiftTypeForm?.toasts[messageKey]);
+  }
+
+  private showToast(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 
   onDialogHide(): void {
@@ -185,10 +150,7 @@ export class ShiftTypeModalComponent implements OnInit, OnChanges {
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
-
-      if (control instanceof FormGroup) {
-        this.markFormGroupTouched(control);
-      }
+      if (control instanceof FormGroup) this.markFormGroupTouched(control);
     });
   }
 }

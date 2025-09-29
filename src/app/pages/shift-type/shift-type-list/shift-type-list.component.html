@@ -75,7 +75,7 @@
                 <td>{{ shiftType.nameSE }}</td>
                 <td>{{ shiftType.priority }}</td>
                 <td>
-                    <p-tag [value]="getStatus(shiftType)" [severity]="getSeverity(getStatus(shiftType))"></p-tag>
+                    <p-tag [value]="('shiftTypeList.statusValues.' + getStatus(shiftType)) | translate" [severity]="getSeverity(getStatus(shiftType))"></p-tag>
                 </td>
                 <td>
                     <button 

@@ -73,7 +73,6 @@ export class MenuComponent implements OnInit {
                             { label: this.t('menu.organization.costCenter'), icon: 'pi pi-fw pi-dollar', routerLink: ['/cost-centers/list'] },
                             { label: this.t('menu.organization.shiftType'), icon: 'pi pi-fw pi-clone', routerLink: ['/shift-types/list'] },
                             { label: this.t('menu.teams.teams'), icon: 'pi pi-fw pi-users', routerLink: ['/teams'] },
-                            { label: 'Holiday Types', icon: 'pi pi-fw pi-tags', routerLink: ['/holiday-types/list'] }
                         ]
                     },
                     {
@@ -101,9 +100,10 @@ export class MenuComponent implements OnInit {
                     {
                         label: this.t('menu.hr.groupLabel'),
                         items: [
-                            { label: 'Holidays', icon: 'pi pi-fw pi-calendar', routerLink: ['/holidays/list'] },
-                            { label: 'Leave Types', icon: 'pi pi-fw pi-calendar-plus', routerLink: ['/leave-types/list'] },
-                            { label: 'Ramadan Periods', icon: 'pi pi-fw pi-moon', routerLink: ['/ramadan-periods/list'] }
+                            { label: this.t('menu.hr.holidays'), icon: 'pi pi-fw pi-calendar', routerLink: ['/holidays/list'] },
+                            { label: this.t('menu.hr.holidayTypes'), icon: 'pi pi-fw pi-tags', routerLink: ['/holiday-types/list'] },
+                            { label: this.t('menu.hr.leaveTypes'), icon: 'pi pi-fw pi-calendar-plus', routerLink: ['/leave-types/list'] },
+                            { label: this.t('menu.hr.ramadanPeriods'), icon: 'pi pi-fw pi-moon', routerLink: ['/ramadan-periods/list'] }
                         ]
                     }
                     ,
@@ -112,8 +112,7 @@ export class MenuComponent implements OnInit {
                         items: [
                             { label: this.t('menu.users.employee'), icon: 'pi pi-fw pi-users', routerLink: ['/employees'] },
                             { label: this.t('menu.employeeDevicesAssignment.employeeDevicesAssignment'), icon: 'pi pi-fw pi-map-marker', routerLink: ['/employeeDevicesAssignment'] },
-                            { label: this.t('menu.employee.reportingmanager'), icon: 'pi pi-fw pi-map-marker', routerLink: ['/employees/reportingmanager/add'] },
-
+{ label: this.t('menu.employee.reportingManager'), icon: 'pi pi-fw pi-sitemap', routerLink: ['/employees/reportingmanager/add'] }
 
                         ]
                     }

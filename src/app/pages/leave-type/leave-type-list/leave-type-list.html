@@ -1,10 +1,10 @@
 <div class="card">
     <div class="flex justify-between items-center mb-4">
-        <h2 class="mb-0">Leave Types</h2>
+        <h2 class="mb-0">{{ 'leaveTypeList.title' | translate }}</h2>
         <div class="flex-grow"></div>
         <button 
             pButton 
-            label="Add Leave Type"
+            [label]="'leaveTypeList.addButton' | translate"
             icon="pi pi-plus" 
             class="p-button-sm"
             (click)="openCreateDialog()"
@@ -27,21 +27,19 @@
             <div class="flex justify-between items-center flex-col sm:flex-row">
                 <button 
                     pButton 
-                    label="Clear"
+                    [label]="'leaveTypeList.clearButton' | translate"
                     class="p-button-outlined mb-2" 
                     icon="pi pi-filter-slash" 
                     (click)="clear(dt)"
                 ></button>
                 <p-iconfield iconPosition="left" class="ml-auto">
-                    <p-inputicon>
-                        <i class="pi pi-search"></i>
-                    </p-inputicon>
+                    <p-inputicon><i class="pi pi-search"></i></p-inputicon>
                     <input 
                         pInputText 
                         type="text" 
                         #filter
                         (input)="onGlobalFilter(dt, $event)" 
-                        placeholder="Search leave types..."
+                        [placeholder]="'leaveTypeList.searchPlaceholder' | translate"
                     />
                 </p-iconfield>
             </div>
@@ -49,78 +47,39 @@
         
         <ng-template pTemplate="header">
             <tr>
-                <th pSortableColumn="code">
-                    Code
-                    <p-sortIcon field="code"></p-sortIcon>
-                </th>
-                <th pSortableColumn="name">
-                    Name
-                    <p-sortIcon field="name"></p-sortIcon>
-                </th>
-                <th pSortableColumn="nameSE">
-                    Name (SE)
-                    <p-sortIcon field="nameSE"></p-sortIcon>
-                </th>
-                <th pSortableColumn="symbol">
-                    Symbol
-                    <p-sortIcon field="symbol"></p-sortIcon>
-                </th>
-                <th pSortableColumn="organizationName">
-                    Organization
-                    <p-sortIcon field="organizationName"></p-sortIcon>
-                </th>
-                <th>Requirements</th>
-                <th style="min-width: 8rem">Actions</th>
+                <th pSortableColumn="code">{{ 'leaveTypeList.headers.code' | translate }}<p-sortIcon field="code"></p-sortIcon></th>
+                <th pSortableColumn="name">{{ 'leaveTypeList.headers.name' | translate }}<p-sortIcon field="name"></p-sortIcon></th>
+                <th pSortableColumn="nameSE">{{ 'leaveTypeList.headers.nameSE' | translate }}<p-sortIcon field="nameSE"></p-sortIcon></th>
+                <th pSortableColumn="symbol">{{ 'leaveTypeList.headers.symbol' | translate }}<p-sortIcon field="symbol"></p-sortIcon></th>
+                <th pSortableColumn="organizationName">{{ 'leaveTypeList.headers.organization' | translate }}<p-sortIcon field="organizationName"></p-sortIcon></th>
+                <th>{{ 'leaveTypeList.headers.requirements' | translate }}</th>
+                <th style="min-width: 8rem">{{ 'leaveTypeList.headers.actions' | translate }}</th>
             </tr>
         </ng-template>
         
         <ng-template pTemplate="body" let-leaveType>
             <tr>
-                <td>
-                    <p-tag [value]="leaveType.code" severity="info"></p-tag>
-                </td>
+                <td><p-tag [value]="leaveType.code" severity="info"></p-tag></td>
                 <td>{{ leaveType.name }}</td>
                 <td>{{ leaveType.nameSE }}</td>
-                <td>
-                    <p-tag [value]="leaveType.symbol" severity="success"></p-tag>
-                </td>
+                <td><p-tag [value]="leaveType.symbol" severity="success"></p-tag></td>
                 <td>{{ leaveType.organizationName || 'N/A' }}</td>
                 <td>
                     <div class="flex flex-col gap-1">
-                        <p-tag 
-                            *ngIf="leaveType.isAttachmentRequired" 
-                            value="Attachment" 
-                            severity="warning" 
-                            class="text-xs">
-                        </p-tag>
-                        <p-tag 
-                            *ngIf="leaveType.isCommentRequired" 
-                            value="Comment" 
-                            severity="info" 
-                            class="text-xs">
-                        </p-tag>
+                        <p-tag *ngIf="leaveType.isAttachmentRequired" [value]="'leaveTypeList.requirements.attachment' | translate" severity="warning" class="text-xs"></p-tag>
+                        <p-tag *ngIf="leaveType.isCommentRequired" [value]="'leaveTypeList.requirements.comment' | translate" severity="info" class="text-xs"></p-tag>
                     </div>
                 </td>
                 <td>
-                    <button 
-                        pButton 
-                        icon="pi pi-pencil" 
-                        class="p-button-rounded p-button-text p-button-sm"
-                        (click)="openEditDialog(leaveType)"
-                    ></button>
-                    <button 
-                        pButton 
-                        icon="pi pi-trash" 
-                        class="p-button-rounded p-button-text p-button-danger p-button-sm"
-                        (click)="deleteLeaveType(leaveType)"
-                    ></button>
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm" (click)="openEditDialog(leaveType)"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm" (click)="deleteLeaveType(leaveType)"></button>
                 </td>
             </tr>
         </ng-template>
         
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="7">No leave types found.</td>
+                <td colspan="7">{{ 'leaveTypeList.messages.empty' | translate }}</td>
             </tr>
         </ng-template>
     </p-table>
@@ -135,8 +94,7 @@
   [isSuperAdmin]="isSuperAdmin"
   [loading]="loading"
   (onSave)="onLeaveTypeSaved($event)"
->
-</app-leave-type-modal>
+></app-leave-type-modal>
 
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>

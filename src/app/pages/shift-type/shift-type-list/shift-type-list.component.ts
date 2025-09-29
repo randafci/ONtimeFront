@@ -25,6 +25,7 @@ import { Organization } from '../../../interfaces/organization.interface';
 import { LookupService } from '../../organization/OrganizationService';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 
 @Component({
   selector: 'app-shift-type-list',
@@ -55,13 +56,12 @@ import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 export class ShiftTypeListComponent implements OnInit {
   shiftTypes: ShiftType[] = [];
   loading: boolean = true;
-
-  // Dialog properties
   dialogVisible: boolean = false;
   isEditMode: boolean = false;
   selectedShiftType: ShiftType | null = null;
   organizations: Organization[] = [];
   isSuperAdmin = false;
+  private translations: any = {};
 
   @ViewChild('dt') table!: Table;
   @ViewChild('filter') filter!: ElementRef;
@@ -71,12 +71,14 @@ export class ShiftTypeListComponent implements OnInit {
     private organizationService: LookupService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private router: Router,
     private authService: AuthService,
-    private translatePipe: TranslatePipe
+    private translationService: TranslationService
   ) {}
 
   ngOnInit() {
+    this.translationService.translations$.subscribe(translations => {
+      this.translations = translations;
+    });
     this.isSuperAdmin = this.checkIsSuperAdmin();
     this.loadShiftTypes();
     this.loadOrganizations();
@@ -90,13 +92,9 @@ export class ShiftTypeListComponent implements OnInit {
   loadOrganizations(): void {
     this.organizationService.getAllOrganizations().subscribe({
       next: (response: ApiResponse<Organization[]>) => {
-        if (response.succeeded) {
-          this.organizations = response.data;
-        }
+        if (response.succeeded) this.organizations = response.data;
       },
-      error: (error) => {
-        console.error('Error loading organizations:', error);
-      }
+      error: (error) => console.error('Error loading organizations:', error)
     });
   }
 
@@ -107,21 +105,12 @@ export class ShiftTypeListComponent implements OnInit {
         if (response.succeeded) {
           this.shiftTypes = response.data;
         } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: response.message || 'Failed to load shift types'
-          });
+          this.showToast('error', this.translations.common?.error, response.message || this.translations.shiftTypeList?.toasts?.loadError);
         }
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading shift types:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load shift types'
-        });
+        this.showToast('error', this.translations.common?.error, this.translations.shiftTypeList?.toasts?.loadError);
         this.loading = false;
       }
     });
@@ -131,16 +120,11 @@ export class ShiftTypeListComponent implements OnInit {
     return shiftType.isDeleted ? 'inactive' : 'active';
   }
 
-  getSeverity(status: string) {
-    if (!status) return 'info';
-    
-    switch (status.toLowerCase()) {
-      case 'active':
-        return 'success';
-      case 'inactive':
-        return 'danger';
-      default:
-        return 'info';
+  getSeverity(status: string): string {
+    switch (status?.toLowerCase()) {
+      case 'active': return 'success';
+      case 'inactive': return 'danger';
+      default: return 'info';
     }
   }
 
@@ -161,36 +145,26 @@ export class ShiftTypeListComponent implements OnInit {
   }
 
   deleteShiftType(shiftType: ShiftType) {
-    const message = this.translatePipe.transform('shiftTypeList.messages.deleteConfirm').replace('{name}', shiftType.name);
+    const commonTrans = this.translations.common || {};
+    const shiftTypeTrans = this.translations.shiftTypeList?.messages || {};
+    const message = (shiftTypeTrans.deleteConfirm || 'Are you sure you want to delete {name}?').replace('{name}', shiftType.name);
+
     this.confirmationService.confirm({
       message: message,
-      header: this.translatePipe.transform('common.deleteHeader'),
+      header: commonTrans.deleteHeader || 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.shiftTypeService.deleteShiftType(shiftType.id).subscribe({
           next: (response: ApiResponse<boolean>) => {
             if (response.succeeded) {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: `Shift Type ${shiftType.name} deleted successfully`
-              });
+              this.showToast('success', commonTrans.success, this.translations.shiftTypeList?.toasts?.deleteSuccess);
               this.loadShiftTypes();
             } else {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: response.message || 'Failed to delete shift type'
-              });
+              this.showToast('error', commonTrans.error, response.message || this.translations.shiftTypeList?.toasts?.deleteError);
             }
           },
           error: (error) => {
-            console.error('Error deleting shift type:', error);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to delete shift type'
-            });
+            this.showToast('error', commonTrans.error, this.translations.shiftTypeList?.toasts?.deleteError);
           }
         });
       }
@@ -204,5 +178,9 @@ export class ShiftTypeListComponent implements OnInit {
   clear(table: Table) {
     table.clear();
     this.filter.nativeElement.value = '';
+  }
+
+  private showToast(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 }

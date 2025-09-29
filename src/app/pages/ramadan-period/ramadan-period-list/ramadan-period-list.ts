@@ -23,6 +23,8 @@ import { ApiResponse } from '@/core/models/api-response.model';
 import { AuthService } from '@/auth/auth.service';
 import { RamadanPeriodModalComponent } from '../ramadan-period-modal/ramadan-period-modal.component';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-ramadan-period-list',
@@ -45,7 +47,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     RouterModule,
     DatePipe,
     ConfirmDialogModule,
-    RamadanPeriodModalComponent
+    RamadanPeriodModalComponent,
+    TranslatePipe
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './ramadan-period-list.html'
@@ -53,10 +56,10 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 export class RamadanPeriodListComponent implements OnInit {
   ramadanPeriods: RamadanPeriod[] = [];
   loading: boolean = true;
-
   dialogVisible: boolean = false;
   isEditMode: boolean = false;
   selectedRamadanPeriod: RamadanPeriod | null = null;
+  private translations: any = {};
 
   @ViewChild('dt') table!: Table;
   @ViewChild('filter') filter!: ElementRef;
@@ -65,11 +68,13 @@ export class RamadanPeriodListComponent implements OnInit {
     private ramadanPeriodService: RamadanPeriodService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private router: Router,
-    private authService: AuthService
+    private translationService: TranslationService
   ) {}
 
   ngOnInit() {
+    this.translationService.translations$.subscribe(translations => {
+      this.translations = translations;
+    });
     this.loadRamadanPeriods();
   }
 
@@ -80,20 +85,12 @@ export class RamadanPeriodListComponent implements OnInit {
         if (response.succeeded) {
           this.ramadanPeriods = response.data;
         } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: response.message || 'Failed to load ramadan periods'
-          });
+          this.showToast('error', this.translations.common?.error, response.message || this.translations.ramadanPeriodList?.messages?.loadError);
         }
         this.loading = false;
       },
       error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load ramadan periods'
-        });
+        this.showToast('error', this.translations.common?.error, this.translations.ramadanPeriodList?.messages?.loadError);
         this.loading = false;
       }
     });
@@ -116,35 +113,25 @@ export class RamadanPeriodListComponent implements OnInit {
   }
 
   deleteRamadanPeriod(ramadanPeriod: RamadanPeriod) {
+    const trans = this.translations.ramadanPeriodList?.messages || {};
+    const commonTrans = this.translations.common || {};
+    const message = (trans.deleteConfirm || 'Are you sure you want to delete {name}?').replace('{name}', ramadanPeriod.name);
+
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete ${ramadanPeriod.name}?`,
-      header: 'Confirm Delete',
+      message: message,
+      header: commonTrans.deleteHeader || 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.ramadanPeriodService.deleteRamadanPeriod(ramadanPeriod.id).subscribe({
           next: (response: ApiResponse<boolean>) => {
             if (response.succeeded) {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: 'Ramadan period deleted successfully'
-              });
+              this.showToast('success', commonTrans.success, trans.deleteSuccess);
               this.loadRamadanPeriods();
             } else {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: response.message || 'Failed to delete ramadan period'
-              });
+              this.showToast('error', commonTrans.error, response.message || trans.deleteError);
             }
           },
-          error: (error) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to delete ramadan period'
-            });
-          }
+          error: () => this.showToast('error', commonTrans.error, trans.deleteError)
         });
       }
     });
@@ -157,5 +144,9 @@ export class RamadanPeriodListComponent implements OnInit {
   clear(table: Table) {
     table.clear();
     this.filter.nativeElement.value = '';
+  }
+
+  private showToast(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 }

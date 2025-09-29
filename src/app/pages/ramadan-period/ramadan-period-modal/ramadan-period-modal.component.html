@@ -1,7 +1,7 @@
 <!-- Create/Edit Dialog -->
 <p-dialog 
   [(visible)]="dialogVisible" 
-  [header]="isEditMode ? 'Edit Ramadan Period' : 'Add Ramadan Period'"
+  [header]="(isEditMode ? 'ramadanPeriodForm.title.edit' : 'ramadanPeriodForm.title.add') | translate"
   [modal]="true" 
   [style]="{width: '50vw'}"
   [draggable]="false" 
@@ -12,7 +12,7 @@
       <!-- Code Field -->
       <div class="field">
         <label for="code" class="block text-sm font-medium mb-2">
-          Code <span class="text-red-500">*</span>
+          {{ 'ramadanPeriodForm.labels.code' | translate }} <span class="text-red-500">*</span>
         </label>
         <input 
           id="code" 
@@ -20,18 +20,18 @@
           pInputText 
           class="w-full"
           formControlName="code" 
-          placeholder="Enter code"
+          [placeholder]="'ramadanPeriodForm.placeholders.code' | translate"
           [class.ng-invalid]="ramadanPeriodForm.get('code')?.invalid && ramadanPeriodForm.get('code')?.touched"
         />
         <small class="text-red-500" *ngIf="ramadanPeriodForm.get('code')?.invalid && ramadanPeriodForm.get('code')?.touched">
-          Code is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <!-- Name Field -->
       <div class="field">
         <label for="name" class="block text-sm font-medium mb-2">
-          Name <span class="text-red-500">*</span>
+          {{ 'ramadanPeriodForm.labels.name' | translate }} <span class="text-red-500">*</span>
         </label>
         <input 
           id="name" 
@@ -39,18 +39,18 @@
           pInputText 
           class="w-full"
           formControlName="name" 
-          placeholder="Enter name"
+          [placeholder]="'ramadanPeriodForm.placeholders.name' | translate"
           [class.ng-invalid]="ramadanPeriodForm.get('name')?.invalid && ramadanPeriodForm.get('name')?.touched"
         />
         <small class="text-red-500" *ngIf="ramadanPeriodForm.get('name')?.invalid && ramadanPeriodForm.get('name')?.touched">
-          Name is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <!-- Name SE Field -->
       <div class="field">
         <label for="nameSE" class="block text-sm font-medium mb-2">
-          Name (SE) <span class="text-red-500">*</span>
+          {{ 'ramadanPeriodForm.labels.nameSE' | translate }} <span class="text-red-500">*</span>
         </label>
         <input 
           id="nameSE" 
@@ -58,18 +58,18 @@
           pInputText 
           class="w-full"
           formControlName="nameSE" 
-          placeholder="Enter name in SE"
+          [placeholder]="'ramadanPeriodForm.placeholders.nameSE' | translate"
           [class.ng-invalid]="ramadanPeriodForm.get('nameSE')?.invalid && ramadanPeriodForm.get('nameSE')?.touched"
         />
         <small class="text-red-500" *ngIf="ramadanPeriodForm.get('nameSE')?.invalid && ramadanPeriodForm.get('nameSE')?.touched">
-          Name (SE) is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <!-- Start Date Field -->
       <div class="field">
         <label for="start" class="block text-sm font-medium mb-2">
-          Start Date <span class="text-red-500">*</span>
+          {{ 'ramadanPeriodForm.labels.startDate' | translate }} <span class="text-red-500">*</span>
         </label>
         <input 
           id="start" 
@@ -80,14 +80,14 @@
           [class.ng-invalid]="ramadanPeriodForm.get('start')?.invalid && ramadanPeriodForm.get('start')?.touched"
         />
         <small class="text-red-500" *ngIf="ramadanPeriodForm.get('start')?.invalid && ramadanPeriodForm.get('start')?.touched">
-          Start date is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <!-- End Date Field -->
       <div class="field">
         <label for="end" class="block text-sm font-medium mb-2">
-          End Date <span class="text-red-500">*</span>
+          {{ 'ramadanPeriodForm.labels.endDate' | translate }} <span class="text-red-500">*</span>
         </label>
         <input 
           id="end" 
@@ -98,7 +98,7 @@
           [class.ng-invalid]="ramadanPeriodForm.get('end')?.invalid && ramadanPeriodForm.get('end')?.touched"
         />
         <small class="text-red-500" *ngIf="ramadanPeriodForm.get('end')?.invalid && ramadanPeriodForm.get('end')?.touched">
-          End date is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
     </div>
@@ -106,14 +106,14 @@
     <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
       <button 
         pButton 
-        label="Cancel" 
+        [label]="'common.buttons.cancel' | translate" 
         class="p-button-secondary" 
         type="button"
         (click)="onCancel()">
       </button>
       <button 
         pButton 
-        [label]="isEditMode ? 'Update' : 'Save'" 
+        [label]="(isEditMode ? 'common.buttons.update' : 'common.buttons.save') | translate" 
         [loading]="loading"
         type="submit">
       </button>
