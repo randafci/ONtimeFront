@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
@@ -69,11 +69,19 @@ export class CompanyModalComponent implements OnInit, OnChanges {
     this.updateMainCompanies();
   }
 
-  ngOnChanges() {
-    if (this.dialogVisible && this.company) {
-      this.loadCompanyData();
-    } else if (this.dialogVisible && !this.isEditMode) {
-      this.resetForm();
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['companies']) {
+      this.updateMainCompanies();
+    }
+    
+    if (changes['dialogVisible'] && this.dialogVisible) {
+      this.loading = false;
+      
+      if (this.isEditMode && this.company) {
+        this.loadCompanyData();
+      } else if (!this.isEditMode) {
+        this.resetForm();
+      }
     }
   }
 
@@ -131,6 +139,7 @@ export class CompanyModalComponent implements OnInit, OnChanges {
       return;
     }
 
+    this.loading = true;
     const formData = this.companyForm.value;
 
     if (this.isEditMode) {
@@ -165,6 +174,7 @@ export class CompanyModalComponent implements OnInit, OnChanges {
           summary: this.translations.common?.success || 'Success',
           detail: this.translations.companies?.formPage?.toasts?.createSuccess || 'Company created successfully'
         });
+        this.loading = false;
         this.onSave.emit(response.data);
         this.closeDialog();
       },
@@ -174,6 +184,7 @@ export class CompanyModalComponent implements OnInit, OnChanges {
           summary: this.translations.common?.error || 'Error',
           detail: this.translations.companies?.formPage?.toasts?.createError || 'Failed to create company'
         });
+        this.loading = false;
       }
     });
   }
@@ -186,6 +197,7 @@ export class CompanyModalComponent implements OnInit, OnChanges {
           summary: this.translations.common?.success || 'Success',
           detail: this.translations.companies?.formPage?.toasts?.updateSuccess || 'Company updated successfully'
         });
+        this.loading = false;
         this.onSave.emit(response.data);
         this.closeDialog();
       },
@@ -195,6 +207,7 @@ export class CompanyModalComponent implements OnInit, OnChanges {
           summary: this.translations.common?.error || 'Error',
           detail: this.translations.companies?.formPage?.toasts?.updateError || 'Failed to update company'
         });
+        this.loading = false;
       }
     });
   }

@@ -100,8 +100,31 @@
           {{ 'common.validation.required' | translate }}
         </small>
       </div>
-       <!-- Parent Department Field -->
+
+      <!-- Department Type Field -->
       <div class="field">
+        <label for="departmentTypeLookupId" class="block text-sm font-medium mb-2">
+          Department Type<span class="text-red-500">*</span>
+        </label>
+        <p-select
+          id="departmentTypeLookupId"
+          class="w-full"
+          formControlName="departmentTypeLookupId"
+          [options]="departmentTypes"
+          optionLabel="name"
+          optionValue="id"
+          [placeholder]="'Select Department Type'"
+          appendTo="body"
+          [class.ng-invalid]="departmentForm.get('departmentTypeLookupId')?.invalid && departmentForm.get('departmentTypeLookupId')?.touched"
+          (onChange)="onDepartmentTypeChange($event.value)">
+        </p-select>
+        <small class="text-red-500" *ngIf="departmentForm.get('departmentTypeLookupId')?.invalid && departmentForm.get('departmentTypeLookupId')?.touched">
+          {{ 'common.validation.required' | translate }}
+        </small>
+      </div>
+
+    
+      <div class="field" *ngIf="departmentForm.get('departmentTypeLookupId')?.value === 2">
         <label for="parentId" class="block text-sm font-medium mb-2">
           {{ 'departmentForm.labels.parentDepartment' | translate }}
         </label>
@@ -109,7 +132,7 @@
           id="parentId"
           class="w-full"
           formControlName="parentId"
-          [options]="[]" 
+          [options]="mainDepartments" 
           optionLabel="name"
           optionValue="id"
           [placeholder]="'departmentForm.placeholders.selectParent' | translate"
