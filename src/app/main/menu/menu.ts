@@ -103,7 +103,8 @@ export class MenuComponent implements OnInit {
                         items: [
                             { label: 'Holidays', icon: 'pi pi-fw pi-calendar', routerLink: ['/holidays/list'] },
                             { label: 'Leave Types', icon: 'pi pi-fw pi-calendar-plus', routerLink: ['/leave-types/list'] },
-                            { label: 'Ramadan Periods', icon: 'pi pi-fw pi-moon', routerLink: ['/ramadan-periods/list'] }
+                            { label: 'Ramadan Periods', icon: 'pi pi-fw pi-moon', routerLink: ['/ramadan-periods/list'] },
+                            { label: 'Time Tables', icon: 'pi pi-fw pi-clock', routerLink: ['/timetables'] }
                         ]
                     }
                     ,
