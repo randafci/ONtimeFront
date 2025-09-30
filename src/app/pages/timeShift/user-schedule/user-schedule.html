@@ -1,0 +1,142 @@
+<div class="card">
+  <!-- Header Section -->
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="mb-0">{{ 'userSchedule.title' | translate }}</h2>
+    <div class="flex-grow"></div>
+    <button 
+      pButton 
+      label="{{ 'Refresh' | translate }}"
+      icon="pi pi-refresh" 
+      class="p-button-sm p-button-outlined"
+      (click)="refreshSchedule()"
+      [disabled]="loading"
+    ></button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="space-y-3">
+    <p-card>
+      <div class="flex flex-col gap-3">
+        <p-skeleton width="100%" height="2rem"></p-skeleton>
+        <p-skeleton width="100%" height="2rem"></p-skeleton>
+        <p-skeleton width="100%" height="2rem"></p-skeleton>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error && !loading" class="mb-4">
+    <p-message severity="error" [text]="error"></p-message>
+  </div>
+
+  <!-- Schedule Table -->
+  <p-table
+    *ngIf="!loading && userSchedule.length > 0"
+    #dt
+    [value]="userSchedule"
+    [rows]="10"
+    [paginator]="true"
+    [loading]="loading"
+    [rowHover]="true"
+    [showGridlines]="true"
+    responsiveLayout="scroll"
+    [globalFilterFields]="['dayNumber', 'shiftId', 'timeTableId']"
+  >
+    <!-- Caption: Filter + Clear -->
+    <ng-template pTemplate="caption">
+      <div class="flex justify-between items-center flex-col sm:flex-row">
+        <button
+          pButton
+          label="Clear"
+          class="p-button-outlined mb-2"
+          icon="pi pi-filter-slash"
+          (click)="clear(dt)"
+        ></button>
+        <p-iconfield iconPosition="left" class="ml-auto">
+          <p-inputicon>
+            <i class="pi pi-search"></i>
+          </p-inputicon>
+          <input
+            pInputText
+            type="text"
+            #filter
+            (input)="onGlobalFilter(dt, $event)"
+            placeholder="Search schedule..."
+          />
+        </p-iconfield>
+      </div>
+    </ng-template>
+
+    <!-- Table Header -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="dayNumber">
+          Day
+          <p-sortIcon field="dayNumber"></p-sortIcon>
+        </th>
+        <th pSortableColumn="shiftId">
+          Shift Type
+          <p-sortIcon field="shiftId"></p-sortIcon>
+        </th>
+        <th pSortableColumn="timeTableId">
+          Time Table
+          <p-sortIcon field="timeTableId"></p-sortIcon>
+        </th>
+        <th>Details</th>
+      </tr>
+    </ng-template>
+
+    <!-- Table Body -->
+    <ng-template pTemplate="body" let-schedule>
+      <tr>
+        <td><strong>{{ getDayName(schedule.dayNumber) }}</strong></td>
+        <td>
+          <p-tag 
+            [value]="getShiftType(schedule.shiftId)" 
+            [severity]="getShiftTypeClass(schedule.shiftId)">
+          </p-tag>
+        </td>
+        <td>
+          <span class="font-medium">Table #{{ schedule.timeTableId }}</span>
+        </td>
+        <td>
+          <div class="text-sm text-gray-600">
+            <div>Shift ID: {{ schedule.shiftId }}</div>
+            <div>Day Number: {{ schedule.dayNumber }}</div>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <!-- Empty Message -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4" class="text-center py-4">
+          No schedule data available.
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <!-- Empty State -->
+  <div 
+    *ngIf="!loading && userSchedule.length === 0 && !error" 
+    class="text-center py-8"
+  >
+    <i class="pi pi-calendar text-6xl text-gray-400 mb-4"></i>
+    <h3 class="text-xl font-semibold mb-2">No Schedule Found</h3>
+    <p class="text-gray-600 mb-4">
+      Your schedule information is not available at the moment.
+    </p>
+    <button 
+      pButton 
+      icon="pi pi-refresh" 
+      label="Try Again" 
+      class="p-button-outlined"
+      (click)="refreshSchedule()">
+    </button>
+  </div>
+</div>
+
+<!-- Toast for notifications -->
+<p-toast></p-toast>
