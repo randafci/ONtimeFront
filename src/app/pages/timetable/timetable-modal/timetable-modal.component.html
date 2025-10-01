@@ -1,0 +1,331 @@
+<!-- Create/Edit TimeTable Dialog -->
+<p-dialog 
+  [(visible)]="dialogVisible" 
+  [header]="isEditMode ? 'Edit TimeTable' : 'Add TimeTable'"
+  [modal]="true" 
+  [style]="{width: '80vw', maxWidth: '1000px'}"
+  [draggable]="false" 
+  [resizable]="false"
+  (onHide)="onDialogHide()">
+  <form [formGroup]="timeTableForm" (ngSubmit)="onSubmit()">
+    <!-- Basic Information -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <h3 class="col-span-full text-lg font-semibold border-b pb-2 mb-4">Basic Information</h3>
+      
+      <!-- Name (English) -->
+      <div class="field">
+        <label for="nameEn" class="block text-sm font-medium mb-2">
+          Name (English) <span class="text-red-500">*</span>
+        </label>
+        <input 
+          id="nameEn" 
+          type="text" 
+          pInputText 
+          class="w-full"
+          formControlName="nameEn" 
+          placeholder="Enter name in English"
+          [class.ng-invalid]="timeTableForm.get('nameEn')?.invalid && timeTableForm.get('nameEn')?.touched"
+        />
+        <small class="text-red-500" *ngIf="timeTableForm.get('nameEn')?.invalid && timeTableForm.get('nameEn')?.touched">
+          Name (English) is required
+        </small>
+      </div>
+
+      <!-- Name (Arabic) -->
+      <div class="field">
+        <label for="nameAr" class="block text-sm font-medium mb-2">
+          Name (Arabic)
+        </label>
+        <input 
+          id="nameAr" 
+          type="text" 
+          pInputText 
+          class="w-full"
+          formControlName="nameAr" 
+          placeholder="Enter name in Arabic"
+        />
+      </div>
+
+      <!-- Organization -->
+      <div class="field" [ngClass]="{'md:col-span-2': !isSuperAdmin}">
+        <label for="organizationId" class="block text-sm font-medium mb-2">
+          Organization <span class="text-red-500">*</span>
+          <span *ngIf="!isSuperAdmin" class="text-xs text-gray-500 ml-1">(Auto-selected based on your access)</span>
+        </label>
+        <p-select
+          id="organizationId"
+          formControlName="organizationId"
+          [options]="organizationOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select Organization"
+          [disabled]="!isSuperAdmin"
+          class="w-full"
+          appendTo="body"
+          [class.ng-invalid]="timeTableForm.get('organizationId')?.invalid && timeTableForm.get('organizationId')?.touched"
+        />
+        <small class="text-red-500" *ngIf="timeTableForm.get('organizationId')?.invalid && timeTableForm.get('organizationId')?.touched">
+          Organization is required
+        </small>
+        <small class="text-gray-500" *ngIf="!isSuperAdmin">
+          You can only create timetables for your assigned organization
+        </small>
+      </div>
+
+      <!-- Status -->
+      <div class="field flex items-center" *ngIf="isSuperAdmin">
+        <p-checkbox 
+          id="isActive"
+          formControlName="isActive"
+          [binary]="true"
+        />
+        <label for="isActive" class="ml-2 text-sm">Active</label>
+      </div>
+    </div>
+
+    <!-- Time Configuration -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+      <h3 class="col-span-full text-lg font-semibold border-b pb-2 mb-4">Time Configuration</h3>
+      
+      <!-- Start Time -->
+      <div class="field">
+        <label for="startTime" class="block text-sm font-medium mb-2">
+          Start Time <span class="text-red-500">*</span>
+        </label>
+        <input 
+          id="startTime" 
+          type="time" 
+          pInputText 
+          class="w-full"
+          formControlName="startTime"
+          (change)="timeTableForm.updateValueAndValidity()"
+          [class.ng-invalid]="timeTableForm.get('startTime')?.invalid && timeTableForm.get('startTime')?.touched"
+        />
+        <small class="text-red-500" *ngIf="timeTableForm.get('startTime')?.invalid && timeTableForm.get('startTime')?.touched">
+          Start time is required
+        </small>
+      </div>
+
+      <!-- End Time -->
+      <div class="field">
+        <label for="endTime" class="block text-sm font-medium mb-2">
+          End Time <span class="text-red-500">*</span>
+        </label>
+        <input 
+          id="endTime" 
+          type="time" 
+          pInputText 
+          class="w-full"
+          formControlName="endTime"
+          (change)="timeTableForm.updateValueAndValidity()"
+          [class.ng-invalid]="timeTableForm.get('endTime')?.invalid && timeTableForm.get('endTime')?.touched"
+        />
+        <small class="text-red-500" *ngIf="timeTableForm.get('endTime')?.invalid && timeTableForm.get('endTime')?.touched">
+          End time is required
+        </small>
+      </div>
+
+      <!-- Time Validation Error Message -->
+      <div class="field md:col-span-2" *ngIf="getTimeValidationError()">
+        <div class="bg-red-50 border border-red-200 rounded-md p-3">
+          <div class="flex items-center">
+            <i class="pi pi-exclamation-triangle text-red-500 mr-2"></i>
+            <small class="text-red-600 font-medium">{{ getTimeValidationError() }}</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Working Hours Display -->
+      <div class="field md:col-span-2" *ngIf="getWorkingHours()">
+        <div class="bg-green-50 border border-green-200 rounded-md p-3">
+          <div class="flex items-center">
+            <i class="pi pi-clock text-green-600 mr-2"></i>
+            <small class="text-green-700 font-medium">
+              Working Hours: {{ getWorkingHours() }}
+              <span *ngIf="timeTableForm.get('isNightShift')?.value" class="ml-2 text-xs">(Night shift spans midnight)</span>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shift Configuration -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+      <h3 class="col-span-full text-lg font-semibold border-b pb-2 mb-4">Shift Configuration</h3>
+      
+      <!-- Shift Rules Info -->
+      <div class="field md:col-span-2">
+        <div class="bg-blue-50 border border-blue-200 rounded-md p-3">
+          <div class="flex items-start">
+            <i class="pi pi-info-circle text-blue-500 mr-2 mt-0.5"></i>
+            <div class="text-sm text-blue-700">
+              <strong>Shift Time Rules:</strong><br>
+              • <strong>Regular Shift:</strong> End time must be later than start time (e.g., 09:00 - 17:00)<br>
+              • <strong>Night Shift:</strong> End time must be earlier than start time - spans midnight (e.g., 22:00 - 06:00)<br>
+              • <strong>Pre-Night Shift:</strong> Can only be enabled for night shifts
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Night Shift -->
+      <div class="field flex items-center">
+        <p-checkbox 
+          id="isNightShift"
+          formControlName="isNightShift"
+          [binary]="true"
+          (onChange)="onShiftTypeChange()"
+        />
+        <label for="isNightShift" class="ml-2 text-sm">Night Shift</label>
+      </div>
+
+      <!-- Pre-Night Shift -->
+      <div class="field flex items-center">
+        <p-checkbox 
+          id="isPreNightShift"
+          formControlName="isPreNightShift"
+          [binary]="true"
+          [disabled]="!timeTableForm.get('isNightShift')?.value"
+        />
+        <label for="isPreNightShift" class="ml-2 text-sm">Pre-Night Shift</label>
+      </div>
+
+      <!-- Weekend -->
+      <div class="field flex items-center">
+        <p-checkbox 
+          id="isWeekend"
+          formControlName="isWeekend"
+          [binary]="true"
+        />
+        <label for="isWeekend" class="ml-2 text-sm">Weekend Shift</label>
+      </div>
+
+      <!-- Open Shift -->
+      <div class="field flex items-center">
+        <p-checkbox 
+          id="isOpenShift"
+          formControlName="isOpenShift"
+          [binary]="true"
+        />
+        <label for="isOpenShift" class="ml-2 text-sm">Open Shift</label>
+      </div>
+
+      <!-- Training Course -->
+      <div class="field flex items-center">
+        <p-checkbox 
+          id="isTrainingCourse"
+          formControlName="isTrainingCourse"
+          [binary]="true"
+        />
+        <label for="isTrainingCourse" class="ml-2 text-sm">Training Course</label>
+      </div>
+
+      <!-- Extra Training Hours -->
+      <div class="field" *ngIf="timeTableForm.get('isTrainingCourse')?.value">
+        <label for="trainingCourseExtraWorkHours" class="block text-sm font-medium mb-2">
+          Extra Training Hours
+        </label>
+        <p-inputNumber
+          id="trainingCourseExtraWorkHours"
+          formControlName="trainingCourseExtraWorkHours"
+          [min]="0"
+          [max]="24"
+          suffix=" hours"
+          placeholder="0"
+          class="w-full"
+        />
+      </div>
+    </div>
+
+    <!-- Flexible Range -->
+    <div class="grid grid-cols-1 gap-4 mt-6">
+      <h3 class="text-lg font-semibold border-b pb-2 mb-4">Flexible Check-in/out Range</h3>
+      
+      <div class="field flex items-center mb-4">
+        <p-checkbox 
+          id="isCheckInOutRangeEnabled"
+          formControlName="isCheckInOutRangeEnabled"
+          [binary]="true"
+          (onChange)="onFlexibleRangeChange()"
+        />
+        <label for="isCheckInOutRangeEnabled" class="ml-2 text-sm">Enable Flexible Range</label>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4" *ngIf="timeTableForm.get('isCheckInOutRangeEnabled')?.value">
+        <!-- Earliest Check-in -->
+        <div class="field">
+          <label for="beginIn" class="block text-sm font-medium mb-2">
+            Earliest Check-in
+          </label>
+          <input 
+            id="beginIn" 
+            type="time" 
+            pInputText 
+            class="w-full"
+            formControlName="beginIn"
+          />
+        </div>
+
+        <!-- Latest Check-in -->
+        <div class="field">
+          <label for="beginOut" class="block text-sm font-medium mb-2">
+            Latest Check-in
+          </label>
+          <input 
+            id="beginOut" 
+            type="time" 
+            pInputText 
+            class="w-full"
+            formControlName="beginOut"
+          />
+        </div>
+
+        <!-- Earliest Check-out -->
+        <div class="field">
+          <label for="endIn" class="block text-sm font-medium mb-2">
+            Earliest Check-out
+          </label>
+          <input 
+            id="endIn" 
+            type="time" 
+            pInputText 
+            class="w-full"
+            formControlName="endIn"
+          />
+        </div>
+
+        <!-- Latest Check-out -->
+        <div class="field">
+          <label for="endOut" class="block text-sm font-medium mb-2">
+            Latest Check-out
+          </label>
+          <input 
+            id="endOut" 
+            type="time" 
+            pInputText 
+            class="w-full"
+            formControlName="endOut"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+      <button 
+        pButton 
+        label="Cancel" 
+        class="p-button-secondary" 
+        type="button"
+        (click)="onCancel()">
+      </button>
+      <button 
+        pButton 
+        [label]="isEditMode ? 'Update' : 'Create'" 
+        [loading]="loading"
+        [disabled]="timeTableForm.invalid"
+        type="submit">
+      </button>
+    </div>
+  </form>
+</p-dialog>
