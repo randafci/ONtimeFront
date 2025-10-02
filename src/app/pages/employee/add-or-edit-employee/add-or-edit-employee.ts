@@ -374,4 +374,18 @@ export class AddEditEmployeeComponent implements OnInit {
   get jobTitle(): string {
     return this.employeeForm.get('employeeType')?.value || '';
   }
+
+  navigateToShiftAssignments() {
+    if (!this.isEditMode || !this.employeeId) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please save the employee first before managing shift assignments'
+      });
+      return;
+    }
+    
+    const employeeName = this.fullName || 'Employee';
+    this.router.navigate(['/employees/shift-assignments', this.employeeId, employeeName]);
+  }
 }

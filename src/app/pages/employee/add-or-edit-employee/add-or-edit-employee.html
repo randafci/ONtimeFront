@@ -531,12 +531,49 @@
 
     <!-- Assign Schedule Tab -->
     <div *ngIf="activeTabIndex === 5" class="tab-content">
-      <div class="text-center py-12">
-        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <i class="pi pi-calendar text-2xl text-gray-400"></i>
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-medium text-gray-900">{{ 'employees.formPage.tabs.assignSchedule' | translate }}</h3>
+          <button 
+            *ngIf="isEditMode"
+            pButton 
+            label="Manage Shift Assignments" 
+            icon="pi pi-calendar" 
+            class="p-button-outlined p-button-sm"
+            (click)="navigateToShiftAssignments()"
+          ></button>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ 'employees.formPage.tabs.assignSchedule' | translate }}</h3>
-        <p class="text-gray-500">{{ 'employees.formPage.assignSchedule.comingSoon' | translate }}</p>
+        
+        <div class="bg-gray-50 rounded-lg p-6">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="pi pi-calendar text-2xl text-blue-600"></i>
+            </div>
+            <h4 class="text-lg font-medium text-gray-900 mb-2">Shift Assignment Management</h4>
+            <p class="text-gray-600 mb-4" *ngIf="isEditMode">
+              Manage employee shift assignments, schedules, and work patterns.
+            </p>
+            <p class="text-gray-600 mb-4" *ngIf="!isEditMode">
+              Save the employee first to manage shift assignments.
+            </p>
+            <button 
+              *ngIf="isEditMode"
+              pButton 
+              label="View Shift Assignments" 
+              icon="pi pi-eye" 
+              class="p-button-sm"
+              (click)="navigateToShiftAssignments()"
+            ></button>
+            <button 
+              *ngIf="!isEditMode"
+              pButton 
+              label="Save Employee First" 
+              icon="pi pi-save" 
+              class="p-button-outlined p-button-sm"
+              disabled
+            ></button>
+          </div>
+        </div>
       </div>
     </div>
 
