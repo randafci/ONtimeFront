@@ -228,11 +228,9 @@
     .p-datatable-thead > tr > th:nth-child(2), // Organization
     .p-datatable-thead > tr > th:nth-child(4), // Duration
     .p-datatable-thead > tr > th:nth-child(7), // Flexible Range
-    .p-datatable-thead > tr > th:nth-child(8), // Created Date
     .p-datatable-tbody > tr > td:nth-child(2),
     .p-datatable-tbody > tr > td:nth-child(4),
-    .p-datatable-tbody > tr > td:nth-child(7),
-    .p-datatable-tbody > tr > td:nth-child(8) {
+    .p-datatable-tbody > tr > td:nth-child(7) {
       display: none;
     }
 
@@ -263,11 +261,6 @@
 
 @media (min-width: 769px) and (max-width: 1024px) {
   :host ::ng-deep {
-    // Hide created date column on tablet
-    .p-datatable-thead > tr > th:nth-child(8),
-    .p-datatable-tbody > tr > td:nth-child(8) {
-      display: none;
-    }
 
     .p-datatable-thead > tr > th,
     .p-datatable-tbody > tr > td {

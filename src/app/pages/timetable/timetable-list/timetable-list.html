@@ -88,11 +88,6 @@
           </div>
         </th>
         <th style="min-width: 120px">
-          <div class="flex align-items-center">
-            Created Date
-          </div>
-        </th>
-        <th style="min-width: 120px">
           Actions
         </th>
       </tr>
@@ -101,18 +96,15 @@
     <ng-template pTemplate="body" let-timeTable>
       <tr>
         <td>
-          <span class="p-column-title">Name</span>
           <div class="font-medium">{{ timeTable.nameEn || timeTable.nameAr || '-' }}</div>
           <div class="text-sm text-muted" *ngIf="timeTable.nameAr && timeTable.nameEn">
             {{ timeTable.nameAr }}
           </div>
         </td>
         <td>
-          <span class="p-column-title">Organization</span>
           {{ timeTable.organizationName || '-' }}
         </td>
         <td>
-          <span class="p-column-title">Shift Time</span>
           <div class="text-sm">
             <div>
               <i class="pi pi-clock mr-1"></i>
@@ -125,28 +117,24 @@
           </div>
         </td>
         <td>
-          <span class="p-column-title">Duration</span>
           <div class="flex align-items-center">
             <i class="pi pi-hourglass mr-2 text-muted"></i>
             {{ formatShiftDuration(timeTable) }}
           </div>
         </td>
         <td>
-          <span class="p-column-title">Shift Type</span>
           <p-tag 
             [value]="getShiftTypeDisplay(timeTable)" 
             [severity]="getShiftTypeSeverity(timeTable)"
           ></p-tag>
         </td>
         <td>
-          <span class="p-column-title">Status</span>
           <p-tag 
             [value]="timeTable.isActive ? 'Active' : 'Inactive'" 
             [severity]="timeTable.isActive ? 'success' : 'danger'"
           ></p-tag>
         </td>
         <td>
-          <span class="p-column-title">Flexible Range</span>
           <div *ngIf="timeTable.isCheckInOutRangeEnabled" class="text-xs">
             <div>
               <i class="pi pi-sign-in mr-1 text-success"></i>
@@ -163,11 +151,6 @@
           </div>
         </td>
         <td>
-          <span class="p-column-title">Created Date</span>
-          {{ timeTable.creationDate | date:'short' }}
-        </td>
-        <td>
-          <span class="p-column-title">Actions</span>
           <div class="action-buttons">
             <button 
               pButton 
@@ -192,7 +175,7 @@
     
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="9" class="text-center py-6">
+        <td colspan="8" class="text-center py-6">
           <i class="pi pi-calendar text-muted text-4xl mb-3 block"></i>
           <div class="text-muted font-medium">No timetables found</div>
           <div class="text-sm text-muted mt-2">Create your first timetable to get started</div>
