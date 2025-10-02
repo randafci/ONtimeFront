@@ -222,7 +222,13 @@ export const appRoutes: Routes = [
             (m) => m.EMPLOYEEREPORTINGMANAGER_ROUTES
           )
       },
-
+      {
+        path: 'time-shifts',
+        loadChildren: () =>
+          import('./app/pages/timeShift/timeShift.routes').then(
+            (m) => m.TIME_SHIFT_ROUTES
+          )
+      },
       { path: 'test', component: Layout },
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
       {
