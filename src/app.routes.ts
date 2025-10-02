@@ -209,6 +209,13 @@ export const appRoutes: Routes = [
           )
       },
       {
+        path: 'timetables',
+        loadChildren: () =>
+          import('./app/pages/timetable/timetable.routes').then(
+            (m) => m.TIMETABLE_ROUTES
+          )
+      },
+      {
         path: 'employees/reportingmanager',
         loadChildren: () =>
           import('./app/pages/employeeReportingManager/employeeReportingManager.routes').then(

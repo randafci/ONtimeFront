@@ -109,6 +109,7 @@ export class MenuComponent implements OnInit {
 
 
                             
+                            { label: 'Time Tables', icon: 'pi pi-fw pi-clock', routerLink: ['/timetables'] }
                         ]
                     }
                     ,
