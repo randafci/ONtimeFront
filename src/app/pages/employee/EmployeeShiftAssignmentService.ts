@@ -23,6 +23,9 @@ export class EmployeeShiftAssignmentService {
   private get headers() {
     return { headers: this.authService.getHeaders() };
   }
+  private get headersforfile() {
+    return { headers: this.authService.getHeaders(true) };
+  }
 
   getAllEmployeeShiftAssignments(): Observable<ApiResponse<EmployeeShiftAssignment[]>> {
     return this.http.get<ApiResponse<EmployeeShiftAssignment[]>>(`${this.apiUrl}/EmployeeShiftAssignment`, this.headers);
@@ -33,7 +36,7 @@ export class EmployeeShiftAssignmentService {
   }
 
   getEmployeeShiftAssignmentsByEmployeeId(employeeId: number): Observable<ApiResponse<EmployeeShiftAssignment[]>> {
-    return this.http.get<ApiResponse<EmployeeShiftAssignment[]>>(`${this.apiUrl}/EmployeeShiftAssignment`, this.headers);
+    return this.http.get<ApiResponse<EmployeeShiftAssignment[]>>(`${this.apiUrl}/EmployeeShiftAssignment/GetAllForEmployee/${employeeId}`, this.headers);
   }
 
   createEmployeeShiftAssignment(data: CreateEmployeeShiftAssignment): Observable<ApiResponse<EmployeeShiftAssignment>> {
@@ -50,8 +53,8 @@ export class EmployeeShiftAssignmentService {
 
   uploadShiftFile(file: File): Observable<ApiResponse<string>> {
     const formData = new FormData();
-    formData.append('file', file);
-    return this.http.post<ApiResponse<string>>(`${this.apiUrl}/EmployeeShiftAssignment/upload`, formData, this.headers);
+  formData.append('file', file, file.name);
+    return this.http.post<ApiResponse<string>>(`${this.apiUrl}/EmployeeShiftAssignment/upload`, formData, this.headersforfile);
   }
 
   getAllShifts(): Observable<ApiResponse<Shift[]>> {

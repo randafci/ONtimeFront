@@ -30,7 +30,7 @@ export interface CreateEmployeeShiftAssignment {
   shiftId: number;
   startDateTime: string;
   endDateTime?: string;
-  priority: 'Temporary' | 'Permanent';
+  priority: number;
   isOtShift: boolean;
   isOverwriteHolidays: boolean;
   isPunchNotRequired: boolean;

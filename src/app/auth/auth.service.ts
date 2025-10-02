@@ -316,34 +316,29 @@ forgotPassword(Email: string): Observable<any> {
   }
 
 // Enhanced getHeaders method with better debugging
-getHeaders(): HttpHeaders {
+getHeaders(isFileUpload: boolean = false): HttpHeaders {
   try {
     const userData = this.getUserDataFromLocalStorage();
     const token = userData?.token;
-    
-    console.log('Token being used:', token ? 'Present' : 'Missing');
-    
+
+    let headers = new HttpHeaders();
+
     if (token) {
-      // Verify token format
-      if (!token.startsWith('eyJ')) {
-        console.error('Token format appears invalid');
-      }
-      
-      return new HttpHeaders({
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      });
+      headers = headers.set('Authorization', `Bearer ${token}`);
     }
+
+    if (!isFileUpload) {
+      headers = headers.set('Content-Type', 'application/json');
+      headers = headers.set('Accept', 'application/json');
+    }
+
+    return headers;
   } catch (error) {
-    console.error('Error getting auth headers:', error);
+    console.error('Error getting headers:', error);
+    return new HttpHeaders();
   }
-  
-  return new HttpHeaders({
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  });
 }
+
 getDecodedToken(): any {
   const userDataFromStorage = this.getUserDataFromLocalStorage();
   if (!userDataFromStorage?.token) {

@@ -269,7 +269,7 @@ export class EmployeeShiftAssignmentComponent implements OnInit {
       shiftId: formData.shiftId,
       startDateTime: formData.startDateTime,
       endDateTime: formData.endDateTime,
-      priority: formData.priority,
+      priority: formData.priority=="1"?1:0,
       isOtShift: formData.isOtShift || false,
       isOverwriteHolidays: formData.isOverwriteHolidays || false,
       isPunchNotRequired: formData.isPunchNotRequired || false,
@@ -396,7 +396,7 @@ export class EmployeeShiftAssignmentComponent implements OnInit {
   }
 
   getPrioritySeverity(priority: string) {
-    return priority === 'Permanent' ? 'success' : 'warning';
+    return priority === '1' ? 'success' : 'warning';
   }
 
   navigateBack() {
