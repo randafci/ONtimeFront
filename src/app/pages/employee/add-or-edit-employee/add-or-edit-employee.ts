@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -14,6 +14,10 @@ import { EmployeeService } from '../EmployeeService';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
+import { TabPersistenceService } from '../../../core/services/tab-persistence.service';
+import { TAB_CONFIGS } from '../../../core/constants/tab-configs';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-add-or-edit-employee',
@@ -34,7 +38,7 @@ import { TranslationService } from '../../translation-manager/translation-manage
   templateUrl: './add-or-edit-employee.html',
   styleUrl: './add-or-edit-employee.scss'
 })
-export class AddEditEmployeeComponent implements OnInit {
+export class AddEditEmployeeComponent implements OnInit, OnDestroy {
   employeeForm: FormGroup;
   isEditMode = false;
   employeeId: number | null = null;
@@ -47,6 +51,7 @@ export class AddEditEmployeeComponent implements OnInit {
   genderOptions: any[] = [];
   employeeStatusOptions: any[] = [];
   private translations: any = {};
+  private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -54,7 +59,8 @@ export class AddEditEmployeeComponent implements OnInit {
     private messageService: MessageService,
     private router: Router,
     private route: ActivatedRoute,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private tabPersistenceService: TabPersistenceService
   ) {
     this.employeeForm = this.createForm();
   }
@@ -67,12 +73,45 @@ export class AddEditEmployeeComponent implements OnInit {
     this.employeeId = this.route.snapshot.params['id'];
     this.isEditMode = !!this.employeeId;
 
+   
+    this.activeTabIndex = this.tabPersistenceService.initializeTabFromUrl(this.route, TAB_CONFIGS.EMPLOYEE_FORM);
+    
+
+    this.tabPersistenceService.currentTab$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(tabIndex => {
+        this.activeTabIndex = tabIndex;
+      });
+
     if (this.isEditMode && this.employeeId) {
       this.loadEmployee(this.employeeId);
     }
   }
+
+  onTabChange(tabIndex: number): void {
+    this.tabPersistenceService.changeTab(tabIndex, this.route, TAB_CONFIGS.EMPLOYEE_FORM);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   
-  // Helper function to safely get nested translation values
+  getTabName(tabIndex: number): string {
+    const tabNames = [
+      'general',
+      'contact', 
+      'organizational',
+      'documents',
+      'reportManagers',
+      'assignSchedule',
+      'policies'
+    ];
+    return tabNames[tabIndex] || 'unknown';
+  }
+  
+ 
   private getTranslation(key: string, fallback: string): string {
     const keys = key.split('.');
     let result = this.translations;
