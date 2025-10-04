@@ -72,7 +72,6 @@ export class MenuComponent implements OnInit {
                             { label: this.t('menu.organization.grade'), icon: 'pi pi-fw pi-star', routerLink: ['/grades'] },
                             { label: this.t('menu.organization.costCenter'), icon: 'pi pi-fw pi-dollar', routerLink: ['/cost-centers/list'] },
                             { label: this.t('menu.organization.shiftType'), icon: 'pi pi-fw pi-clone', routerLink: ['/shift-types/list'] },
-                            { label: this.t('menu.organization.shift'), icon: 'pi pi-fw pi-clock', routerLink: ['/shifts/list'] },
                             { label: this.t('menu.teams.teams'), icon: 'pi pi-fw pi-users', routerLink: ['/teams'] },
                         ]
                     },
@@ -105,6 +104,15 @@ export class MenuComponent implements OnInit {
                             { label: this.t('menu.hr.holidayTypes'), icon: 'pi pi-fw pi-tags', routerLink: ['/holiday-types/list'] },
                             { label: this.t('menu.hr.leaveTypes'), icon: 'pi pi-fw pi-calendar-plus', routerLink: ['/leave-types/list'] },
                             { label: this.t('menu.hr.ramadanPeriods'), icon: 'pi pi-fw pi-moon', routerLink: ['/ramadan-periods/list'] }
+                        ]
+                    },
+                    {
+                        label: this.t('menu.attendance.groupLabel'),
+                        items: [
+                            { label: this.t('menu.organization.shift'), icon: 'pi pi-fw pi-clock', routerLink: ['/shifts/list'] },
+                            { label: 'Time Tables', icon: 'pi pi-fw pi-clock', routerLink: ['/timetables'] },
+                            { label: 'Time Shifts', icon: 'pi pi-fw pi-clock', routerLink: ['/time-shifts/list'] },
+                            { label: 'Regularization', icon: 'pi pi-fw pi-clock', routerLink: ['/attendance'] }
                         ]
                     }
                     ,

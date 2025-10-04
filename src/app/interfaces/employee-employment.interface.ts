@@ -3,13 +3,13 @@ export interface EmployeeEmployment {
   employeeId: number;
   companyId: number;
   departmentId: number;
-  sectionId?: number;
-  designationId?: number;
-  gradeId?: number;
+  sectionId?: number | null;
+  designationId?: number | null;
+  gradeId?: number | null;
   isSpecialNeeds: boolean;
   isCurrent: number;
-  joinDate?: string;
-  relieveDate?: string;
+  joinDate?: string | null;
+  relieveDate?: string | null;
   showInReport: boolean;
   showInDashboard: boolean;
   
@@ -23,14 +23,13 @@ export interface CreateEmployeeEmployment {
   employeeId: number;
   companyId: number;
   departmentId: number;
-  sectionId?: number;
-  designationId?: number;
-  gradeId?: number;
+  sectionId?: number | null;
+  designationId?: number | null;
+  gradeId?: number | null;
   isSpecialNeeds: boolean;
-  joinDate?: string;
-  relieveDate?: string;
-  showInReport: boolean;
-  showInDashboard: boolean;
+  isCurrent?: number;
+  joinDate?: string | null;
+  relieveDate?: string | null;
 }
 
 export interface EmployeeEmploymentSearch {

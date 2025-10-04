@@ -242,6 +242,13 @@ export const appRoutes: Routes = [
             (m) => m.TIME_SHIFT_ROUTES
           )
       },
+      {
+        path: 'attendance',
+        loadChildren: () =>
+          import('./app/pages/attendance/attendance.routes').then(
+            (m) => m.ATTENDANCE_ROUTES
+          )
+      },
       { path: 'test', component: Layout },
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
       {

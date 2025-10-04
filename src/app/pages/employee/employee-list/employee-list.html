@@ -100,7 +100,7 @@
     </ng-template>
     
     <ng-template pTemplate="body" let-employee>
-      <tr (click)="navigateToEmployments(employee)" class='cursor-pointer '>
+      <tr>
         <td>{{ employee.employeeCode }}</td>  
         <td>{{ getFullName(employee) }}</td>
         <td>{{ employee.employeeType || 'N/A' }}</td>

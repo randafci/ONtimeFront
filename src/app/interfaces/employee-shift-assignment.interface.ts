@@ -2,7 +2,7 @@ export interface EmployeeShiftAssignment {
   id: number;
   startDateTime: string;
   endDateTime?: string;
-  priority: 'Temporary' | 'Permanent';
+  priority: number | 'Temporary' | 'Permanent'; // Support both formats
   employeeId: number;
   shiftId: number;
   isOtShift: boolean;
@@ -10,7 +10,7 @@ export interface EmployeeShiftAssignment {
   attachmentURL?: string;
   isPunchNotRequired: boolean;
   isCurrent: boolean;
-  weekdays?: string[];
+  weekdays?: (string | number)[]; // Support both formats
   shift?: {
     id: number;
     name: string;
@@ -28,14 +28,16 @@ export interface EmployeeShiftAssignment {
 export interface CreateEmployeeShiftAssignment {
   employeeId: number;
   shiftId: number;
+  shiftName: string;
   startDateTime: string;
-  endDateTime?: string;
+  endDateTime?: string | null;
   priority: number;
   isOtShift: boolean;
   isOverwriteHolidays: boolean;
   isPunchNotRequired: boolean;
-  attachmentURL?: string;
-  weekdays?: string[];
+  isCurrent: boolean;
+  attachmentURL?: string | null;
+  weekdays: number[];
 }
 
 export interface Shift {

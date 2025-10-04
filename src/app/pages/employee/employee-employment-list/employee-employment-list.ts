@@ -162,10 +162,31 @@ export class EmployeeEmploymentListComponent implements OnInit {
     }
     this.loading = true;
     const formData = this.employmentForm.value;
+    
+    const employmentData: CreateEmployeeEmployment = {
+      employeeId: parseInt(formData.employeeId),
+      companyId: parseInt(formData.companyId),
+      departmentId: parseInt(formData.departmentId),
+      sectionId: formData.sectionId ? parseInt(formData.sectionId) : null,
+      designationId: formData.designationId ? parseInt(formData.designationId) : null,
+      gradeId: formData.gradeId ? parseInt(formData.gradeId) : null,
+      isSpecialNeeds: formData.isSpecialNeeds || false,
+      isCurrent: 1,
+      joinDate: formData.joinDate,
+      relieveDate: formData.relieveDate
+    };
+    
     if (this.isEditMode) {
-      this.employeeEmploymentService.updateEmployeeEmployment({...formData, isCurrent: 0}).subscribe(this.getObserver('update'));
+      const updateData: EmployeeEmployment = {
+        ...employmentData,
+        id: parseInt(formData.id),
+        isCurrent: 0, // For updates, keep existing isCurrent value
+        showInReport: formData.showInReport || false,
+        showInDashboard: formData.showInDashboard || false
+      };
+      this.employeeEmploymentService.updateEmployeeEmployment(updateData).subscribe(this.getObserver('update'));
     } else {
-      this.employeeEmploymentService.createEmployeeEmployment(formData).subscribe(this.getObserver('create'));
+      this.employeeEmploymentService.createEmployeeEmployment(employmentData).subscribe(this.getObserver('create'));
     }
   }
 
