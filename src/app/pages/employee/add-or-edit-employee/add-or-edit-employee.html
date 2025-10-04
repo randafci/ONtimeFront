@@ -70,49 +70,49 @@
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 0"
-          (click)="activeTabIndex = 0">
+          (click)="onTabChange(0)">
           <i class="pi pi-user mr-2"></i>
           {{ 'employees.formPage.tabs.general' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 1"
-          (click)="activeTabIndex = 1">
+          (click)="onTabChange(1)">
           <i class="pi pi-phone mr-2"></i>
           {{ 'employees.formPage.tabs.contact' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 2"
-          (click)="activeTabIndex = 2">
+          (click)="onTabChange(2)">
           <i class="pi pi-building mr-2"></i>
           {{ 'employees.formPage.tabs.organizational' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 3"
-          (click)="activeTabIndex = 3">
+          (click)="onTabChange(3)">
           <i class="pi pi-file mr-2"></i>
           {{ 'employees.formPage.tabs.documents' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 4"
-          (click)="activeTabIndex = 4">
+          (click)="onTabChange(4)">
           <i class="pi pi-users mr-2"></i>
           {{ 'employees.formPage.tabs.reportManagers' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 5"
-          (click)="activeTabIndex = 5">
+          (click)="onTabChange(5)">
           <i class="pi pi-calendar mr-2"></i>
           {{ 'employees.formPage.tabs.assignSchedule' | translate }}
         </button>
         <button 
           class="tab-button py-2 px-1 border-b-2 font-medium text-sm"
           [class.active]="activeTabIndex === 6"
-          (click)="activeTabIndex = 6">
+          (click)="onTabChange(6)">
           <i class="pi pi-shield mr-2"></i>
           {{ 'employees.formPage.tabs.policies' | translate }}
         </button>
