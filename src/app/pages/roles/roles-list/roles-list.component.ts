@@ -167,4 +167,8 @@ export class RolesListComponent implements OnInit {
   private showToast(severity: string, summary: string, detail: string): void {
     this.messageService.add({ severity, summary, detail });
   }
+
+  navigateToUsers(role: RoleDto) {
+    this.router.navigate(['/roles', role.id, 'users']);
+  }
 }

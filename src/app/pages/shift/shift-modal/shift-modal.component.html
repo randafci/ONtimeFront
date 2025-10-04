@@ -1,0 +1,44 @@
+<!-- src/app/features/attendance/shifts/shift-modal/shift-modal.component.html -->
+
+<p-dialog [(visible)]="dialogVisible" [header]="(isEditMode ? 'shiftForm.title.edit' : 'shiftForm.title.add') | translate"
+    [modal]="true" [style]="{width: '450px'}" (onHide)="closeDialog()">
+
+    <form [formGroup]="shiftForm" (ngSubmit)="onSubmit()">
+        <div class="field mt-4">
+            <label for="shiftTypeId">{{ 'shiftForm.labels.shiftType' | translate }} <span class="text-red-500">*</span></label>
+            <p-select id="shiftTypeId" [options]="shiftTypes" formControlName="shiftTypeId" optionLabel="name" optionValue="id"
+                [placeholder]="'shiftForm.placeholders.selectShiftType' | translate" appendTo="body" class="w-full"
+                [class.ng-invalid]="shiftForm.get('shiftTypeId')?.invalid && shiftForm.get('shiftTypeId')?.touched">
+            </p-select>
+            <small class="text-red-500" *ngIf="shiftForm.get('shiftTypeId')?.invalid && shiftForm.get('shiftTypeId')?.touched">
+                {{ 'common.validation.required' | translate }}
+            </small>
+        </div>
+
+        <div class="field mt-4" *ngIf="isSuperAdmin">
+            <label for="organizationId">{{ 'shiftForm.labels.organization' | translate }} <span class="text-red-500">*</span></label>
+            <p-select id="organizationId" [options]="organizations" formControlName="organizationId" optionLabel="name" optionValue="id"
+                [placeholder]="'shiftForm.placeholders.selectOrganization' | translate" appendTo="body" class="w-full"
+                [class.ng-invalid]="shiftForm.get('organizationId')?.invalid && shiftForm.get('organizationId')?.touched">
+            </p-select>
+            <small class="text-red-500" *ngIf="shiftForm.get('organizationId')?.invalid && shiftForm.get('organizationId')?.touched">
+                {{ 'common.validation.required' | translate }}
+            </small>
+        </div>
+        
+        <div class="field flex items-center mt-4 md:mt-8">
+        <p-checkbox 
+            formControlName="isDefaultShift" 
+            [binary]="true" 
+            inputId="isDefaultShift">
+        </p-checkbox>
+        <label for="isDefaultShift" class="ml-2">{{ 'shiftForm.labels.isDefault' | translate }}</label>
+      </div>
+
+
+        <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+            <button pButton [label]="'common.buttons.cancel' | translate" class="p-button-secondary" type="button" (click)="closeDialog()"></button>
+            <button pButton [label]="(isEditMode ? 'common.buttons.update' : 'common.buttons.save') | translate" [loading]="loading" type="submit"></button>
+        </div>
+    </form>
+</p-dialog>

@@ -3,17 +3,16 @@
     <div class="flex items-center gap-3">
       <button 
         pButton 
-        label="Back to Employees" 
+        [label]="'employments.listPage.backButton' | translate" 
         icon="pi pi-arrow-left" 
         class="p-button-outlined p-button-sm"
         (click)="navigateBack()"
       ></button>
-    
     </div>
-    <h2>({{ employeeName }}) Employments</h2>
+    <h2>({{ employeeName }}) {{ 'employments.listPage.title' | translate }}</h2>
     <button 
       pButton 
-      label="Create Employment" 
+      [label]="'employments.listPage.createButton' | translate" 
       icon="pi pi-plus" 
       class="p-button-sm h-fit"
       (click)="openCreateDialog()"
@@ -36,7 +35,7 @@
       <div class="flex justify-between items-center flex-column sm:flex-row">
         <button 
           pButton 
-          label="Clear" 
+          [label]="'common.buttons.clear' | translate" 
           class="p-button-outlined mb-2" 
           icon="pi pi-filter-slash" 
           (click)="clear(dt)"
@@ -50,7 +49,7 @@
             type="text" 
             #filter
             (input)="onGlobalFilter(dt, $event)" 
-            placeholder="Search employments..." 
+            [placeholder]="'employments.listPage.searchPlaceholder' | translate" 
           />
         </p-iconfield>
       </div>
@@ -60,38 +59,38 @@
       <tr>
         <th style="min-width: 12rem">
           <div class="flex justify-between items-center">
-            Company
+            {{ 'employments.listPage.headers.company' | translate }}
             <p-columnFilter type="text" field="companyName" display="menu"></p-columnFilter>
           </div>
         </th>
         <th style="min-width: 12rem">
           <div class="flex justify-between items-center">
-            Department
+            {{ 'employments.listPage.headers.department' | translate }}
             <p-columnFilter type="text" field="departmentName" display="menu"></p-columnFilter>
           </div>
         </th>
         <th style="min-width: 10rem">
           <div class="flex justify-between items-center">
-            Join Date
+            {{ 'employments.listPage.headers.joinDate' | translate }}
             <p-columnFilter type="date" field="joinDate" display="menu"></p-columnFilter>
           </div>
         </th>
         <th style="min-width: 10rem">
           <div class="flex justify-between items-center">
-            Relieve Date
+            {{ 'employments.listPage.headers.relieveDate' | translate }}
             <p-columnFilter type="date" field="relieveDate" display="menu"></p-columnFilter>
           </div>
         </th>
         <th style="min-width: 8rem">
           <div class="flex justify-between items-center">
-            Status
+            {{ 'employments.listPage.headers.status' | translate }}
             <p-columnFilter field="isCurrent" matchMode="equals" display="menu">
               <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                 <p-select 
                   [ngModel]="value" 
                   [options]="statusOptions" 
                   (onChange)="filter($event.value)" 
-                  placeholder="Any" 
+                  [placeholder]="'employments.listPage.statuses.any' | translate" 
                   [style]="{ 'min-width': '12rem' }"
                 >
                   <ng-template let-option pTemplate="item">
@@ -105,7 +104,7 @@
             </p-columnFilter>
           </div>
         </th>
-        <th style="min-width: 8rem">Actions</th>
+        <th style="min-width: 8rem">{{ 'employments.listPage.headers.actions' | translate }}</th>
       </tr>
     </ng-template>
     
@@ -128,7 +127,7 @@
               icon="pi pi-pencil" 
               class="p-button-rounded p-button-text p-button-sm"
               (click)="openEditDialog(employment)"
-              pTooltip="Edit Employment"
+              [pTooltip]="'employments.listPage.tooltips.edit' | translate"
               tooltipPosition="top"
             ></button>
             <button 
@@ -136,7 +135,7 @@
               icon="pi pi-trash" 
               class="p-button-rounded p-button-text p-button-danger p-button-sm"
               (click)="deleteEmployment(employment)"
-              pTooltip="Delete Employment"
+              [pTooltip]="'employments.listPage.tooltips.delete' | translate"
               tooltipPosition="top"
             ></button>
           </div>
@@ -146,13 +145,13 @@
     
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="6">No employments found</td>
+        <td colspan="6">{{ 'employments.listPage.messages.empty' | translate }}</td>
       </tr>
     </ng-template>
     
     <ng-template pTemplate="loadingbody">
       <tr>
-        <td colspan="6">Loading employments...</td>
+        <td colspan="6">{{ 'employments.listPage.messages.loading' | translate }}</td>
       </tr>
     </ng-template>
   </p-table>
@@ -161,7 +160,7 @@
 <!-- Create/Edit Dialog -->
 <p-dialog 
   [(visible)]="dialogVisible" 
-  [header]="isEditMode ? 'Edit Employment' : 'Create Employment'"
+  [header]="(isEditMode ? 'employments.formPage.title.edit' : 'employments.formPage.title.add') | translate"
   [modal]="true" 
   [style]="{width: '50vw'}"
   [draggable]="false" 
@@ -171,12 +170,12 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
       <div class="field">
         <label for="companyId" class="block text-sm font-medium mb-2">
-          Company <span class="text-red-500">*</span>
+          {{ 'employments.formPage.labels.company' | translate }} <span class="text-red-500">*</span>
         </label>
         <p-select 
           id="companyId"
           formControlName="companyId"
-          placeholder="Select Company"
+          [placeholder]="'employments.formPage.placeholders.selectCompany' | translate"
           [options]="companies"
           optionLabel="name"
           optionValue="id"
@@ -185,18 +184,18 @@
           [class.ng-invalid]="employmentForm.get('companyId')?.invalid && employmentForm.get('companyId')?.touched">
         </p-select>
         <small class="text-red-500" *ngIf="employmentForm.get('companyId')?.invalid && employmentForm.get('companyId')?.touched">
-          Company is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <div class="field">
         <label for="departmentId" class="block text-sm font-medium mb-2">
-          Department <span class="text-red-500">*</span>
+          {{ 'employments.formPage.labels.department' | translate }} <span class="text-red-500">*</span>
         </label>
         <p-select 
           id="departmentId"
           formControlName="departmentId"
-          placeholder="Select Department"
+          [placeholder]="'employments.formPage.placeholders.selectDepartment' | translate"
           [options]="departments"
           optionLabel="name"
           optionValue="id"
@@ -205,18 +204,18 @@
           [class.ng-invalid]="employmentForm.get('departmentId')?.invalid && employmentForm.get('departmentId')?.touched">
         </p-select>
         <small class="text-red-500" *ngIf="employmentForm.get('departmentId')?.invalid && employmentForm.get('departmentId')?.touched">
-          Department is required
+          {{ 'common.validation.required' | translate }}
         </small>
       </div>
 
       <div class="field">
         <label for="sectionId" class="block text-sm font-medium mb-2">
-          Section
+          {{ 'employments.formPage.labels.section' | translate }}
         </label>
         <p-select 
           id="sectionId"
           formControlName="sectionId"
-          placeholder="Select Section"
+          [placeholder]="'employments.formPage.placeholders.selectSection' | translate"
           [options]="sections"
           optionLabel="name"
           optionValue="id"
@@ -226,12 +225,12 @@
 
       <div class="field">
         <label for="designationId" class="block text-sm font-medium mb-2">
-          Designation
+          {{ 'employments.formPage.labels.designation' | translate }}
         </label>
         <p-select 
           id="designationId"
           formControlName="designationId"
-          placeholder="Select Designation"
+          [placeholder]="'employments.formPage.placeholders.selectDesignation' | translate"
           [options]="designations"
           optionLabel="name"
           optionValue="id"
@@ -241,20 +240,20 @@
 
       <div class="field">
         <label for="gradeId" class="block text-sm font-medium mb-2">
-          Grade ID
+          {{ 'employments.formPage.labels.grade' | translate }}
         </label>
         <input 
           id="gradeId"
           pInputText 
           type="number"
           formControlName="gradeId"
-          placeholder="Grade ID"
+          [placeholder]="'employments.formPage.placeholders.grade' | translate"
           class="w-full">
       </div>
 
       <div class="field">
         <label for="joinDate" class="block text-sm font-medium mb-2">
-          Join Date
+          {{ 'employments.formPage.labels.joinDate' | translate }}
         </label>
         <input 
           id="joinDate"
@@ -265,7 +264,7 @@
 
       <div class="field">
         <label for="relieveDate" class="block text-sm font-medium mb-2">
-          Relieve Date
+          {{ 'employments.formPage.labels.relieveDate' | translate }}
         </label>
         <input 
           id="relieveDate"
@@ -277,50 +276,24 @@
       <div class="field md:col-span-2">
         <div class="flex items-center gap-4">
           <div class="flex items-center">
-            <input 
-              type="checkbox"
-              id="isSpecialNeeds"
-              formControlName="isSpecialNeeds"
-              class="mr-3 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
-            <label for="isSpecialNeeds" class="text-sm text-gray-700">Special Needs</label>
+            <input type="checkbox" id="isSpecialNeeds" formControlName="isSpecialNeeds" class="mr-3 h-4 w-4">
+            <label for="isSpecialNeeds" class="text-sm text-gray-700">{{ 'employments.formPage.labels.specialNeeds' | translate }}</label>
           </div>
-
           <div class="flex items-center">
-            <input 
-              type="checkbox"
-              id="showInReport"
-              formControlName="showInReport"
-              class="mr-3 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
-            <label for="showInReport" class="text-sm text-gray-700">Show in Report</label>
+            <input type="checkbox" id="showInReport" formControlName="showInReport" class="mr-3 h-4 w-4">
+            <label for="showInReport" class="text-sm text-gray-700">{{ 'employments.formPage.labels.showInReport' | translate }}</label>
           </div>
-
           <div class="flex items-center">
-            <input 
-              type="checkbox"
-              id="showInDashboard"
-              formControlName="showInDashboard"
-              class="mr-3 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
-            <label for="showInDashboard" class="text-sm text-gray-700">Show in Dashboard</label>
+            <input type="checkbox" id="showInDashboard" formControlName="showInDashboard" class="mr-3 h-4 w-4">
+            <label for="showInDashboard" class="text-sm text-gray-700">{{ 'employments.formPage.labels.showInDashboard' | translate }}</label>
           </div>
         </div>
       </div>
     </div>
 
     <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
-      <button 
-        pButton 
-        label="Cancel" 
-        class="p-button-secondary" 
-        type="button"
-        (click)="closeDialog()">
-      </button>
-      <button 
-        pButton 
-        label="{{ isEditMode ? 'Update' : 'Create' }}" 
-        class="p-button-danger" 
-        [loading]="loading"
-        type="submit">
-      </button>
+      <button pButton [label]="'common.buttons.cancel' | translate" class="p-button-secondary" type="button" (click)="closeDialog()"></button>
+      <button pButton [label]="(isEditMode ? 'common.buttons.update' : 'common.buttons.create') | translate" class="p-button-danger" [loading]="loading" type="submit"></button>
     </div>
   </form>
 </p-dialog>

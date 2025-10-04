@@ -12,6 +12,8 @@ import { LeaveTypeService, CreateLeaveType, EditLeaveType } from '../LeaveTypeSe
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
 import { Organization } from '../../../interfaces/organization.interface';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-leave-type-modal',
@@ -24,6 +26,7 @@ import { Organization } from '../../../interfaces/organization.interface';
     SelectModule,
     ButtonModule,
     CheckboxModule,
+    TranslatePipe
   ],
   providers: [MessageService],
   templateUrl: './leave-type-modal.component.html',
@@ -41,17 +44,22 @@ export class LeaveTypeModalComponent implements OnInit, OnChanges {
   @Output() onCancelEvent = new EventEmitter<void>();
 
   leaveTypeForm: FormGroup;
+  private translations: any = {};
 
   constructor(
     private fb: FormBuilder,
     private leaveTypeService: LeaveTypeService,
     private messageService: MessageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private translationService: TranslationService
   ) {
     this.leaveTypeForm = this.createForm();
   }
 
   ngOnInit() {
+    this.translationService.translations$.subscribe(translations => {
+      this.translations = translations;
+    });
   }
 
   ngOnChanges() {
@@ -79,28 +87,12 @@ export class LeaveTypeModalComponent implements OnInit, OnChanges {
 
   loadLeaveTypeData(): void {
     if (this.leaveType) {
-      this.leaveTypeForm.patchValue({
-        id: this.leaveType.id,
-        code: this.leaveType.code,
-        name: this.leaveType.name,
-        nameSE: this.leaveType.nameSE,
-        description: this.leaveType.description,
-        symbol: this.leaveType.symbol,
-        reason: this.leaveType.reason,
-        isAttachmentRequired: this.leaveType.isAttachmentRequired,
-        isCommentRequired: this.leaveType.isCommentRequired,
-        organizationId: this.leaveType.organizationId
-      });
+      this.leaveTypeForm.patchValue(this.leaveType);
     }
   }
 
   resetForm(): void {
-    this.leaveTypeForm.reset();
-    // Set default values for boolean fields
-    this.leaveTypeForm.patchValue({
-      isAttachmentRequired: false,
-      isCommentRequired: false
-    });
+    this.leaveTypeForm.reset({ isAttachmentRequired: false, isCommentRequired: false });
     if (!this.isSuperAdmin) {
       const orgId = this.authService.getOrgId();
       if (orgId) {
@@ -116,79 +108,37 @@ export class LeaveTypeModalComponent implements OnInit, OnChanges {
     }
 
     const formData = this.leaveTypeForm.value;
-
-    if (this.isEditMode) {
-      const editData: EditLeaveType = {
-        id: this.leaveTypeForm.get('id')?.value,
-        code: formData.code,
-        name: formData.name,
-        nameSE: formData.nameSE,
-        description: formData.description || '',
-        symbol: formData.symbol,
-        reason: formData.reason,
-        isAttachmentRequired: Boolean(formData.isAttachmentRequired),
-        isCommentRequired: Boolean(formData.isCommentRequired),
-        organizationId: formData.organizationId
-      };
-      this.updateLeaveType(editData);
-    } else {
-      const createData: CreateLeaveType = {
-        code: formData.code,
-        name: formData.name,
-        nameSE: formData.nameSE,
-        description: formData.description || '',
-        symbol: formData.symbol,
-        reason: formData.reason,
-        isAttachmentRequired: Boolean(formData.isAttachmentRequired),
-        isCommentRequired: Boolean(formData.isCommentRequired),
-        organizationId: formData.organizationId
-      };
-      this.createLeaveType(createData);
-    }
+    const action = this.isEditMode ? this.updateLeaveType(formData) : this.createLeaveType(formData);
   }
 
   createLeaveType(data: CreateLeaveType): void {
     this.leaveTypeService.createLeaveType(data).subscribe({
-      next: (response: ApiResponse<LeaveType>) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Leave type created successfully'
-        });
-        this.onSave.emit(response.data);
-        this.closeDialog();
-      },
-      error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to create leave type'
-        });
-      }
+      next: (response: ApiResponse<LeaveType>) => this.handleSuccess(response, 'createSuccess'),
+      error: (error) => this.handleError('createError')
     });
   }
 
   updateLeaveType(data: EditLeaveType): void {
     this.leaveTypeService.updateLeaveType(data).subscribe({
-      next: (response: ApiResponse<LeaveType>) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Leave type updated successfully'
-        });
-        this.onSave.emit(response.data);
-        this.closeDialog();
-      },
-      error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to update leave type'
-        });
-      }
+      next: (response: ApiResponse<LeaveType>) => this.handleSuccess(response, 'updateSuccess'),
+      error: (error) => this.handleError('updateError')
     });
   }
 
+  private handleSuccess(response: ApiResponse<LeaveType>, messageKey: string): void {
+    this.showToast('success', this.translations.common?.success, this.translations.leaveTypeForm?.toasts[messageKey]);
+    this.onSave.emit(response.data);
+    this.closeDialog();
+  }
+
+  private handleError(messageKey: string): void {
+    this.showToast('error', this.translations.common?.error, this.translations.leaveTypeForm?.toasts[messageKey]);
+  }
+
+  private showToast(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
+  }
+  
   onDialogHide(): void {
     this.closeDialog();
   }
@@ -205,10 +155,7 @@ export class LeaveTypeModalComponent implements OnInit, OnChanges {
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
-
-      if (control instanceof FormGroup) {
-        this.markFormGroupTouched(control);
-      }
+      if (control instanceof FormGroup) this.markFormGroupTouched(control);
     });
   }
 }

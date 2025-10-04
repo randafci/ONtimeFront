@@ -125,13 +125,13 @@ employees: Employee[] = [];
     return `${employee.firstName || ''} ${employee.lastName || ''}`.trim() || 'N/A';
   }
 
-  getSeverity(status: string): string {
+  getSeverity(status: string): "success" | "info" | "warn" | "danger" | "secondary" | "contrast" {
     switch (status?.toLowerCase()) {
       case 'active': return 'success';
       case 'inactive': return 'danger';
-      case 'onleave': return 'warning';
+      case 'onleave': return 'warn';
       case 'terminated': return 'danger';
-      case 'suspended': return 'warning';
+      case 'suspended': return 'warn';
       case 'probation': return 'info';
       default: return 'info';
     }

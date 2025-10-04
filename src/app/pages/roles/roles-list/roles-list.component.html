@@ -77,7 +77,7 @@
                         <button (click)="makeAsDefault(role)" pButton pRipple type="button" class="p-button-rounded" [pTooltip]="(role.isDefaultRole ? 'rolesList.actions.unmarkAsDefault' : 'rolesList.actions.markAsDefault') | translate" tooltipPosition="top" [label]="(role.isDefaultRole ? 'rolesList.actions.unmarkAsDefault' : 'rolesList.actions.markAsDefault') | translate"></button>
                         <button (click)="editRole(role)" pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.edit' | translate" tooltipPosition="top" [label]="'rolesList.actions.edit' | translate"></button>
                         <button (click)="editPermissions(role)" pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.permissions' | translate" tooltipPosition="top" [label]="'rolesList.actions.permissions' | translate"></button>
-                        <button pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.systemUsers' | translate" tooltipPosition="top" [label]="'rolesList.actions.systemUsers' | translate"></button>
+                        <button (click)="navigateToUsers(role)" pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.systemUsers' | translate" tooltipPosition="top" [label]="'rolesList.actions.systemUsers' | translate"></button>
                     </div>
                 </td>
             </tr>

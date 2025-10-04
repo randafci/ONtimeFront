@@ -1,13 +1,13 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Table } from 'primeng/table';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TableModule } from 'primeng/table';
+import { Router, RouterModule, ActivatedRoute } from "@angular/router";
+import { Table, TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TagModule } from 'primeng/tag';
-import { ButtonModule } from 'primeng/button';
-import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { SelectModule } from 'primeng/select';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -17,28 +17,17 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { EmployeeEmployment, CreateEmployeeEmployment } from '@/interfaces/employee-employment.interface';
 import { EmployeeEmploymentService } from '../EmployeeEmploymentService';
 import { ApiResponse } from '@/core/models/api-response.model';
-import { Router, RouterModule, ActivatedRoute } from "@angular/router";
 import { LookupService, LookupItem } from './LookupService';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 
 @Component({
   selector: 'app-employee-employment-list',
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    TableModule,
-    InputTextModule,
-    TagModule,
-    ButtonModule,
-    InputIconModule,
-    IconFieldModule,
-    SelectModule,
-    ToastModule,
-    RouterModule,
-    ConfirmDialogModule,
-    TooltipModule,
-    DialogModule
+    CommonModule, FormsModule, ReactiveFormsModule, TableModule, InputTextModule, TagModule,
+    ButtonModule, InputIconModule, IconFieldModule, SelectModule, ToastModule,
+    RouterModule, ConfirmDialogModule, TooltipModule, DialogModule, TranslatePipe
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './employee-employment-list.html',
@@ -49,21 +38,15 @@ export class EmployeeEmploymentListComponent implements OnInit {
   loading: boolean = true;
   employeeId: number = 0;
   employeeName: string = '';
-  
   dialogVisible: boolean = false;
   isEditMode: boolean = false;
   employmentForm: FormGroup;
-  
   companies: LookupItem[] = [];
   departments: LookupItem[] = [];
-  allDepartments: LookupItem[] = [];
   sections: LookupItem[] = [];
   designations: LookupItem[] = [];
-  
-  statusOptions: any[] = [
-    { label: 'Current', value: 1 },
-    { label: 'Previous', value: 0 }
-  ];
+  statusOptions: any[] = [];
+  private translations: any = {};
 
   @ViewChild('dt') table!: Table;
   @ViewChild('filter') filter!: ElementRef;
@@ -75,22 +58,33 @@ export class EmployeeEmploymentListComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private lookupService: LookupService
+    private lookupService: LookupService,
+    private translationService: TranslationService
   ) {
     this.employmentForm = this.createForm();
   }
 
   ngOnInit() {
+    this.translationService.translations$.subscribe(trans => {
+      this.translations = trans;
+      this.initializeTranslatedArrays();
+    });
+
     this.employeeId = Number(this.route.snapshot.params['employeeId']);
     this.employeeName = this.route.snapshot.params['employeeName'] || 'Employee';
     
     if (this.employeeId) {
       this.loadEmployments();
-      this.loadCompanies();
-      this.loadAllDepartments();
-      this.loadSections();
-      this.loadDesignations();
+      this.loadLookups();
     }
+  }
+
+  initializeTranslatedArrays(): void {
+    const statusTrans = this.translations.employments?.listPage?.statuses || {};
+    this.statusOptions = [
+      { label: statusTrans.current || 'Current', value: 1 },
+      { label: statusTrans.previous || 'Previous', value: 0 }
+    ];
   }
 
   createForm(): FormGroup {
@@ -111,39 +105,32 @@ export class EmployeeEmploymentListComponent implements OnInit {
   }
 
   loadEmployments() {
-    console.log('Loading employments for employee:', this.employeeId);
     this.loading = true;
     this.employeeEmploymentService.getEmployeeEmploymentsByEmployeeId(this.employeeId).subscribe({
       next: (response: ApiResponse<EmployeeEmployment[]>) => {
         if (response.succeeded) {
-          console.log('Employments loaded successfully:', response.data.length, 'employments');
           this.employments = response.data;
         } else {
-          console.error('Failed to load employments:', response.message);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: response.message || 'Failed to load employments'
-          });
+          this.showToast('error', this.translations.common?.error, response.message || this.translations.employments?.listPage?.messages?.loadError);
         }
         this.loading = false;
       },
-      error: (error) => {
-        console.error('Error loading employments:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load employments'
-        });
+      error: () => {
+        this.showToast('error', this.translations.common?.error, this.translations.employments?.listPage?.messages?.loadError);
         this.loading = false;
       }
     });
   }
 
+  loadLookups(): void {
+    this.lookupService.getAllCompanies().subscribe(res => this.companies = res.succeeded ? res.data : []);
+    this.lookupService.getAllSections().subscribe(res => this.sections = res.succeeded ? res.data : []);
+    this.lookupService.getAllDesignations().subscribe(res => this.designations = res.succeeded ? res.data : []);
+  }
+
   openCreateDialog() {
     this.isEditMode = false;
-    this.employmentForm.reset();
-    this.employmentForm.patchValue({
+    this.employmentForm.reset({
       employeeId: this.employeeId,
       showInReport: true,
       showInDashboard: true
@@ -153,259 +140,97 @@ export class EmployeeEmploymentListComponent implements OnInit {
 
   openEditDialog(employment: EmployeeEmployment) {
     this.isEditMode = true;
-    
-    // Load departments for the selected company first
     if (employment.companyId) {
       this.onCompanyChange(employment.companyId);
     }
-    
     this.employmentForm.patchValue({
-      id: employment.id,
-      employeeId: employment.employeeId,
-      companyId: employment.companyId,
-      departmentId: employment.departmentId,
-      sectionId: employment.sectionId,
-      designationId: employment.designationId,
-      gradeId: employment.gradeId,
-      isSpecialNeeds: employment.isSpecialNeeds,
+      ...employment,
       joinDate: employment.joinDate ? employment.joinDate.split('T')[0] : null,
       relieveDate: employment.relieveDate ? employment.relieveDate.split('T')[0] : null,
-      showInReport: employment.showInReport,
-      showInDashboard: employment.showInDashboard
     });
     this.dialogVisible = true;
   }
 
   closeDialog() {
     this.dialogVisible = false;
-    this.employmentForm.reset();
   }
 
   onSubmit() {
     if (this.employmentForm.invalid) {
-      this.messageService.add({ 
-        severity: 'error', 
-        summary: 'Error', 
-        detail: 'Please fill all required fields' 
-      });
+      this.showToast('error', this.translations.common?.error, this.translations.employments?.formPage?.validation?.fillRequired);
       return;
     }
-
     this.loading = true;
     const formData = this.employmentForm.value;
-
     if (this.isEditMode) {
-      // Update employment
-      const updateData: EmployeeEmployment = {
-        ...formData,
-        isCurrent: 0
-      };
-
-      this.employeeEmploymentService.updateEmployeeEmployment(updateData).subscribe({
-        next: (response: ApiResponse<EmployeeEmployment>) => {
-          if (response.succeeded) {
-            this.messageService.add({ 
-              severity: 'success', 
-              summary: 'Success', 
-              detail: 'Employment updated successfully' 
-            });
-            this.closeDialog();
-            this.loadEmployments();
-          } else {
-            this.messageService.add({ 
-              severity: 'error', 
-              summary: 'Error', 
-              detail: response.message || 'Failed to update employment' 
-            });
-          }
-          this.loading = false;
-        },
-        error: (error) => {
-          console.error('Error updating employment:', error);
-          this.messageService.add({ 
-            severity: 'error', 
-            summary: 'Error', 
-            detail: 'Failed to update employment' 
-          });
-          this.loading = false;
-        }
-      });
+      this.employeeEmploymentService.updateEmployeeEmployment({...formData, isCurrent: 0}).subscribe(this.getObserver('update'));
     } else {
-      // Create employment
-      const createData: CreateEmployeeEmployment = {
-        employeeId: formData.employeeId,
-        companyId: formData.companyId,
-        departmentId: formData.departmentId,
-        sectionId: formData.sectionId,
-        designationId: formData.designationId,
-        gradeId: formData.gradeId,
-        isSpecialNeeds: formData.isSpecialNeeds || false, 
-        joinDate: formData.joinDate,
-        relieveDate: formData.relieveDate,
-        showInReport: formData.showInReport,
-        showInDashboard: formData.showInDashboard
-      };
-
-      this.employeeEmploymentService.createEmployeeEmployment(createData).subscribe({
-        next: (response: ApiResponse<EmployeeEmployment>) => {
-          if (response.succeeded) {
-            this.messageService.add({ 
-              severity: 'success', 
-              summary: 'Success', 
-              detail: 'Employment created successfully' 
-            });
-            this.closeDialog();
-            this.loadEmployments();
-          } else {
-            this.messageService.add({ 
-              severity: 'error', 
-              summary: 'Error', 
-              detail: response.message || 'Failed to create employment' 
-            });
-          }
-          this.loading = false;
-        },
-        error: (error) => {
-          console.error('Error creating employment:', error);
-          this.messageService.add({ 
-            severity: 'error', 
-            summary: 'Error', 
-            detail: 'Failed to create employment' 
-          });
-          this.loading = false;
-        }
-      });
+      this.employeeEmploymentService.createEmployeeEmployment(formData).subscribe(this.getObserver('create'));
     }
   }
 
-  loadCompanies() {
-    this.lookupService.getAllCompanies().subscribe({
-      next: (response: ApiResponse<LookupItem[]>) => {
-        if (response.succeeded) {
-          this.companies = response.data;
-        } else {
-          console.error('Failed to load companies:', response.message);
-        }
-      },
-      error: (error) => {
-        console.error('Error loading companies:', error);
-      }
-    });
-  }
+  private getObserver(action: 'create' | 'update') {
+    const toasts = this.translations.employments?.formPage?.toasts || {};
+    const successKey = action === 'create' ? 'createSuccess' : 'updateSuccess';
+    const errorKey = action === 'create' ? 'createError' : 'updateError';
 
-  loadAllDepartments() {
-    this.lookupService.getAllDepartments().subscribe({
-      next: (response: ApiResponse<LookupItem[]>) => {
+    return {
+      next: (response: ApiResponse<EmployeeEmployment>) => {
         if (response.succeeded) {
-          this.allDepartments = response.data;
+          this.showToast('success', this.translations.common?.success, toasts[successKey]);
+          this.closeDialog();
+          this.loadEmployments();
         } else {
-          console.error('Failed to load departments:', response.message);
+          this.showToast('error', this.translations.common?.error, response.message || toasts[errorKey]);
         }
+        this.loading = false;
       },
-      error: (error) => {
-        console.error('Error loading departments:', error);
+      error: () => {
+        this.showToast('error', this.translations.common?.error, toasts[errorKey]);
+        this.loading = false;
       }
-    });
-  }
-
-  loadSections() {
-    this.lookupService.getAllSections().subscribe({
-      next: (response: ApiResponse<LookupItem[]>) => {
-        if (response.succeeded) {
-          this.sections = response.data;
-        } else {
-          console.error('Failed to load sections:', response.message);
-        }
-      },
-      error: (error) => {
-        console.error('Error loading sections:', error);
-      }
-    });
-  }
-
-  loadDesignations() {
-    this.lookupService.getAllDesignations().subscribe({
-      next: (response: ApiResponse<LookupItem[]>) => {
-        if (response.succeeded) {
-          this.designations = response.data;
-        } else {
-          console.error('Failed to load designations:', response.message);
-        }
-      },
-      error: (error) => {
-        console.error('Error loading designations:', error);
-      }
-    });
+    };
   }
 
   onCompanyChange(companyId: number) {
-    // Reset department selection
     this.employmentForm.patchValue({ departmentId: null });
     this.departments = [];
-
     if (companyId) {
-      this.lookupService.getDepartmentsByCompanyId(companyId).subscribe({
-        next: (response: ApiResponse<LookupItem[]>) => {
-          if (response.succeeded) {
-            this.departments = response.data;
-          } else {
-            console.error('Failed to load departments for company:', response.message);
-          }
-        },
-        error: (error) => {
-          console.error('Error loading departments for company:', error);
-        }
-      });
+      this.lookupService.getDepartmentsByCompanyId(companyId).subscribe(res => this.departments = res.succeeded ? res.data : []);
     }
   }
 
   deleteEmployment(employment: EmployeeEmployment) {
+    const trans = this.translations.employments?.listPage?.messages || {};
+    const commonTrans = this.translations.common || {};
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete this employment?`,
-      header: 'Confirm Deletion',
+      message: trans.deleteConfirm,
+      header: commonTrans.confirmDelete,
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Yes, Delete',
-      rejectLabel: 'Cancel',
+      acceptLabel: commonTrans.yes,
+      rejectLabel: commonTrans.no,
       accept: () => {
         this.employeeEmploymentService.deleteEmployeeEmployment(employment.id).subscribe({
           next: (response: ApiResponse<boolean>) => {
             if (response.succeeded) {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: 'Employment deleted successfully.'
-              });
+              this.showToast('success', commonTrans.success, trans.deleteSuccess);
               this.loadEmployments();
             } else {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: response.message || 'Failed to delete employment'
-              });
+              this.showToast('error', commonTrans.error, response.message || trans.deleteError);
             }
           },
-          error: (error) => {
-            console.error('Error deleting employment:', error);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to delete employment'
-            });
-          }
+          error: () => this.showToast('error', commonTrans.error, trans.deleteError)
         });
       },
       reject: () => {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Cancelled',
-          detail: 'Delete operation cancelled'
-        });
+        this.showToast('info', trans.cancelled, trans.deleteCancelled);
       }
     });
   }
 
   getStatusLabel(isCurrent: number): string {
-    return isCurrent === 1 ? 'Current' : 'Previous';
+    const status = this.statusOptions.find(s => s.value === isCurrent);
+    return status ? status.label : '';
   }
 
   getSeverity(isCurrent: number) {
@@ -415,7 +240,7 @@ export class EmployeeEmploymentListComponent implements OnInit {
   navigateBack() {
     this.router.navigate(['/employees']);
   }
-
+  
   onGlobalFilter(table: Table, event: Event) {
     table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
@@ -423,5 +248,9 @@ export class EmployeeEmploymentListComponent implements OnInit {
   clear(table: Table) {
     table.clear();
     this.filter.nativeElement.value = '';
+  }
+
+  private showToast(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 }

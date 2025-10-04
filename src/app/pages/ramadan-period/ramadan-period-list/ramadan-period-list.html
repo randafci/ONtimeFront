@@ -1,10 +1,10 @@
 <div class="card">
     <div class="flex justify-between items-center mb-4">
-        <h2 class="mb-0">Ramadan Periods</h2>
+        <h2 class="mb-0">{{ 'ramadanPeriodList.title' | translate }}</h2>
         <div class="flex-grow"></div>
         <button 
             pButton 
-            label="Add Ramadan Period"
+            [label]="'ramadanPeriodList.addButton' | translate"
             icon="pi pi-plus" 
             class="p-button-sm"
             (click)="openCreateDialog()"
@@ -27,21 +27,19 @@
             <div class="flex justify-between items-center flex-col sm:flex-row">
                 <button 
                     pButton 
-                    label="Clear"
+                    [label]="'ramadanPeriodList.clearButton' | translate"
                     class="p-button-outlined mb-2" 
                     icon="pi pi-filter-slash" 
                     (click)="clear(dt)"
                 ></button>
                 <p-iconfield iconPosition="left" class="ml-auto">
-                    <p-inputicon>
-                        <i class="pi pi-search"></i>
-                    </p-inputicon>
+                    <p-inputicon><i class="pi pi-search"></i></p-inputicon>
                     <input 
                         pInputText 
                         type="text" 
                         #filter
                         (input)="onGlobalFilter(dt, $event)" 
-                        placeholder="Search ramadan periods..."
+                        [placeholder]="'ramadanPeriodList.searchPlaceholder' | translate"
                     />
                 </p-iconfield>
             </div>
@@ -49,59 +47,32 @@
         
         <ng-template pTemplate="header">
             <tr>
-                <th pSortableColumn="code">
-                    Code
-                    <p-sortIcon field="code"></p-sortIcon>
-                </th>
-                <th pSortableColumn="name">
-                    Name
-                    <p-sortIcon field="name"></p-sortIcon>
-                </th>
-                <th pSortableColumn="nameSE">
-                    Name (SE)
-                    <p-sortIcon field="nameSE"></p-sortIcon>
-                </th>
-                <th pSortableColumn="start">
-                    Start Date
-                    <p-sortIcon field="start"></p-sortIcon>
-                </th>
-                <th pSortableColumn="end">
-                    End Date
-                    <p-sortIcon field="end"></p-sortIcon>
-                </th>
-                <th style="min-width: 8rem">Actions</th>
+                <th pSortableColumn="code">{{ 'ramadanPeriodList.headers.code' | translate }}<p-sortIcon field="code"></p-sortIcon></th>
+                <th pSortableColumn="name">{{ 'ramadanPeriodList.headers.name' | translate }}<p-sortIcon field="name"></p-sortIcon></th>
+                <th pSortableColumn="nameSE">{{ 'ramadanPeriodList.headers.nameSE' | translate }}<p-sortIcon field="nameSE"></p-sortIcon></th>
+                <th pSortableColumn="start">{{ 'ramadanPeriodList.headers.startDate' | translate }}<p-sortIcon field="start"></p-sortIcon></th>
+                <th pSortableColumn="end">{{ 'ramadanPeriodList.headers.endDate' | translate }}<p-sortIcon field="end"></p-sortIcon></th>
+                <th style="min-width: 8rem">{{ 'ramadanPeriodList.headers.actions' | translate }}</th>
             </tr>
         </ng-template>
         
         <ng-template pTemplate="body" let-ramadanPeriod>
             <tr>
-                <td>
-                    <p-tag [value]="ramadanPeriod.code" severity="info"></p-tag>
-                </td>
+                <td><p-tag [value]="ramadanPeriod.code" severity="info"></p-tag></td>
                 <td>{{ ramadanPeriod.name }}</td>
                 <td>{{ ramadanPeriod.nameSE }}</td>
                 <td>{{ ramadanPeriod.start | date: 'MM/dd/yyyy' }}</td>
                 <td>{{ ramadanPeriod.end | date: 'MM/dd/yyyy' }}</td>
                 <td>
-                    <button 
-                        pButton 
-                        icon="pi pi-pencil" 
-                        class="p-button-rounded p-button-text p-button-sm"
-                        (click)="openEditDialog(ramadanPeriod)"
-                    ></button>
-                    <button 
-                        pButton 
-                        icon="pi pi-trash" 
-                        class="p-button-rounded p-button-text p-button-danger p-button-sm"
-                        (click)="deleteRamadanPeriod(ramadanPeriod)"
-                    ></button>
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm" (click)="openEditDialog(ramadanPeriod)"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm" (click)="deleteRamadanPeriod(ramadanPeriod)"></button>
                 </td>
             </tr>
         </ng-template>
         
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="6">No ramadan periods found.</td>
+                <td colspan="6">{{ 'ramadanPeriodList.messages.empty' | translate }}</td>
             </tr>
         </ng-template>
     </p-table>
@@ -114,8 +85,7 @@
   [ramadanPeriod]="selectedRamadanPeriod"
   [loading]="loading"
   (onSave)="onRamadanPeriodSaved($event)"
->
-</app-ramadan-period-modal>
+></app-ramadan-period-modal>
 
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>

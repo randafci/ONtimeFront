@@ -9,6 +9,7 @@ import { Employee } from '../../interfaces/employee.interface';
 import { AuthService } from '../../auth/auth.service';
 import { AppConfigService } from '../service/app-config.service';
 import { Organization } from '@/interfaces/organization.interface';
+import { UpdateUserRoles, UserRole } from '../../interfaces/user-role.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -69,6 +70,15 @@ export class UserService {
 
   getOrganizations(): Observable<ApiResponse<Organization[]>> {
     return this.http.get<ApiResponse<Organization[]>>(`${this.baseApiUrl}/Lookup/Organization`,this.headers);
+  }
+
+  getUserRoles(userId: string): Observable<ApiResponse<UserRole[]>> {
+    return this.http.get<ApiResponse<UserRole[]>>(`${this.apiUrl}/${userId}/roles`, this.headers);
+  }
+
+  // NEW METHOD 2: Update the roles for a specific user
+  updateUserRoles(userId: string, data: UpdateUserRoles): Observable<ApiResponse<boolean>> {
+    return this.http.put<ApiResponse<boolean>>(`${this.apiUrl}/${userId}/roles`, data, this.headers);
   }
 
 }

@@ -24,6 +24,8 @@ import { LeaveTypeModalComponent } from '../leave-type-modal/leave-type-modal.co
 import { Organization } from '../../../interfaces/organization.interface';
 import { LookupService } from '../../organization/OrganizationService';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-leave-type-list',
@@ -45,7 +47,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     TooltipModule,
     RouterModule,
     ConfirmDialogModule,
-    LeaveTypeModalComponent
+    LeaveTypeModalComponent,
+    TranslatePipe
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './leave-type-list.html'
@@ -53,12 +56,12 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 export class LeaveTypeListComponent implements OnInit {
   leaveTypes: LeaveType[] = [];
   loading: boolean = true;
-
   dialogVisible: boolean = false;
   isEditMode: boolean = false;
   selectedLeaveType: LeaveType | null = null;
   organizations: Organization[] = [];
   isSuperAdmin = false;
+  private translations: any = {};
 
   @ViewChild('dt') table!: Table;
   @ViewChild('filter') filter!: ElementRef;
@@ -67,15 +70,20 @@ export class LeaveTypeListComponent implements OnInit {
     private leaveTypeService: LeaveTypeService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
-    private router: Router,
     private authService: AuthService,
-    private organizationService: LookupService
+    private organizationService: LookupService,
+    private translationService: TranslationService
   ) {}
 
   ngOnInit() {
+    this.translationService.translations$.subscribe(translations => {
+      this.translations = translations;
+    });
     this.isSuperAdmin = this.checkIsSuperAdmin();
     this.loadLeaveTypes();
-    this.loadOrganizations();
+    if (this.isSuperAdmin) {
+      this.loadOrganizations();
+    }
   }
 
   private checkIsSuperAdmin(): boolean {
@@ -90,21 +98,12 @@ export class LeaveTypeListComponent implements OnInit {
         if (response.succeeded) {
           this.leaveTypes = response.data;
         } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: response.message || 'Failed to load leave types'
-          });
+          this.showToast('error', this.translations.common?.error, response.message || this.translations.leaveTypeList?.messages?.loadError);
         }
         this.loading = false;
       },
-      error: (error) => {
-        console.error('Error loading leave types:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load leave types'
-        });
+      error: () => {
+        this.showToast('error', this.translations.common?.error, this.translations.leaveTypeList?.messages?.loadError);
         this.loading = false;
       }
     });
@@ -113,13 +112,9 @@ export class LeaveTypeListComponent implements OnInit {
   loadOrganizations(): void {
     this.organizationService.getAllOrganizations().subscribe({
       next: (response: ApiResponse<Organization[]>) => {
-        if (response.succeeded) {
-          this.organizations = response.data;
-        }
+        if (response.succeeded) this.organizations = response.data;
       },
-      error: (error) => {
-        // Silent error handling
-      }
+      error: (error) => console.error(error)
     });
   }
 
@@ -140,35 +135,25 @@ export class LeaveTypeListComponent implements OnInit {
   }
 
   deleteLeaveType(leaveType: LeaveType) {
+    const trans = this.translations.leaveTypeList?.messages || {};
+    const commonTrans = this.translations.common || {};
+    const message = (trans.deleteConfirm || 'Are you sure you want to delete {name}?').replace('{name}', leaveType.name);
+
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete ${leaveType.name}?`,
-      header: 'Confirm Delete',
+      message: message,
+      header: commonTrans.deleteHeader || 'Confirm Deletion',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.leaveTypeService.deleteLeaveType(leaveType.id).subscribe({
           next: (response: ApiResponse<boolean>) => {
             if (response.succeeded) {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: 'Leave type deleted successfully'
-              });
+              this.showToast('success', commonTrans.success, trans.deleteSuccess);
               this.loadLeaveTypes();
             } else {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: response.message || 'Failed to delete leave type'
-              });
+              this.showToast('error', commonTrans.error, response.message || trans.deleteError);
             }
           },
-          error: (error) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to delete leave type'
-            });
-          }
+          error: () => this.showToast('error', commonTrans.error, trans.deleteError)
         });
       }
     });
@@ -181,5 +166,9 @@ export class LeaveTypeListComponent implements OnInit {
   clear(table: Table) {
     table.clear();
     this.filter.nativeElement.value = '';
+  }
+
+  private showToast(severity: string, summary: string, detail: string): void {
+    this.messageService.add({ severity, summary, detail });
   }
 }
