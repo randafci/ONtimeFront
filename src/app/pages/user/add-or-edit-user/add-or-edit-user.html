@@ -56,18 +56,20 @@
       </div>
 
 
-      <!-- Password -->
-<div class="field" *ngIf="!isEditMode && !userForm.get('isLdapUser')?.value">
+   <!-- Password -->
+<div class="field" *ngIf="!userForm.get('isLdapUser')?.value">
   <label for="password">
     {{ 'users.formPage.labels.password' | translate }}
-    <span class="required-star">*</span>
+    <span *ngIf="!isEditMode" class="required-star">*</span>
+    <span *ngIf="isEditMode" class="text-gray-500 text-sm">({{ 'common.optional' | translate }})</span>
   </label>
 
   <input id="password" type="password" pInputText class="w-full" formControlName="password"
+         placeholder="{{ isEditMode ? ('Leave empty to keep current password' | translate) : '' }}"
          [ngClass]="{'field-error': userForm.controls['password'].invalid && (userForm.controls['password'].touched || submitted)}" />
 
-  <!-- Required -->
-  <small *ngIf="userForm.controls['password'].errors?.['required'] && (userForm.controls['password'].touched || submitted)" class="p-error">
+  <!-- Required (only for create mode) -->
+  <small *ngIf="!isEditMode && userForm.controls['password'].errors?.['required'] && (userForm.controls['password'].touched || submitted)" class="p-error">
     {{ 'common.validation.required' | translate }}
   </small>
 

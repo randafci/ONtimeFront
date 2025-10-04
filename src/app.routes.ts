@@ -222,13 +222,26 @@ export const appRoutes: Routes = [
           )
       },
       {
+        path: 'timetables',
+        loadChildren: () =>
+          import('./app/pages/timetable/timetable.routes').then(
+            (m) => m.TIMETABLE_ROUTES
+          )
+      },
+      {
         path: 'employees/reportingmanager',
         loadChildren: () =>
           import('./app/pages/employeeReportingManager/employeeReportingManager.routes').then(
             (m) => m.EMPLOYEEREPORTINGMANAGER_ROUTES
           )
       },
-
+      {
+        path: 'time-shifts',
+        loadChildren: () =>
+          import('./app/pages/timeShift/timeShift.routes').then(
+            (m) => m.TIME_SHIFT_ROUTES
+          )
+      },
       { path: 'test', component: Layout },
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
       {

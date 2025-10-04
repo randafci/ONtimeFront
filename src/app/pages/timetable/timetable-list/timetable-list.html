@@ -1,0 +1,204 @@
+<div class="card">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Time Tables</h2>
+    <div class="flex-grow-1"></div>
+    <button 
+      pButton 
+      label="Add TimeTable"
+      icon="pi pi-plus" 
+      class="p-button-sm"
+      (click)="openCreateDialog()"
+    ></button>
+  </div>
+  
+  <p-table
+    #dt
+    [value]="timeTables"
+    dataKey="id"
+    [rows]="10"
+    [loading]="loading"
+    [rowHover]="true"
+    [showGridlines]="true"
+    [paginator]="true"
+    [globalFilterFields]="['nameAr', 'nameEn', 'organizationName']"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex justify-between items-center flex-column sm:flex-row">
+        <button 
+          pButton 
+          label="Clear"
+          class="p-button-outlined mb-2" 
+          icon="pi pi-filter-slash" 
+          (click)="clear(dt)"
+        ></button>
+        <p-iconfield iconPosition="left" class="ml-auto">
+          <p-inputicon>
+            <i class="pi pi-search"></i>
+          </p-inputicon>
+          <input 
+            pInputText 
+            type="text" 
+            #filter
+            (input)="onGlobalFilter(dt, $event)" 
+            placeholder="Search timetables..."
+          />
+        </p-iconfield>
+      </div>
+    </ng-template>
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="min-width: 150px">
+          <div class="flex align-items-center">
+            Name
+            <p-columnFilter type="text" field="nameEn" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 120px">
+          <div class="flex align-items-center">
+            Organization
+            <p-columnFilter type="text" field="organizationName" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 100px">
+          <div class="flex align-items-center">
+            Shift Time
+          </div>
+        </th>
+        <th style="min-width: 100px">
+          <div class="flex align-items-center">
+            Duration
+          </div>
+        </th>
+        <th style="min-width: 120px">
+          <div class="flex align-items-center">
+            Shift Type
+          </div>
+        </th>
+        <th style="min-width: 100px">
+          <div class="flex align-items-center">
+            Status
+            <p-columnFilter type="boolean" field="isActive" display="menu"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 100px">
+          <div class="flex align-items-center">
+            Flexible Range
+          </div>
+        </th>
+        <th style="min-width: 120px">
+          Actions
+        </th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-timeTable>
+      <tr>
+        <td>
+          <div class="font-medium">{{ timeTable.nameEn || timeTable.nameAr || '-' }}</div>
+          <div class="text-sm text-muted" *ngIf="timeTable.nameAr && timeTable.nameEn">
+            {{ timeTable.nameAr }}
+          </div>
+        </td>
+        <td>
+          {{ timeTable.organizationName || '-' }}
+        </td>
+        <td>
+          <div class="text-sm">
+            <div>
+              <i class="pi pi-clock mr-1"></i>
+              {{ formatTime(timeTable.startTime) }} - {{ formatTime(timeTable.endTime) }}
+            </div>
+            <div *ngIf="timeTable.isNightShift" class="text-muted text-xs">
+              <i class="pi pi-moon mr-1"></i>
+              Night shift spans day
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="flex align-items-center">
+            <i class="pi pi-hourglass mr-2 text-muted"></i>
+            {{ formatShiftDuration(timeTable) }}
+          </div>
+        </td>
+        <td>
+          <p-tag 
+            [value]="getShiftTypeDisplay(timeTable)" 
+            [severity]="getShiftTypeSeverity(timeTable)"
+          ></p-tag>
+        </td>
+        <td>
+          <p-tag 
+            [value]="timeTable.isActive ? 'Active' : 'Inactive'" 
+            [severity]="timeTable.isActive ? 'success' : 'danger'"
+          ></p-tag>
+        </td>
+        <td>
+          <div *ngIf="timeTable.isCheckInOutRangeEnabled" class="text-xs">
+            <div>
+              <i class="pi pi-sign-in mr-1 text-success"></i>
+              {{ formatTime(timeTable.beginIn) }} - {{ formatTime(timeTable.beginOut) }}
+            </div>
+            <div>
+              <i class="pi pi-sign-out mr-1 text-danger"></i>
+              {{ formatTime(timeTable.endIn) }} - {{ formatTime(timeTable.endOut) }}
+            </div>
+          </div>
+          <div *ngIf="!timeTable.isCheckInOutRangeEnabled" class="text-muted">
+            <i class="pi pi-minus"></i>
+            Fixed Time
+          </div>
+        </td>
+        <td>
+          <div class="action-buttons">
+            <button 
+              pButton 
+              pTooltip="Edit"
+              tooltipPosition="top"
+              icon="pi pi-pencil" 
+              class="p-button-rounded p-button-text p-button-info p-button-sm mr-2"
+              (click)="openEditDialog(timeTable)"
+            ></button>
+            <button 
+              pButton 
+              pTooltip="Delete"
+              tooltipPosition="top"
+              icon="pi pi-trash" 
+              class="p-button-rounded p-button-text p-button-danger p-button-sm"
+              (click)="deleteTimeTable(timeTable)"
+            ></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="8" class="text-center py-6">
+          <i class="pi pi-calendar text-muted text-4xl mb-3 block"></i>
+          <div class="text-muted font-medium">No timetables found</div>
+          <div class="text-sm text-muted mt-2">Create your first timetable to get started</div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- TimeTable Modal Component -->
+<app-timetable-modal
+  [(dialogVisible)]="dialogVisible"
+  [isEditMode]="isEditMode"
+  [timeTable]="selectedTimeTable"
+  [organizationOptions]="organizationOptions"
+  [isSuperAdmin]="isSuperAdmin"
+  [loading]="loading"
+  (onSave)="onTimeTableSaved($event)"
+>
+</app-timetable-modal>
+
+<!-- Toast Messages -->
+<p-toast></p-toast>
+
+<!-- Confirmation Dialog -->
+<p-confirmDialog></p-confirmDialog>

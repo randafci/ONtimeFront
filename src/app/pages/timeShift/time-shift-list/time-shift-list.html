@@ -1,0 +1,112 @@
+<div class="card">
+  <!-- Header Section -->
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="mb-0">{{ 'timeShiftList.title' | translate }}</h2>
+    <div class="flex-grow"></div>
+    <button 
+      pButton 
+      label="Add Time Shift"
+      icon="pi pi-plus" 
+      class="p-button-sm"
+      (click)="openAddDialog()"
+    ></button>
+  </div>
+
+  <!-- Table Section -->
+  <p-table
+    #dt
+    [value]="timeShifts"
+    dataKey="id"
+    [rows]="10"
+    [loading]="loading"
+    [rowHover]="true"
+    [showGridlines]="true"
+    [paginator]="true"
+    [globalFilterFields]="['dayName', 'startTime', 'endTime']"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex justify-between items-center flex-col sm:flex-row">
+        <button 
+          pButton 
+          label="Clear"
+          class="p-button-outlined mb-2" 
+          icon="pi pi-filter-slash" 
+          (click)="clear(dt)"
+        ></button>
+        <p-iconfield iconPosition="left" class="ml-auto">
+          <p-inputicon>
+            <i class="pi pi-search"></i>
+          </p-inputicon>
+          <input 
+            pInputText 
+            type="text" 
+            #filter
+            (input)="onGlobalFilter(dt, $event)" 
+            placeholder="Search time shifts..."
+          />
+        </p-iconfield>
+      </div>
+    </ng-template>
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="dayName">
+          Day Name
+          <p-sortIcon field="dayName"></p-sortIcon>
+        </th>
+        <th pSortableColumn="startTime">
+          Start Time
+          <p-sortIcon field="startTime"></p-sortIcon>
+        </th>
+        <th pSortableColumn="endTime">
+          End Time
+          <p-sortIcon field="endTime"></p-sortIcon>
+        </th>
+        <th style="min-width: 8rem">Actions</th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-timeShift>
+      <tr>
+        <td>{{ timeShift.dayName }}</td>
+        <td>{{ timeShift.startTime }}</td>
+        <td>{{ timeShift.endTime }}</td>
+        <td>
+          <button 
+            pButton 
+            icon="pi pi-pencil" 
+            class="p-button-rounded p-button-text p-button-sm"
+            (click)="openEditDialog(timeShift)"
+          ></button>
+          <button 
+            pButton 
+            icon="pi pi-trash" 
+            class="p-button-rounded p-button-text p-button-danger p-button-sm"
+            (click)="deleteTimeShift(timeShift)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4">No time shifts found.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Add/Edit Dialog Component -->
+<app-add-or-edit-time-shift
+  [(dialogVisible)]="timeShiftDialogVisible"
+  [isEditMode]="isEditMode"
+  [timeShift]="selectedTimeShift"
+  [loading]="loading"
+  (onSave)="onTimeShiftSaved($event)"
+>
+</app-add-or-edit-time-shift>
+
+<!-- Toast and Confirm Dialog -->
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
