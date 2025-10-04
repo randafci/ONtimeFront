@@ -120,7 +120,7 @@ export class ShiftTypeListComponent implements OnInit {
     return shiftType.isDeleted ? 'inactive' : 'active';
   }
 
-  getSeverity(status: string): string {
+  getSeverity(status: string): "success" | "info" | "warn" | "danger" | "secondary" | "contrast" {
     switch (status?.toLowerCase()) {
       case 'active': return 'success';
       case 'inactive': return 'danger';

@@ -108,7 +108,7 @@ export class GradeListComponent implements OnInit {
         return grade.isDeleted ? 'inactive' : 'active';
     }
 
-    getSeverity(status: string): string {
+    getSeverity(status: string): "success" | "info" | "warn" | "danger" | "secondary" | "contrast" {
         return status === 'active' ? 'success' : 'danger';
     }
 

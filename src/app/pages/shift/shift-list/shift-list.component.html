@@ -1,0 +1,70 @@
+<!-- src/app/features/attendance/shifts/shift-list/shift-list.component.html -->
+
+<div class="card">
+    <div class="flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">{{ 'shiftList.title' | translate }}</h2>
+        <div class="flex-grow-1"></div>
+        <button pButton [label]="'shiftList.addButton' | translate" icon="pi pi-plus" class="p-button-sm" (click)="openCreateDialog()"></button>
+    </div>
+    
+    <p-table #dt [value]="shifts" dataKey="id" [rows]="10" [loading]="loading" [rowHover]="true" [showGridlines]="true"
+        [paginator]="true" responsiveLayout="scroll" [globalFilterFields]="['shiftTypeName', 'organizationName']">
+
+        <ng-template pTemplate="caption">
+            <div class="flex justify-between items-center flex-column sm:flex-row">
+                <button pButton [label]="'shiftList.clearButton' | translate" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(dt)"></button>
+                <p-iconfield iconPosition="left" class="ml-auto">
+                    <p-inputicon><i class="pi pi-search"></i></p-inputicon>
+                    <input pInputText type="text" #filter (input)="onGlobalFilter(dt, $event)" [placeholder]="'shiftList.searchPlaceholder' | translate" />
+                </p-iconfield>
+            </div>
+        </ng-template>
+        
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="shiftTypeName">
+                    {{ 'shiftList.headers.shiftType' | translate }} <p-sortIcon field="shiftTypeName"></p-sortIcon>
+                </th>
+                <th pSortableColumn="organizationName" *ngIf="isSuperAdmin">
+                    {{ 'shiftList.headers.organization' | translate }} <p-sortIcon field="organizationName"></p-sortIcon>
+                </th>
+                <th pSortableColumn="isDefaultShift">
+                    {{ 'shiftList.headers.isDefault' | translate }} <p-sortIcon field="isDefaultShift"></p-sortIcon>
+                </th>
+                <th style="min-width: 8rem">{{ 'shiftList.headers.actions' | translate }}</th>
+            </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="body" let-shift>
+            <tr>
+                <td>{{ shift.shiftTypeName }}</td>
+                <td *ngIf="isSuperAdmin">{{ shift.organizationName }}</td>
+                <td>
+                    <p-tag [value]="shift.isDefaultShift ? ('common.yes' | translate) : ('common.no' | translate)" [severity]="getSeverity(shift.isDefaultShift)"></p-tag>
+                </td>
+                <td>
+                    <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm" (click)="openEditDialog(shift)"></button>
+                    <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm" (click)="deleteShift(shift)"></button>
+                </td>
+            </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="emptymessage">
+            <tr><td [attr.colspan]="isSuperAdmin ? 4 : 3">{{ 'shiftList.messages.empty' | translate }}</td></tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<!-- Shift Modal Component -->
+<app-shift-modal
+  [(dialogVisible)]="dialogVisible"
+  [isEditMode]="isEditMode"
+  [shift]="selectedShift"
+  [organizations]="organizations"
+  [shiftTypes]="shiftTypes"
+  [isSuperAdmin]="isSuperAdmin"
+  (onSave)="onShiftSaved($event)">
+</app-shift-modal>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

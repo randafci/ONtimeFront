@@ -99,6 +99,9 @@
                         class="p-button-rounded p-button-text p-button-sm"
                         (click)="navigateToEdit(user.id)"
                     ></button>
+                    <button pButton icon="pi pi-users" class="p-button-rounded p-button-text p-button-success p-button-sm"
+        pTooltip="Assign Roles" tooltipPosition="top"
+        (click)="navigateToAssignRoles(user.id)"></button>
                     <button 
                         pButton 
                         icon="pi pi-trash" 

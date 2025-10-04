@@ -105,7 +105,7 @@ export class UserList implements OnInit {
     }
   }
 
-  getSeverity(isLdap: boolean): string {
+  getSeverity(isLdap: boolean): "success" | "info" | "warn" | "danger" | "secondary" | "contrast" {
     return isLdap ? 'success' : 'info';
   }
 
@@ -146,5 +146,9 @@ export class UserList implements OnInit {
   
   private showToast(severity: string, summary: string, detail: string): void {
     this.messageService.add({ severity, summary, detail });
+  }
+
+  navigateToAssignRoles(userId: string): void {
+    this.router.navigate(['/users', userId, 'roles']);
   }
 }

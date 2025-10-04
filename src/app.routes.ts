@@ -18,6 +18,7 @@ import { ForgetPassword } from './app/auth/forget-password/forget-password';
 import { ChangePassowrd } from './app/auth/change-passowrd/change-passowrd';
 import { DeviceListComponent } from './app/pages/device/device-list/device-list.component';
 import { AddEditDeviceComponent } from './app/pages/device/add-edit-device/add-edit-device.component';
+import { RoleUsersComponent } from './app/pages/roles/role-users/role-users.component';
 
 export const appRoutes: Routes = [
   {
@@ -36,7 +37,7 @@ export const appRoutes: Routes = [
           import('./app/pages/organization/oraganization.routes').then(
             (m) => m.ORGANIZATION_ROUTES
           ),
-        canActivate: [SuperAdminGuard]
+        // canActivate: [SuperAdminGuard]
       },
       {
         path: 'users',
@@ -60,6 +61,11 @@ export const appRoutes: Routes = [
         component: AddEditRoleComponent,
         canActivate: [SuperAdminGuard]
       },
+      {
+    path: 'roles/:id/users', 
+    component: RoleUsersComponent,
+    canActivate: [SuperAdminGuard]
+  },
       {
         path: 'devices',
         component: DeviceListComponent,
@@ -108,6 +114,13 @@ export const appRoutes: Routes = [
         loadChildren: () =>
           import('./app/pages/shift-type/shift-type.routes').then(
             (m) => m.SHIFT_TYPE_ROUTES
+          )
+      },
+      {
+        path: 'shifts',
+        loadChildren: () =>
+          import('./app/pages/shift/shift.routes').then(
+            (m) => m.SHIFT_ROUTES
           )
       },
       {

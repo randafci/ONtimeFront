@@ -1,0 +1,13 @@
+// You can add custom styles here if needed.
+// For example, to match the red theme from your screenshot:
+:host ::ng-deep {
+  .p-checkbox .p-checkbox-box.p-highlight {
+    border-color: #A52A2A; // Dark Red
+    background: #A52A2A; // Dark Red
+  }
+
+  .p-button {
+    background-color: #8B0000; // Darker Red for buttons
+    border-color: #8B0000;
+  }
+}

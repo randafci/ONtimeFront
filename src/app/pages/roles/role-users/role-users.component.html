@@ -1,0 +1,57 @@
+<div class="card">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">
+      {{ 'roles_usersPage.title' | translate }} - <span class="font-semibold">{{ role?.name }}</span>
+    </h2>
+    <button pButton [label]="'common.buttons.back' | translate" icon="pi pi-arrow-left" class="p-button-secondary p-button-sm" (click)="goBack()"></button>
+  </div>
+
+  <p-table #dt [value]="users" dataKey="id" [(selection)]="selectedUsers"
+    [rows]="10" [loading]="loading" [rowHover]="true" [showGridlines]="true"
+    [paginator]="true" [globalFilterFields]="['userName']" responsiveLayout="scroll">
+
+    <ng-template pTemplate="caption">
+      <div class="flex justify-content-between align-items-center">
+        <!-- Delete Button -->
+        <button pButton [label]="'common.buttons.delete' | translate" icon="pi pi-trash" class="p-button-danger"
+          (click)="onDeleteSelected()" [disabled]="!selectedUsers || selectedUsers.length === 0" [loading]="deleting">
+        </button>
+
+        <!-- Search Input -->
+        <div class="p-inputgroup w-auto">
+          <span class="p-inputgroup-addon"><i class="pi pi-search"></i></span>
+          <input pInputText type="text" #filter (input)="onGlobalFilter(dt, $event)" [placeholder]="'roles_usersPage.searchPlaceholder' | translate" />
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 4rem">
+          <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+        </th>
+        <th pSortableColumn="userName">
+          {{ 'roles_usersPage.headers.username' | translate }} <p-sortIcon field="userName"></p-sortIcon>
+        </th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-user>
+      <tr>
+        <td>
+          <p-tableCheckbox [value]="user"></p-tableCheckbox>
+        </td>
+        <td>{{ user.userName }}</td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="2">{{ 'roles_usersPage.messages.empty' | translate }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

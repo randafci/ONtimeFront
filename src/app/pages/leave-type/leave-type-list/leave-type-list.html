@@ -66,7 +66,7 @@
                 <td>{{ leaveType.organizationName || 'N/A' }}</td>
                 <td>
                     <div class="flex flex-col gap-1">
-                        <p-tag *ngIf="leaveType.isAttachmentRequired" [value]="'leaveTypeList.requirements.attachment' | translate" severity="warning" class="text-xs"></p-tag>
+                        <p-tag *ngIf="leaveType.isAttachmentRequired" [value]="'leaveTypeList.requirements.attachment' | translate" severity="warn" class="text-xs"></p-tag>
                         <p-tag *ngIf="leaveType.isCommentRequired" [value]="'leaveTypeList.requirements.comment' | translate" severity="info" class="text-xs"></p-tag>
                     </div>
                 </td>
