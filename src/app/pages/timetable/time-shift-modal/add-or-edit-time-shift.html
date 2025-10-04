@@ -1,0 +1,106 @@
+<p-dialog 
+  [(visible)]="dialogVisible" 
+  [header]="(isEditMode ? 'timeShiftForm.title.edit' : 'timeShiftForm.title.add') | translate"
+  [modal]="true" 
+  [style]="{width: '50vw'}"
+  [draggable]="false" 
+  [resizable]="false"
+  (onHide)="closeDialog()">
+
+  <form [formGroup]="timeShiftForm" (ngSubmit)="onSubmit()">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+
+      <!-- Time Table Field -->
+      <div class="field">
+        <label for="timeTableId" class="block text-sm font-medium mb-2">
+          {{ 'timeShiftForm.labels.timeTable' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <p-select
+          id="timeTableId"
+          formControlName="timeTableId"
+          [options]="timeTables"
+          optionLabel="nameEn"
+          optionValue="id"
+          [placeholder]="'timeShiftForm.placeholders.selectTimeTable' | translate"
+          class="w-full"
+          appendTo="body"
+          [class.ng-invalid]="timeShiftForm.get('timeTableId')?.invalid && timeShiftForm.get('timeTableId')?.touched"
+        ></p-select>
+        <small class="text-red-500" *ngIf="timeShiftForm.get('timeTableId')?.invalid && timeShiftForm.get('timeTableId')?.touched">
+          {{ 'timeShiftForm.validation.timeTableRequired' | translate }}
+        </small>
+      </div>
+
+      <!-- Shift Field -->
+      <div class="field">
+        <label for="shiftId" class="block text-sm font-medium mb-2">
+          {{ 'timeShiftForm.labels.shift' | translate }} <span class="text-red-500">*</span>
+        </label>
+        <p-select
+          id="shiftId"
+          formControlName="shiftId"
+          [options]="shifts"
+          optionLabel="name"
+          optionValue="id"
+          [placeholder]="'timeShiftForm.placeholders.selectShift' | translate"
+          class="w-full"
+          appendTo="body"
+          [class.ng-invalid]="timeShiftForm.get('shiftId')?.invalid && timeShiftForm.get('shiftId')?.touched"
+        ></p-select>
+        <small class="text-red-500" *ngIf="timeShiftForm.get('shiftId')?.invalid && timeShiftForm.get('shiftId')?.touched">
+          {{ 'timeShiftForm.validation.shiftRequired' | translate }}
+        </small>
+      </div>
+    </div>
+
+    <!-- Days Table -->
+    <div class="mt-6">
+      <h4 class="mb-3 font-medium">{{ 'timeShiftForm.labels.days' | translate }}</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="px-3 py-2 text-left">{{ 'timeShiftForm.tableHeaders.dayName' | translate }}</th>
+              <th class="px-3 py-2 text-center">{{ 'timeShiftForm.tableHeaders.assign' | translate }}</th>
+              <th class="px-3 py-2 text-center">{{ 'timeShiftForm.tableHeaders.weekend' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody formArrayName="days">
+            <tr *ngFor="let day of daysFormArray.controls; let i = index" class="border-t" [formGroupName]="i">
+              <td class="px-3 py-2">{{ getDayFormGroup(i).get('dayName')?.value }}</td>
+              <td class="px-3 py-2 text-center">
+                <p-checkbox 
+                  formControlName="isSelected"
+                  [binary]="true">
+                </p-checkbox>
+              </td>
+              <td class="px-3 py-2 text-center">
+                <p-checkbox 
+                  formControlName="isWeekend"
+                  [binary]="true">
+                </p-checkbox>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+      <button 
+        pButton 
+        [label]="'common.buttons.cancel' | translate" 
+        class="p-button-secondary" 
+        type="button"
+        (click)="onCancel()">
+      </button>
+      <button 
+        pButton 
+        [label]="(isEditMode ? 'common.buttons.update' : 'common.buttons.save') | translate" 
+        [loading]="loading"
+        type="submit">
+      </button>
+    </div>
+  </form>
+</p-dialog>
