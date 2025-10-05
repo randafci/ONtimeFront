@@ -249,6 +249,13 @@ export const appRoutes: Routes = [
             (m) => m.ATTENDANCE_ROUTES
           )
       },
+       {
+        path: 'shifts',
+        loadChildren: () =>
+          import('./app/pages/shift/shift.routes').then(
+            (m) => m.SHIFT_ROUTES
+          )
+      },
       { path: 'test', component: Layout },
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
       {
