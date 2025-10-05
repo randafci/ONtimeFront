@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Table } from 'primeng/table';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { MultiSelectModule } from 'primeng/multiselect';
@@ -17,16 +17,17 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { MessageService, ConfirmationService } from 'primeng/api';
+import { Router, RouterModule } from "@angular/router";
+
 import { TimeTable, OrganizationOption } from '../../../interfaces/timetable.interface';
-import { TimeTableService } from '../TimeTableService';
-import { Router, RouterModule, NavigationEnd } from "@angular/router";
-import { DatePipe } from '@angular/common';
-import { filter } from 'rxjs/operators';
+import { Organization } from '../../../interfaces/organization.interface';
 import { ApiResponse } from '../../../core/models/api-response.model';
+
+import { TimeTableService } from '../TimeTableService';
+import { LookupService } from '../../organization/OrganizationService';
 import { AuthService } from '../../../auth/auth.service';
 import { TimeTableModalComponent } from '../timetable-modal/timetable-modal.component';
-import { LookupService } from '../../organization/OrganizationService';
-import { Organization } from '../../../interfaces/organization.interface';
+import { AddOrEditTimeShift } from '../time-shift-modal/add-or-edit-time-shift';
 
 @Component({
   selector: 'app-timetable-list',
@@ -49,21 +50,29 @@ import { Organization } from '../../../interfaces/organization.interface';
     RouterModule,
     ConfirmDialogModule,
     TooltipModule,
-    TimeTableModalComponent
+    TimeTableModalComponent,
+    AddOrEditTimeShift
   ],
-  providers: [MessageService, ConfirmationService],
+  providers: [MessageService, ConfirmationService, DatePipe],
   templateUrl: './timetable-list.html',
   styleUrl: './timetable-list.scss'
 })
 export class TimeTableListComponent implements OnInit {
   timeTables: TimeTable[] = [];
-  loading: boolean = true;
+  loading = true;
 
-  dialogVisible: boolean = false;
-  isEditMode: boolean = false;
+  dialogVisible = false;
+  isEditMode = false;
   selectedTimeTable: TimeTable | null = null;
+
+  // Organization dropdowns
   organizationOptions: OrganizationOption[] = [];
   isSuperAdmin = false;
+
+  // Second dialog (TimeShift)
+  timeShiftDialogVisible = false;
+  selectedTimeTableId: number | null = null;
+  selectedTimeShift: any = { timeTableId: null };
 
   @ViewChild('dt') table!: Table;
   @ViewChild('filter') filter!: ElementRef;
@@ -77,7 +86,7 @@ export class TimeTableListComponent implements OnInit {
     private organizationService: LookupService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.isSuperAdmin = this.checkIsSuperAdmin();
     this.loadTimeTables();
     this.loadOrganizations();
@@ -88,7 +97,7 @@ export class TimeTableListComponent implements OnInit {
     return claims?.IsSuperAdmin === "true" || claims?.IsSuperAdmin === true;
   }
 
-  loadTimeTables() {
+  loadTimeTables(): void {
     this.loading = true;
     this.timeTableService.getAllTimeTables().subscribe({
       next: (response: ApiResponse<TimeTable[]>) => {
@@ -104,7 +113,7 @@ export class TimeTableListComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading time tables:', error);
+        console.error('Error loading timetables:', error);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
@@ -123,12 +132,6 @@ export class TimeTableListComponent implements OnInit {
             label: org.name,
             value: org.id
           }));
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: response.message || 'Failed to load organizations'
-          });
         }
       },
       error: (error) => {
@@ -142,23 +145,57 @@ export class TimeTableListComponent implements OnInit {
     });
   }
 
-  openCreateDialog() {
+  openCreateDialog(): void {
     this.isEditMode = false;
     this.selectedTimeTable = null;
     this.dialogVisible = true;
   }
 
-  openEditDialog(timeTable: TimeTable) {
+  openEditDialog(timeTable: TimeTable): void {
     this.isEditMode = true;
-    this.selectedTimeTable = timeTable;
+    this.selectedTimeTable = { ...timeTable };
     this.dialogVisible = true;
   }
 
-  onTimeTableSaved(timeTable: TimeTable) {
-    this.loadTimeTables();
+  openTimeShiftDialog(timeTable: TimeTable): void {
+    this.selectedTimeTable = { ...timeTable };
+    this.selectedTimeTableId = timeTable.id;
+    this.selectedTimeShift = { timeTableId: timeTable.id };
+    this.timeShiftDialogVisible = true;
   }
 
-  deleteTimeTable(timeTable: TimeTable) {
+  // ✅ Save event from TimeTableModal
+  onTimeTableSaved(timeTable: TimeTable): void {
+    this.loadTimeTables();
+    this.dialogVisible = false;
+
+    if (!this.isEditMode && timeTable && timeTable.id) {
+      this.selectedTimeTableId = timeTable.id;
+      this.selectedTimeShift = { timeTableId: timeTable.id }; // ✅ Fix binding
+      this.timeShiftDialogVisible = true;
+
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Next Step',
+        detail: 'TimeTable created successfully. Please add shift details.'
+      });
+    }
+  }
+
+  // ✅ Save event from AddOrEditTimeShift
+  handleTimeShiftSave(): void {
+    this.timeShiftDialogVisible = false;
+    this.selectedTimeTableId = null;
+    this.selectedTimeShift = { timeTableId: null };
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Shift Saved',
+      detail: 'Time shift was added successfully!'
+    });
+  }
+
+  deleteTimeTable(timeTable: TimeTable): void {
     this.confirmationService.confirm({
       message: `Are you sure you want to delete "${timeTable.nameEn || timeTable.nameAr || 'this timetable'}"?`,
       header: 'Delete Confirmation',
@@ -170,7 +207,7 @@ export class TimeTableListComponent implements OnInit {
             if (response.succeeded) {
               this.messageService.add({
                 severity: 'success',
-                summary: 'Success',
+                summary: 'Deleted',
                 detail: 'TimeTable deleted successfully'
               });
               this.loadTimeTables();
@@ -183,7 +220,7 @@ export class TimeTableListComponent implements OnInit {
             }
           },
           error: (error) => {
-            console.error('Error deleting time table:', error);
+            console.error('Error deleting timetable:', error);
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
@@ -213,12 +250,8 @@ export class TimeTableListComponent implements OnInit {
 
   formatTime(timeString?: string): string {
     if (!timeString) return '-';
-    // Handle both "HH:MM:SS" and "HH:MM" formats
-    const timeParts = timeString.split(':');
-    if (timeParts.length >= 2) {
-      return `${timeParts[0].padStart(2, '0')}:${timeParts[1].padStart(2, '0')}`;
-    }
-    return timeString;
+    const parts = timeString.split(':');
+    return parts.length >= 2 ? `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}` : timeString;
   }
 
   formatShiftDuration(timeTable: TimeTable): string {
@@ -227,12 +260,12 @@ export class TimeTableListComponent implements OnInit {
     return formatted !== '-' ? `${formatted} hrs` : '-';
   }
 
-  onGlobalFilter(table: Table, event: Event) {
+  onGlobalFilter(table: Table, event: Event): void {
     table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
 
-  clear(table: Table) {
+  clear(table: Table): void {
     table.clear();
-    this.filter.nativeElement.value = '';
+    if (this.filter) this.filter.nativeElement.value = '';
   }
 }

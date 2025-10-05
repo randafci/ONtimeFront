@@ -160,6 +160,14 @@
               class="p-button-rounded p-button-text p-button-info p-button-sm mr-2"
               (click)="openEditDialog(timeTable)"
             ></button>
+             <button 
+              pButton 
+              pTooltip="Edit Time Shift"
+              tooltipPosition="top"
+              icon="pi pi-pencil" 
+              class="p-button-rounded p-button-text p-button-info p-button-sm mr-2"
+              (click)="openTimeShiftDialog(timeTable)"
+            ></button>
             <button 
               pButton 
               pTooltip="Delete"
@@ -186,6 +194,7 @@
 </div>
 
 <!-- TimeTable Modal Component -->
+<!-- TimeTable Modal Component -->
 <app-timetable-modal
   [(dialogVisible)]="dialogVisible"
   [isEditMode]="isEditMode"
@@ -194,8 +203,16 @@
   [isSuperAdmin]="isSuperAdmin"
   [loading]="loading"
   (onSave)="onTimeTableSaved($event)"
->
-</app-timetable-modal>
+></app-timetable-modal>
+
+<!-- ✅ Time Shift Dialog -->
+<app-add-or-edit-time-shift
+  [(dialogVisible)]="timeShiftDialogVisible"
+  [isEditMode]="false"
+  [timeShift]="selectedTimeShift"
+  (onSave)="handleTimeShiftSave()"
+></app-add-or-edit-time-shift>
+
 
 <!-- Toast Messages -->
 <p-toast></p-toast>
