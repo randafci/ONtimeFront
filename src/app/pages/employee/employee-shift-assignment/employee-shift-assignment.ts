@@ -92,9 +92,13 @@ export class EmployeeShiftAssignmentComponent implements OnInit {
     this.employeeName = this.route.snapshot.params['employeeName'] || 'Employee';
     
     if (this.employeeId) {
-      this.loadShiftAssignments();
       this.loadShifts();
     }
+
+    // Subscribe to priority changes to update form validation
+    this.assignmentForm.get('priority')?.valueChanges.subscribe(priority => {
+      this.onPriorityChange(priority);
+    });
   }
 
   createForm(): FormGroup {
@@ -103,8 +107,8 @@ export class EmployeeShiftAssignmentComponent implements OnInit {
       employeeId: [this.employeeId, [Validators.required]],
       shiftId: [null, [Validators.required]],
       startDateTime: [null, [Validators.required]],
-      endDateTime: [null, [Validators.required]],
-      priority: ['Temporary', [Validators.required]],
+      endDateTime: [null], // Will be conditionally required
+      priority: ['0', [Validators.required]], // 0 = Temporary, 1 = Permanent
       isOtShift: [false],
       isOverwriteHolidays: [false],
       isPunchNotRequired: [false],
@@ -113,16 +117,25 @@ export class EmployeeShiftAssignmentComponent implements OnInit {
   }
 
   loadShiftAssignments() {
-    console.log('Loading shift assignments for employee:', this.employeeId);
     this.loading = true;
     this.employeeShiftAssignmentService.getEmployeeShiftAssignmentsByEmployeeId(this.employeeId).subscribe({
       next: (response: ApiResponse<EmployeeShiftAssignment[]>) => {
         if (response.succeeded) {
-          console.log('Shift assignments loaded successfully:', response.data.length, 'assignments');
-          // Filter assignments for the specific employee on the frontend
           this.shiftAssignments = response.data.filter(assignment => assignment.employeeId === this.employeeId);
+          
+          // Populate shift names by matching with loaded shifts
+          this.shiftAssignments.forEach(assignment => {
+            const matchingShift = this.shifts.find(shift => shift.id === assignment.shiftId);
+            if (matchingShift) {
+              assignment.shift = {
+                id: matchingShift.id,
+                name: matchingShift.name,
+                startTime: '00:00:00',
+                endTime: '00:00:00'
+              };
+            }
+          });
         } else {
-          console.error('Failed to load shift assignments:', response.message);
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
@@ -132,7 +145,6 @@ export class EmployeeShiftAssignmentComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error loading shift assignments:', error);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
@@ -148,14 +160,24 @@ export class EmployeeShiftAssignmentComponent implements OnInit {
       next: (response: ApiResponse<Shift[]>) => {
         if (response.succeeded) {
           this.shifts = response.data.filter(shift => !shift.isDeleted);
-        } else {
-          console.error('Failed to load shifts:', response.message);
+          this.loadShiftAssignments();
         }
       },
       error: (error) => {
         console.error('Error loading shifts:', error);
       }
     });
+  }
+
+  onPriorityChange(priority: string) {
+    const endDateTimeControl = this.assignmentForm.get('endDateTime');
+    if (priority === '0') { 
+      endDateTimeControl?.setValidators([Validators.required]);
+    } else {  
+      endDateTimeControl?.clearValidators();   
+      endDateTimeControl?.setValue(null);
+    }   
+    endDateTimeControl?.updateValueAndValidity();
   }
 
   openCreateDialog() {
@@ -166,16 +188,27 @@ export class EmployeeShiftAssignmentComponent implements OnInit {
     this.selectedFile = null;
     this.assignmentForm.patchValue({
       employeeId: this.employeeId,
-      priority: 'Temporary'
+      priority: '0' // Default to Temporary
     });
     this.dialogVisible = true;
   }
 
   openEditDialog(assignment: EmployeeShiftAssignment) {
     this.isEditMode = true;
-    this.selectedDays = assignment.weekdays || [];
+    
+    const weekdayMapping: { [key: number]: string } = {
+      0: 'Sunday', 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday',
+      4: 'Thursday', 5: 'Friday', 6: 'Saturday'
+    };
+    
+    this.selectedDays = assignment.weekdays 
+      ? assignment.weekdays.map(dayNum => weekdayMapping[dayNum as number] || '').filter(day => day !== '')
+      : [];
+    
     this.selectedFileName = assignment.attachmentURL ? 'File attached' : '';
     this.selectedFile = null;
+    
+    const priorityValue = assignment.priority?.toString() || '0';
     
     this.assignmentForm.patchValue({
       id: assignment.id,
@@ -183,12 +216,14 @@ export class EmployeeShiftAssignmentComponent implements OnInit {
       shiftId: assignment.shiftId,
       startDateTime: assignment.startDateTime ? assignment.startDateTime.split('T')[0] : null,
       endDateTime: assignment.endDateTime ? assignment.endDateTime.split('T')[0] : null,
-      priority: assignment.priority,
+      priority: priorityValue,
       isOtShift: assignment.isOtShift,
       isOverwriteHolidays: assignment.isOverwriteHolidays,
       isPunchNotRequired: assignment.isPunchNotRequired,
       attachmentURL: assignment.attachmentURL
     });
+    
+    this.onPriorityChange(priorityValue);
     this.dialogVisible = true;
   }
 
@@ -264,17 +299,36 @@ export class EmployeeShiftAssignmentComponent implements OnInit {
   }
 
   private createOrUpdateAssignment(formData: any) {
+    const weekdayMapping: { [key: string]: number } = {
+      'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3,
+      'Thursday': 4, 'Friday': 5, 'Saturday': 6
+    };
+
+    const selectedShift = this.shifts.find(shift => shift.id === formData.shiftId);
+    const shiftName = selectedShift?.name?.trim() || '';
+    
+    if (!shiftName) {
+      this.messageService.add({ 
+        severity: 'error', 
+        summary: 'Error', 
+        detail: 'Shift name not found. Please refresh and try again.' 
+      });
+      return;
+    }
+
     const assignmentData: CreateEmployeeShiftAssignment = {
-      employeeId: formData.employeeId,
-      shiftId: formData.shiftId,
-      startDateTime: formData.startDateTime,
-      endDateTime: formData.endDateTime,
-      priority: formData.priority=="1"?1:0,
+      employeeId: parseInt(formData.employeeId),
+      shiftId: parseInt(formData.shiftId),
+      shiftName: shiftName,
+      startDateTime: formData.startDateTime + 'T00:00:00',
+      endDateTime: formData.endDateTime ? formData.endDateTime + 'T23:59:59' : null,
+      priority: parseInt(formData.priority),
       isOtShift: formData.isOtShift || false,
       isOverwriteHolidays: formData.isOverwriteHolidays || false,
       isPunchNotRequired: formData.isPunchNotRequired || false,
-      attachmentURL: formData.attachmentURL,
-      weekdays: this.selectedDays.length > 0 ? this.selectedDays : undefined
+      isCurrent: true,
+      attachmentURL: formData.attachmentURL || null,
+      weekdays: this.selectedDays.length > 0 ? this.selectedDays.map(day => weekdayMapping[day]) : []
     };
 
     if (this.isEditMode) {
@@ -395,12 +449,31 @@ export class EmployeeShiftAssignmentComponent implements OnInit {
     return isCurrent ? 'success' : 'info';
   }
 
-  getPrioritySeverity(priority: string) {
-    return priority === '1' ? 'success' : 'warning';
+  getPrioritySeverity(priority: string | number) {
+    const priorityValue = typeof priority === 'string' ? priority : priority.toString();
+    return priorityValue === '1' ? 'success' : 'warning';
+  }
+
+  getPriorityLabel(priority: string | number) {
+    const priorityValue = typeof priority === 'string' ? priority : priority.toString();
+    return priorityValue === '1' ? 'Permanent' : 'Temporary';
   }
 
   navigateBack() {
-    this.router.navigate(['/employees']);
+    // Navigate back to the employee edit page with the "Assign Schedule" tab active (tab index 5)
+    // Manually encrypt the tab value using the same method as the tab persistence service
+    const encryptionKey = 'OnTimeApp2024';
+    let encrypted = '';
+    const tabValue = '5';
+    for (let i = 0; i < tabValue.length; i++) {
+      const charCode = tabValue.charCodeAt(i) ^ encryptionKey.charCodeAt(i % encryptionKey.length);
+      encrypted += String.fromCharCode(charCode);
+    }
+    const encryptedTab = btoa(encrypted);
+    
+    this.router.navigate(['/employees/edit', this.employeeId], { 
+      queryParams: { tab: encryptedTab }
+    });
   }
 
   onGlobalFilter(table: Table, event: Event) {
