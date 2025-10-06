@@ -12,8 +12,7 @@ import { MessageService } from 'primeng/api';
 import { forkJoin, Observable } from 'rxjs';
 import { TimeShiftService } from '@/pages/timeShift/timeShift.service';
 import { TimeTableService } from '../TimeTableService';
-import { ShiftService } from '@/pages/shift/ShiftService';
-import { Shift } from '@/interfaces/shift.interface';
+import { Shift } from '@/interfaces/employee-shift-assignment.interface';
 import { TimeTable } from '@/interfaces/timetable.interface';
 
 @Component({
@@ -49,21 +48,20 @@ export class AddOrEditTimeShift implements OnInit , OnChanges{
   shifts: Shift[] = [];
 
   days: DaySelection[] = [
-    { dayName: 'Sunday', dayNumber: 1, isSelected: false, isWeekend: false },
-    { dayName: 'Monday', dayNumber: 2, isSelected: false, isWeekend: false },
-    { dayName: 'Tuesday', dayNumber: 3, isSelected: false, isWeekend: false },
-    { dayName: 'Wednesday', dayNumber: 4, isSelected: false, isWeekend: false },
-    { dayName: 'Thursday', dayNumber: 5, isSelected: false, isWeekend: false },
-    { dayName: 'Friday', dayNumber: 6, isSelected: false, isWeekend: false },
-    { dayName: 'Saturday', dayNumber: 7, isSelected: false, isWeekend: false }
+    { dayName: 'Sunday', dayNumber: 0, isSelected: false, isWeekend: true },
+    { dayName: 'Monday', dayNumber: 1, isSelected: false, isWeekend: false },
+    { dayName: 'Tuesday', dayNumber: 2, isSelected: false, isWeekend: false },
+    { dayName: 'Wednesday', dayNumber: 3, isSelected: false, isWeekend: false },
+    { dayName: 'Thursday', dayNumber: 4, isSelected: false, isWeekend: false },
+    { dayName: 'Friday', dayNumber: 5, isSelected: false, isWeekend: false },
+    { dayName: 'Saturday', dayNumber: 6, isSelected: false, isWeekend: true }
   ];
 
   constructor(
     private fb: FormBuilder, 
     private timeShiftService: TimeShiftService,
     private messageService: MessageService,
-    private timeTableService :TimeTableService,
-    private shiftService : ShiftService
+    private timeTableService: TimeTableService
   ) {}
 
   ngOnInit(): void {
@@ -183,7 +181,7 @@ loadTimeTables() {
 
   loadShifts() {
     this.loading = true;
-    this.shiftService.getAllShifts().subscribe({
+    this.timeShiftService.getAllShifts().subscribe({
       next: (res) => {
         if (res.succeeded) {
           this.shifts = res.data ?? [];

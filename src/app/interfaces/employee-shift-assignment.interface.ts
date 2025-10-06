@@ -42,9 +42,15 @@ export interface CreateEmployeeShiftAssignment {
 
 export interface Shift {
   id: number;
-  name: string;
-  nameSE: string;
-  priority: number;
-  isDeleted: boolean;
+  shiftTypeId: number;
   organizationId: number;
+  isDefaultShift: boolean;
+  shiftTypeName?: string;
+  organizationName?: string;
+  
+ 
+  name?: string; 
+  nameSE?: string;
+  priority?: number; 
+  isDeleted?: boolean; 
 }

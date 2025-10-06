@@ -27,7 +27,7 @@ import { TimeTableService } from '../TimeTableService';
 import { LookupService } from '../../organization/OrganizationService';
 import { AuthService } from '../../../auth/auth.service';
 import { TimeTableModalComponent } from '../timetable-modal/timetable-modal.component';
-import { AddOrEditTimeShift } from '../time-shift-modal/add-or-edit-time-shift';
+import { AddOrEditTimeShift } from '../../timeShift/add-or-edit-time-shift/add-or-edit-time-shift';
 
 @Component({
   selector: 'app-timetable-list',

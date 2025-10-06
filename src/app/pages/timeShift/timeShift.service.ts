@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { ApiResponse } from '@/core/models/api-response.model';
 import { AuthService } from '@/auth/auth.service';
 import { AppConfigService } from '../service/app-config.service';
-import { TimeShift } from '@/interfaces/time-shift.interface';
+import { TimeShift, CreateTimeShift, UpdateTimeShift } from '@/interfaces/time-shift.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -37,12 +37,12 @@ export class TimeShiftService {
   }
 
   /** Create a new time shift */
-  create(dto: TimeShift): Observable<ApiResponse<TimeShift>> {
+  create(dto: CreateTimeShift): Observable<ApiResponse<TimeShift>> {
     return this.http.post<ApiResponse<TimeShift>>(this.apiUrl, dto, this.headers);
   }
 
   /** Update an existing time shift */
-  update(id: number, dto: TimeShift): Observable<ApiResponse<TimeShift>> {
+  update(id: number, dto: UpdateTimeShift): Observable<ApiResponse<TimeShift>> {
     return this.http.put<ApiResponse<TimeShift>>(`${this.apiUrl}/${id}`, dto, this.headers);
   }
 
@@ -56,56 +56,52 @@ export class TimeShiftService {
     return this.http.get<ApiResponse<TimeShift[]>>(`${this.apiUrl}/me/schedule`, this.headers);
   }
   // ----------------------------------------------
-  // 🧠 Dummy Data Examples (to be replaced by APIs)
+  // Real API Integration Methods
   // ----------------------------------------------
 
   /** 
-   * Get all time tables (dummy data) 
+   * Get all time tables from backend API
    */
   getAllTimeTables(): Observable<ApiResponse<any[]>> {
-    const dummyData = [
-      { id: 1, name: 'Morning Table', startTime: '08:00', endTime: '16:00' },
-      { id: 2, name: 'Evening Table', startTime: '16:00', endTime: '00:00' },
-      { id: 3, name: 'Night Table', startTime: '00:00', endTime: '08:00' }
-    ];
-
-    const response: ApiResponse<any[]> = {
-        statusCode: 200,
-        succeeded: true,
-        message: 'Dummy time tables loaded successfully',
-        data: dummyData,
-        code: {
-            value: '',
-            code: 0
-        },
-        errors: undefined
-    };
-
-    return of(response);
+    return this.http.get<ApiResponse<any[]>>(`${this.appConfig.apiUrl}/api/TimeTable`, this.headers);
   }
 
   /** 
-   * Get all shifts (dummy data) 
+   * Get all shifts from backend API
    */
   getAllShifts(): Observable<ApiResponse<any[]>> {
-    const dummyData = [
-      { id: 1, name: 'Shift A', description: 'Day Shift' },
-      { id: 2, name: 'Shift B', description: 'Night Shift' },
-      { id: 3, name: 'Shift C', description: 'Weekend Shift' }
-    ];
-
-    const response: ApiResponse<any[]> = {
-        statusCode: 200,
-        succeeded: true,
-        message: 'Dummy shifts loaded successfully',
-        data: dummyData,
-        code: {
-            value: '',
-            code: 0
+    return new Observable(observer => {
+      this.http.get<ApiResponse<any[]>>(`${this.appConfig.apiUrl}/api/Shifts/all-list`, this.headers).subscribe({
+        next: (response) => {
+          if (response.succeeded && response.data) {
+            // Transform backend ShiftDto to frontend Shift interface
+            const transformedData = response.data.map((shift: any) => ({
+              id: shift.id,
+              shiftTypeId: shift.shiftTypeId,
+              organizationId: shift.organizationId,
+              isDefaultShift: shift.isDefaultShift,
+              shiftTypeName: shift.shiftTypeName,
+              organizationName: shift.organizationName,
+              // Backward compatibility fields
+              name: shift.shiftTypeName,
+              nameSE: shift.shiftTypeName,
+              priority: 0,
+              isDeleted: false
+            }));
+            
+            observer.next({
+              ...response,
+              data: transformedData
+            });
+          } else {
+            observer.next(response);
+          }
+          observer.complete();
         },
-        errors: undefined
-    };
-
-    return of(response);
+        error: (error) => {
+          observer.error(error);
+        }
+      });
+    });
   }
 }

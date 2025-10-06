@@ -8,7 +8,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
 import { TranslatePipe } from '@/core/pipes/translate.pipe';
 import { TimeShiftService } from '../timeShift.service';
-import { DaySelection, TimeShift } from '@/interfaces/time-shift.interface';
+import { DaySelection, TimeShift, CreateTimeShift, UpdateTimeShift } from '@/interfaces/time-shift.interface';
 import { MessageService } from 'primeng/api';
 import { forkJoin, Observable } from 'rxjs';
 
@@ -45,13 +45,13 @@ export class AddOrEditTimeShift implements OnInit {
   shifts: any[] = [];
 
   days: DaySelection[] = [
-    { dayName: 'Sunday', dayNumber: 1, isSelected: false, isWeekend: false },
-    { dayName: 'Monday', dayNumber: 2, isSelected: false, isWeekend: false },
-    { dayName: 'Tuesday', dayNumber: 3, isSelected: false, isWeekend: false },
-    { dayName: 'Wednesday', dayNumber: 4, isSelected: false, isWeekend: false },
-    { dayName: 'Thursday', dayNumber: 5, isSelected: false, isWeekend: false },
-    { dayName: 'Friday', dayNumber: 6, isSelected: false, isWeekend: false },
-    { dayName: 'Saturday', dayNumber: 7, isSelected: false, isWeekend: false }
+    { dayName: 'Sunday', dayNumber: 0, isSelected: false, isWeekend: true },
+    { dayName: 'Monday', dayNumber: 1, isSelected: false, isWeekend: false },
+    { dayName: 'Tuesday', dayNumber: 2, isSelected: false, isWeekend: false },
+    { dayName: 'Wednesday', dayNumber: 3, isSelected: false, isWeekend: false },
+    { dayName: 'Thursday', dayNumber: 4, isSelected: false, isWeekend: false },
+    { dayName: 'Friday', dayNumber: 5, isSelected: false, isWeekend: false },
+    { dayName: 'Saturday', dayNumber: 6, isSelected: false, isWeekend: true }
   ];
 
   constructor(
@@ -218,8 +218,7 @@ export class AddOrEditTimeShift implements OnInit {
     const createObservables: Observable<any>[] = [];
 
     selectedDays.forEach(dayNum => {
-      const payload: TimeShift = {
-        id:0,
+      const payload: CreateTimeShift = {
         shiftId: this.timeShiftForm.value.shiftId,
         timeTableId: this.timeShiftForm.value.timeTableId,
         dayNumber: dayNum
@@ -265,14 +264,14 @@ export class AddOrEditTimeShift implements OnInit {
   private updateTimeShifts(selectedDays: number[]) {
     // For edit mode, we typically update one record
     const dayNum = selectedDays[0]; // Take the first selected day
-    const payload: TimeShift = {
+    const payload: UpdateTimeShift = {
       id: this.timeShift.id,
       shiftId: this.timeShiftForm.value.shiftId,
       timeTableId: this.timeShiftForm.value.timeTableId,
       dayNumber: dayNum
     };
 
-    this.timeShiftService.update(this.timeShift.id,payload).subscribe({
+    this.timeShiftService.update(this.timeShift.id, payload).subscribe({
       next: (res) => {
         if (res.succeeded) {
           this.messageService.add({

@@ -19,13 +19,20 @@
           id="timeTableId"
           formControlName="timeTableId"
           [options]="timeTables"
-          optionLabel="name"
+          optionLabel="nameEn"
           optionValue="id"
           [placeholder]="'timeShiftForm.placeholders.selectTimeTable' | translate"
           class="w-full"
           appendTo="body"
           [class.ng-invalid]="timeShiftForm.get('timeTableId')?.invalid && timeShiftForm.get('timeTableId')?.touched"
-        ></p-select>
+        >
+          <ng-template let-timeTable pTemplate="item">
+            <div>
+              <div>{{ timeTable.nameEn || timeTable.nameAr }}</div>
+              <small class="text-gray-500">{{ timeTable.startTime }} - {{ timeTable.endTime }}</small>
+            </div>
+          </ng-template>
+        </p-select>
         <small class="text-red-500" *ngIf="timeShiftForm.get('timeTableId')?.invalid && timeShiftForm.get('timeTableId')?.touched">
           {{ 'timeShiftForm.validation.timeTableRequired' | translate }}
         </small>
@@ -40,13 +47,20 @@
           id="shiftId"
           formControlName="shiftId"
           [options]="shifts"
-          optionLabel="name"
+          optionLabel="shiftTypeName"
           optionValue="id"
           [placeholder]="'timeShiftForm.placeholders.selectShift' | translate"
           class="w-full"
           appendTo="body"
           [class.ng-invalid]="timeShiftForm.get('shiftId')?.invalid && timeShiftForm.get('shiftId')?.touched"
-        ></p-select>
+        >
+          <ng-template let-shift pTemplate="item">
+            <div>
+              <div>{{ shift.shiftTypeName || shift.name }}</div>
+              <small class="text-gray-500">Organization: {{ shift.organizationName }}</small>
+            </div>
+          </ng-template>
+        </p-select>
         <small class="text-red-500" *ngIf="timeShiftForm.get('shiftId')?.invalid && timeShiftForm.get('shiftId')?.touched">
           {{ 'timeShiftForm.validation.shiftRequired' | translate }}
         </small>
