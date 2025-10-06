@@ -58,6 +58,38 @@ export class EmployeeShiftAssignmentService {
   }
 
   getAllShifts(): Observable<ApiResponse<Shift[]>> {
-    return this.http.get<ApiResponse<Shift[]>>(`${this.apiUrl}/Lookup/ShiftType`, this.headers);
+    return new Observable(observer => {
+      this.http.get<ApiResponse<Shift[]>>(`${this.apiUrl}/Shifts/all-list`, this.headers).subscribe({
+        next: (response) => {
+          if (response.succeeded && response.data) {
+         
+            const transformedData = response.data.map((shift: any) => ({
+              id: shift.id,
+              shiftTypeId: shift.shiftTypeId,
+              organizationId: shift.organizationId,
+              isDefaultShift: shift.isDefaultShift,
+              shiftTypeName: shift.shiftTypeName,
+              organizationName: shift.organizationName,
+         
+              name: shift.shiftTypeName,
+              nameSE: shift.shiftTypeName,
+              priority: 0,
+              isDeleted: false
+            }));
+            
+            observer.next({
+              ...response,
+              data: transformedData
+            });
+          } else {
+            observer.next(response);
+          }
+          observer.complete();
+        },
+        error: (error) => {
+          observer.error(error);
+        }
+      });
+    });
   }
 }

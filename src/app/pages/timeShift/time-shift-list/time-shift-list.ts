@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -46,7 +46,6 @@ import { TooltipModule } from 'primeng/tooltip';
     SelectModule,
     TooltipModule,
     RouterModule,
-    DatePipe,
   ],
   providers: [MessageService, ConfirmationService]
 })
@@ -57,16 +56,6 @@ export class TimeShiftList {
   loading = false;
   selectedTimeShift: any = null;
 
-  // Dummy data
-  private dummyTimeShifts = [
-    { id: 1, dayName: 'Monday', startTime: '09:00 AM', endTime: '05:00 PM', shiftType: 'Regular' },
-    { id: 2, dayName: 'Tuesday', startTime: '09:00 AM', endTime: '05:00 PM', shiftType: 'Regular' },
-    { id: 3, dayName: 'Wednesday', startTime: '09:00 AM', endTime: '05:00 PM', shiftType: 'Regular' },
-    { id: 4, dayName: 'Thursday', startTime: '08:00 AM', endTime: '04:00 PM', shiftType: 'Early' },
-    { id: 5, dayName: 'Friday', startTime: '10:00 AM', endTime: '06:00 PM', shiftType: 'Late' },
-    { id: 6, dayName: 'Saturday', startTime: '09:00 AM', endTime: '01:00 PM', shiftType: 'Half Day' },
-    { id: 7, dayName: 'Sunday', startTime: 'Off', endTime: 'Off', shiftType: 'Weekend' }
-  ];
 
   constructor(
     private timeShiftService: TimeShiftService,
@@ -78,14 +67,45 @@ export class TimeShiftList {
     this.loadTimeShifts();
   }
 
-  /** 🔹 Load dummy data */
+  /** 🔹 Load time shifts from API */
   loadTimeShifts() {
     this.loading = true;
-    // Simulate API call delay
-    setTimeout(() => {
-      this.timeShifts = [...this.dummyTimeShifts];
-      this.loading = false;
-    }, 1000);
+    this.timeShiftService.getAll().subscribe({
+      next: (response) => {
+        if (response.succeeded) {
+          // Transform the data to include display fields
+          this.timeShifts = (response.data || []).map(shift => this.transformTimeShiftForDisplay(shift));
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: response.message || 'Failed to load time shifts'
+          });
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load time shifts'
+        });
+        this.loading = false;
+      }
+    });
+  }
+
+  /** 🔹 Transform TimeShift data for display */
+  private transformTimeShiftForDisplay(shift: any): any {
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    
+    return {
+      ...shift,
+      dayName: dayNames[shift.dayNumber] || `Day ${shift.dayNumber}`,
+      startTime: shift.startTime || 'N/A',
+      endTime: shift.endTime || 'N/A',
+      shiftType: shift.shiftType || 'Regular'
+    };
   }
 
   /** 🔹 Open Add dialog */
@@ -105,21 +125,39 @@ export class TimeShiftList {
   /** 🔹 Delete item with confirmation */
   deleteTimeShift(shift: any) {
     this.confirmationService.confirm({
-      message: `Delete time shift for ${shift.dayName}?`,
+      message: `Delete time shift for ${shift.dayName || 'this day'}?`,
       header: 'Confirm Delete',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.loading = true;
-        // Simulate API delete delay
-        setTimeout(() => {
-          this.timeShifts = this.timeShifts.filter(item => item.id !== shift.id);
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Deleted',
-            detail: `Time shift for ${shift.dayName} deleted successfully`
-          });
-          this.loading = false;
-        }, 500);
+        this.timeShiftService.delete(shift.id).subscribe({
+          next: (response) => {
+            if (response.succeeded) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Deleted',
+                detail: `Time shift deleted successfully`
+              });
+              // Refresh the data to show updated list
+              this.loadTimeShifts();
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: response.message || 'Failed to delete time shift'
+              });
+              this.loading = false;
+            }
+          },
+          error: (error) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to delete time shift'
+            });
+            this.loading = false;
+          }
+        });
       }
     });
   }
@@ -138,21 +176,8 @@ export class TimeShiftList {
   onTimeShiftSaved(event: any) {
     this.timeShiftDialogVisible = false;
     
-    if (this.isEditMode) {
-      // Update existing shift
-      const index = this.timeShifts.findIndex(shift => shift.id === event.id);
-      if (index !== -1) {
-        this.timeShifts[index] = event;
-      }
-    } else {
-      // Add new shift
-      const newId = Math.max(...this.timeShifts.map(s => s.id)) + 1;
-      const newShift = {
-        ...event,
-        id: newId
-      };
-      this.timeShifts = [newShift, ...this.timeShifts];
-    }
+    // Refresh the data from the API to show the latest changes
+    this.loadTimeShifts();
     
     this.messageService.add({
       severity: 'success',

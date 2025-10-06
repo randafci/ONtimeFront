@@ -185,7 +185,7 @@
               type="radio"
               id="temporary"
               name="priority"
-              value="0"
+              [value]="0"
               formControlName="priority"
               class="mr-2 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300">
             <label for="temporary" class="text-sm text-gray-700">Temporary</label>
@@ -195,7 +195,7 @@
               type="radio"
               id="permanent"
               name="priority"
-              value="1"
+              [value]="1"
               formControlName="priority"
               class="mr-2 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300">
             <label for="permanent" class="text-sm text-gray-700">Permanent</label>
@@ -207,7 +207,7 @@
       </div>
 
       <!-- Day Selection - Only for Temporary -->
-      <div class="field md:col-span-2" *ngIf="assignmentForm.get('priority')?.value === '0'">
+      <div class="field md:col-span-2" *ngIf="assignmentForm.get('priority')?.value === 0">
         <label class="block text-sm font-medium mb-2 text-gray-700">Days</label>
         <div class="grid grid-cols-7 gap-2">
           <div *ngFor="let day of weekdays" class="flex items-center">
@@ -242,7 +242,7 @@
       </div>
 
       <!-- To Date - Only for Temporary -->
-      <div class="field" *ngIf="assignmentForm.get('priority')?.value === '0'">
+      <div class="field" *ngIf="assignmentForm.get('priority')?.value === 0">
         <label for="endDateTime" class="block text-sm font-medium mb-2 text-gray-700">
           To date <span class="text-red-500">*</span>
         </label>
@@ -301,7 +301,7 @@
       </div>
 
       <!-- Additional Options - Only for Temporary -->
-      <div class="field md:col-span-2" *ngIf="assignmentForm.get('priority')?.value === '0'">
+      <div class="field md:col-span-2" *ngIf="assignmentForm.get('priority')?.value === 0">
         <div class="flex items-center gap-6">
           <div class="flex items-center">
             <input 

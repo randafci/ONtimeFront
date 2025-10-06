@@ -98,11 +98,8 @@ export class AttendanceModalComponent implements OnInit, OnChanges {
   createForm(): FormGroup {
     return this.fb.group({
       id: [null],
-      staffId: [null, Validators.required],
-      punchDate: [null, Validators.required],
-      punchTime: ['', Validators.required],
-      verifyStatus: ['', Validators.required],
-      punchType: ['', Validators.required]
+      employeeId: [null, Validators.required],
+      punchDateTime: [null, Validators.required]
     });
   }
 
@@ -110,11 +107,8 @@ export class AttendanceModalComponent implements OnInit, OnChanges {
     if (this.attendance) {
       this.attendanceForm.patchValue({
         id: this.attendance.id,
-        staffId: this.attendance.staffId,
-        punchDate: new Date(this.attendance.punchDate),
-        punchTime: this.attendance.punchTime,
-        verifyStatus: this.attendance.verifyStatus,
-        punchType: this.attendance.punchType
+        employeeId: this.attendance.employeeId,
+        punchDateTime: new Date(this.attendance.punchDate + 'T' + this.attendance.punchTime)
       });
     }
   }
@@ -135,20 +129,14 @@ export class AttendanceModalComponent implements OnInit, OnChanges {
     if (this.isEditMode) {
       const editData: EditAttendance = {
         id: formData.id,
-        staffId: formData.staffId,
-        punchDate: this.formatDate(formData.punchDate),
-        punchTime: formData.punchTime,
-        verifyStatus: formData.verifyStatus,
-        punchType: formData.punchType
+        employeeId: formData.employeeId,
+        punchDateTime: formData.punchDateTime.toISOString()
       };
       this.updateAttendance(editData);
     } else {
       const createData: CreateAttendance = {
-        staffId: formData.staffId,
-        punchDate: this.formatDate(formData.punchDate),
-        punchTime: formData.punchTime,
-        verifyStatus: formData.verifyStatus,
-        punchType: formData.punchType
+        employeeId: formData.employeeId,
+        punchDateTime: formData.punchDateTime.toISOString()
       };
       this.createAttendance(createData);
     }

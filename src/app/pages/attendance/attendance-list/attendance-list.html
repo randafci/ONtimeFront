@@ -11,19 +11,26 @@
   </div>
   
   <!-- Filter Section -->
-  <div class="flex justify-center mb-4 p-4 bg-gray-50 rounded-lg">
-    <div class="grid grid-cols-2 gap-4 w-full max-w-2xl">
+  <div class="filter-section mb-4 p-4 bg-gray-50 rounded-lg">
+    <div class="filter-header mb-3">
+      <h3 class="text-lg font-semibold text-gray-700 mb-2">Search & Filter</h3>
+      <div class="filter-status" *ngIf="hasActiveFilters()">
+        <p-tag value="Filters Applied" severity="info" icon="pi pi-filter"></p-tag>
+      </div>
+    </div>
+    <div class="filter-grid">
       <div class="field">
-        <label for="staffId" class="block text-sm font-medium mb-2">Staff ID</label>
+        <label for="employeeId" class="block text-sm font-medium mb-2">Employee</label>
         <p-select 
-          id="staffId"
-          formControlName="staffId"
+          id="employeeId"
+          formControlName="employeeId"
           [options]="employees" 
           optionLabel="displayName"
           optionValue="id"
           placeholder="Select Employee"
           class="w-full"
           appendTo="body"
+          (onChange)="onEmployeeChange()"
         >
           <ng-template let-employee pTemplate="item">
             <div>{{ employee.firstName }} {{ employee.lastName }} ({{ employee.employeeCode }})</div>
@@ -32,15 +39,47 @@
       </div>
       
       <div class="field">
-        <label for="punchDate" class="block text-sm font-medium mb-2">Punch Date</label>
+        <label for="from" class="block text-sm font-medium mb-2">From Date</label>
         <p-datepicker 
-          id="punchDate"
-          formControlName="punchDate"
-          placeholder="Select Date"
+          id="from"
+          formControlName="from"
+          placeholder="Select From Date"
           dateFormat="yy-mm-dd"
           class="w-full"
           appendTo="body"
         ></p-datepicker>
+      </div>
+      
+      <div class="field">
+        <label for="to" class="block text-sm font-medium mb-2">To Date</label>
+        <p-datepicker 
+          id="to"
+          formControlName="to"
+          placeholder="Select To Date"
+          dateFormat="yy-mm-dd"
+          class="w-full"
+          appendTo="body"
+        ></p-datepicker>
+      </div>
+      
+      <div class="field search-field">
+        <label class="block text-sm font-medium mb-2">&nbsp;</label>
+        <div class="search-buttons">
+          <button 
+            pButton 
+            label="Search" 
+            icon="pi pi-search" 
+            class="p-button-sm search-button"
+            (click)="searchAttendance()"
+          ></button>
+          <button 
+            pButton 
+            label="Clear" 
+            icon="pi pi-filter-slash" 
+            class="p-button-sm p-button-outlined clear-button"
+            (click)="clearFilters()"
+          ></button>
+        </div>
       </div>
     </div>
   </div>
@@ -54,7 +93,7 @@
     [rowHover]="true"
     [showGridlines]="true"
     [paginator]="true"
-    [globalFilterFields]="['staffId', 'punchDate', 'punchTime', 'verifyStatus', 'punchType']"
+    [globalFilterFields]="['employeeId', 'punchDate', 'punchTime', 'verifyStatus', 'punchType']"
     responsiveLayout="scroll"
   >
     <ng-template pTemplate="caption">
@@ -85,8 +124,8 @@
       <tr>
         <th style="min-width: 10rem">
           <div class="flex justify-between items-center">
-            Staff ID
-            <p-columnFilter type="text" field="staffId" display="menu"></p-columnFilter>
+            Employee
+            <p-columnFilter type="text" field="employeeId" display="menu"></p-columnFilter>
           </div>
         </th>
         <th style="min-width: 12rem">
@@ -119,19 +158,36 @@
     
     <ng-template pTemplate="body" let-attendance>
       <tr>
-        <td>{{ getEmployeeCode(attendance.staffId) }}</td>
-        <td>{{ attendance.punchDate | date:'dd/MM/yyyy' }}</td>
-        <td>{{ attendance.punchTime }}</td>
+        <td>
+          <div class="employee-info">
+            <div class="employee-name">{{ attendance.employeeName }}</div>
+            <div class="employee-code">{{ getEmployeeCode(attendance.employeeId) }}</div>
+          </div>
+        </td>
+        <td>
+          <div class="date-info">
+            <div class="date-display">{{ attendance.displayDate || (attendance.punchDate | date:'MMM dd, yyyy') }}</div>
+            <div class="date-raw">{{ attendance.punchDate | date:'dd/MM/yyyy' }}</div>
+          </div>
+        </td>
+        <td>
+          <div class="time-info">
+            <div class="time-display">{{ attendance.displayTime || attendance.punchTime }}</div>
+            <div class="time-raw">{{ attendance.punchTime }}</div>
+          </div>
+        </td>
         <td>
           <p-tag 
             [value]="attendance.verifyStatus"
-            [severity]="getVerifyStatusSeverity(attendance.verifyStatus)"
+            [severity]="attendance.statusColor || getVerifyStatusSeverity(attendance.verifyStatus)"
+            [icon]="getVerifyStatusIcon(attendance.verifyStatus)"
           ></p-tag>
         </td>
         <td>
           <p-tag 
             [value]="attendance.punchType"
-            [severity]="getPunchTypeSeverity(attendance.punchType)"
+            [severity]="attendance.typeColor || getPunchTypeSeverity(attendance.punchType)"
+            [icon]="getPunchTypeIcon(attendance.punchType)"
           ></p-tag>
         </td>
         <td>

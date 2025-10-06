@@ -8,110 +8,54 @@
   [resizable]="false"
   (onHide)="onDialogHide()">
   <form [formGroup]="attendanceForm" (ngSubmit)="onSubmit()">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-      <!-- Staff ID Field -->
+    <div class="grid grid-cols-1 gap-4 mt-4">
+      <!-- Employee Field -->
       <div class="field">
-        <label for="staffId" class="block text-sm font-medium mb-2">
-          Staff ID <span class="text-red-500">*</span>
+        <label for="employeeId" class="block text-sm font-medium mb-2">
+          Employee <span class="text-red-500">*</span>
         </label>
         <p-select 
-          id="staffId" 
-          formControlName="staffId" 
+          id="employeeId" 
+          formControlName="employeeId" 
           [options]="employees" 
           optionLabel="displayName"
           optionValue="id"
           placeholder="Select Employee"
           class="w-full"
           appendTo="body"
-          [class.ng-invalid]="attendanceForm.get('staffId')?.invalid && attendanceForm.get('staffId')?.touched"
+          [class.ng-invalid]="attendanceForm.get('employeeId')?.invalid && attendanceForm.get('employeeId')?.touched"
         >
           <ng-template let-employee pTemplate="item">
             <div>{{ employee.firstName }} {{ employee.lastName }} ({{ employee.employeeCode }})</div>
           </ng-template>
         </p-select>
-        <small class="text-red-500" *ngIf="attendanceForm.get('staffId')?.invalid && attendanceForm.get('staffId')?.touched">
-          Staff ID is required
+        <small class="text-red-500" *ngIf="attendanceForm.get('employeeId')?.invalid && attendanceForm.get('employeeId')?.touched">
+          Employee is required
         </small>
       </div>
 
-      <!-- Punch Date Field -->
+      <!-- Punch Date Time Field -->
       <div class="field">
-        <label for="punchDate" class="block text-sm font-medium mb-2">
-          Punch Date <span class="text-red-500">*</span>
+        <label for="punchDateTime" class="block text-sm font-medium mb-2">
+          Punch Date & Time <span class="text-red-500">*</span>
         </label>
         <p-datepicker 
-          id="punchDate" 
-          formControlName="punchDate"
-          placeholder="Select Date"
+          id="punchDateTime" 
+          formControlName="punchDateTime"
+          placeholder="Select Date and Time"
+          [showTime]="true"
+          [showSeconds]="false"
           dateFormat="yy-mm-dd"
+          timeFormat="24"
           class="w-full"
           appendTo="body"
-          [class.ng-invalid]="attendanceForm.get('punchDate')?.invalid && attendanceForm.get('punchDate')?.touched"
+          [class.ng-invalid]="attendanceForm.get('punchDateTime')?.invalid && attendanceForm.get('punchDateTime')?.touched"
         ></p-datepicker>
-        <small class="text-red-500" *ngIf="attendanceForm.get('punchDate')?.invalid && attendanceForm.get('punchDate')?.touched">
-          Punch Date is required
+        <small class="text-red-500" *ngIf="attendanceForm.get('punchDateTime')?.invalid && attendanceForm.get('punchDateTime')?.touched">
+          Punch Date & Time is required
         </small>
       </div>
 
-      <!-- Punch Time Field -->
-      <div class="field">
-        <label for="punchTime" class="block text-sm font-medium mb-2">
-          Punch Time <span class="text-red-500">*</span>
-        </label>
-        <input 
-          id="punchTime" 
-          type="time" 
-          pInputText 
-          class="w-full"
-          formControlName="punchTime" 
-          [class.ng-invalid]="attendanceForm.get('punchTime')?.invalid && attendanceForm.get('punchTime')?.touched"
-        />
-        <small class="text-red-500" *ngIf="attendanceForm.get('punchTime')?.invalid && attendanceForm.get('punchTime')?.touched">
-          Punch Time is required
-        </small>
-      </div>
-
-      <!-- Verify Status Field - TEMPORARILY COMMENTED OUT -->
-      <!-- <div class="field">
-        <label for="verifyStatus" class="block text-sm font-medium mb-2">
-          Verify Status <span class="text-red-500">*</span>
-        </label>
-        <p-select 
-          id="verifyStatus" 
-          formControlName="verifyStatus" 
-          [options]="verifyStatusOptions" 
-          optionLabel="label" 
-          optionValue="value"
-          placeholder="Select Verify Status"
-          class="w-full"
-          appendTo="body"
-          [class.ng-invalid]="attendanceForm.get('verifyStatus')?.invalid && attendanceForm.get('verifyStatus')?.touched"
-        ></p-select>
-        <small class="text-red-500" *ngIf="attendanceForm.get('verifyStatus')?.invalid && attendanceForm.get('verifyStatus')?.touched">
-          Verify Status is required
-        </small>
-      </div> -->
-
-      <!-- Punch Type Field - TEMPORARILY COMMENTED OUT -->
-      <!-- <div class="field">
-        <label for="punchType" class="block text-sm font-medium mb-2">
-          Punch Type <span class="text-red-500">*</span>
-        </label>
-        <p-select 
-          id="punchType" 
-          formControlName="punchType" 
-          [options]="punchTypeOptions" 
-          optionLabel="label" 
-          optionValue="value"
-          placeholder="Select Punch Type"
-          class="w-full"
-          appendTo="body"
-          [class.ng-invalid]="attendanceForm.get('punchType')?.invalid && attendanceForm.get('punchType')?.touched"
-        ></p-select>
-        <small class="text-red-500" *ngIf="attendanceForm.get('punchType')?.invalid && attendanceForm.get('punchType')?.touched">
-          Punch Type is required
-        </small>
-      </div> -->
     </div>
 
     <div class="flex justify-end gap-3 mt-6 pt-4 border-t">

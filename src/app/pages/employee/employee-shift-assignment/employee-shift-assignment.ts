@@ -108,7 +108,7 @@ export class EmployeeShiftAssignmentComponent implements OnInit {
       shiftId: [null, [Validators.required]],
       startDateTime: [null, [Validators.required]],
       endDateTime: [null], // Will be conditionally required
-      priority: ['0', [Validators.required]], // 0 = Temporary, 1 = Permanent
+      priority: [0, [Validators.required]], // 0 = Temporary, 1 = Permanent
       isOtShift: [false],
       isOverwriteHolidays: [false],
       isPunchNotRequired: [false],
@@ -129,7 +129,7 @@ export class EmployeeShiftAssignmentComponent implements OnInit {
             if (matchingShift) {
               assignment.shift = {
                 id: matchingShift.id,
-                name: matchingShift.name,
+                name: matchingShift.shiftTypeName || matchingShift.name || 'Unknown Shift',
                 startTime: '00:00:00',
                 endTime: '00:00:00'
               };
@@ -169,11 +169,11 @@ export class EmployeeShiftAssignmentComponent implements OnInit {
     });
   }
 
-  onPriorityChange(priority: string) {
+  onPriorityChange(priority: number) {
     const endDateTimeControl = this.assignmentForm.get('endDateTime');
-    if (priority === '0') { 
+    if (priority === 0) { // Temporary
       endDateTimeControl?.setValidators([Validators.required]);
-    } else {  
+    } else { // Permanent
       endDateTimeControl?.clearValidators();   
       endDateTimeControl?.setValue(null);
     }   
@@ -208,7 +208,7 @@ export class EmployeeShiftAssignmentComponent implements OnInit {
     this.selectedFileName = assignment.attachmentURL ? 'File attached' : '';
     this.selectedFile = null;
     
-    const priorityValue = assignment.priority?.toString() || '0';
+    const priorityValue = typeof assignment.priority === 'number' ? assignment.priority : parseInt(assignment.priority?.toString() || '0');
     
     this.assignmentForm.patchValue({
       id: assignment.id,

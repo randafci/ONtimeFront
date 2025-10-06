@@ -22,6 +22,7 @@ import { ApiResponse } from '../../../core/models/api-response.model';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 import { AttendanceModalComponent } from '../attendance-modal/attendance-modal.component';
+import { AuthService } from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-attendance-list',
@@ -70,20 +71,34 @@ export class AttendanceListComponent implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private translationService: TranslationService,
+    private authService: AuthService,
     private fb: FormBuilder
   ) {
     this.filterForm = this.fb.group({
-      staffId: [null],
-      punchDate: [null]
+      employeeId: [null],
+      from: [null],
+      to: [null]
     });
   }
 
   ngOnInit() {
+    // Check if user is authenticated
+    if (!this.authService.isLoggedIn()) {
+      this.showToast('error', 'Authentication Required', 'Please log in to access attendance records');
+      return;
+    }
+
     this.translationService.translations$.subscribe(trans => {
       this.translations = trans;
     });
     this.loadEmployees();
     this.loadAttendance();
+    
+    // Watch for form changes to provide immediate feedback
+    this.filterForm.valueChanges.subscribe(value => {
+      // You can add real-time filtering logic here if needed
+      // For now, we'll just show that the form has changed
+    });
   }
 
   loadEmployees() {
@@ -104,7 +119,9 @@ export class AttendanceListComponent implements OnInit {
 
   loadAttendance() {
     this.loading = true;
-    this.attendanceService.getAllAttendance().subscribe({
+    
+    // Always load all employees attendance data initially
+    this.attendanceService.getAllEmployeesAttendance().subscribe({
       next: (response: ApiResponse<Attendance[]>) => {
         if (response.succeeded) {
           this.attendances = response.data || [];
@@ -124,10 +141,15 @@ export class AttendanceListComponent implements OnInit {
     const filter: AttendanceFilter = this.filterForm.value;
     this.loading = true;
     
+    // Use searchAttendance which handles both cases (all employees vs specific employee)
     this.attendanceService.searchAttendance(filter).subscribe({
       next: (response: ApiResponse<Attendance[]>) => {
         if (response.succeeded) {
           this.attendances = response.data || [];
+          const message = filter.employeeId 
+            ? `Found ${response.data?.length || 0} attendance records for selected employee`
+            : `Found ${response.data?.length || 0} attendance records for all employees`;
+          this.showToast('success', 'Search Complete', message);
         } else {
           this.showToast('error', 'Error', response.message || 'Search failed');
         }
@@ -142,16 +164,47 @@ export class AttendanceListComponent implements OnInit {
 
   clearFilters() {
     this.filterForm.reset();
-    this.loadAttendance();
+    // Use searchAttendance with empty filter to load all employees' data
+    this.attendanceService.searchAttendance({}).subscribe({
+      next: (response: ApiResponse<Attendance[]>) => {
+        if (response.succeeded) {
+          this.attendances = response.data || [];
+          this.showToast('info', 'Filters Cleared', 'All filters have been reset');
+        } else {
+          this.showToast('error', 'Error', response.message || 'Failed to load data');
+        }
+      },
+      error: (error) => {
+        this.showToast('error', 'Error', 'Failed to load data');
+      }
+    });
   }
 
-  getEmployeeName(staffId: number): string {
-    const employee = this.employees.find(emp => emp.id === staffId);
-    return employee ? `${employee.firstName} ${employee.lastName}` : `Staff ID: ${staffId}`;
+  onEmployeeChange() {
+    // This method can be called when employee selection changes
+    // It provides immediate feedback without auto-loading data
+    const selectedEmployee = this.filterForm.get('employeeId')?.value;
+    
+    if (selectedEmployee) {
+      const employee = this.employees.find(emp => emp.id === selectedEmployee);
+      if (employee) {
+        this.showToast('info', 'Employee Selected', `Selected: ${employee.firstName} ${employee.lastName}. Click Search to filter data.`);
+      }
+    }
   }
 
-  getEmployeeCode(staffId: number): string {
-    const employee = this.employees.find(emp => emp.id === staffId);
+  hasActiveFilters(): boolean {
+    const formValue = this.filterForm.value;
+    return !!(formValue.employeeId || formValue.from || formValue.to);
+  }
+
+  getEmployeeName(employeeId: number): string {
+    const employee = this.employees.find(emp => emp.id === employeeId);
+    return employee ? `${employee.firstName} ${employee.lastName}` : `Employee ID: ${employeeId}`;
+  }
+
+  getEmployeeCode(employeeId: number): string {
+    const employee = this.employees.find(emp => emp.id === employeeId);
     return employee ? employee.employeeCode : '';
   }
 
@@ -174,6 +227,25 @@ export class AttendanceListComponent implements OnInit {
     }
   }
 
+  getVerifyStatusIcon(status: string): string {
+    switch (status?.toLowerCase()) {
+      case 'fingerprint': return 'pi pi-fingerprint';
+      case 'card': return 'pi pi-id-card';
+      case 'manual': return 'pi pi-pencil';
+      default: return 'pi pi-info-circle';
+    }
+  }
+
+  getPunchTypeIcon(type: string): string {
+    switch (type?.toLowerCase()) {
+      case 'check in': return 'pi pi-sign-in';
+      case 'check out': return 'pi pi-sign-out';
+      case 'break in': return 'pi pi-pause';
+      case 'break out': return 'pi pi-play';
+      default: return 'pi pi-clock';
+    }
+  }
+
   openAddModal() {
     this.isEditMode = false;
     this.selectedAttendance = null;
@@ -188,6 +260,7 @@ export class AttendanceListComponent implements OnInit {
 
   onModalSave(attendance: Attendance) {
     this.showModal = false;
+    // Refresh the attendance list to show the new record
     this.loadAttendance();
   }
 
@@ -196,7 +269,7 @@ export class AttendanceListComponent implements OnInit {
   }
 
   deleteAttendance(attendance: Attendance) {
-    const employeeName = this.getEmployeeName(attendance.staffId);
+    const employeeName = this.getEmployeeName(attendance.employeeId);
     const message = `Are you sure you want to delete attendance record for ${employeeName}?`;
 
     this.confirmationService.confirm({
@@ -206,7 +279,7 @@ export class AttendanceListComponent implements OnInit {
       acceptLabel: 'Yes',
       rejectLabel: 'No',
       accept: () => {
-        this.attendanceService.deleteAttendance(attendance.id).subscribe({
+        this.attendanceService.deleteAttendance(attendance.id || 0).subscribe({
           next: (response: ApiResponse<boolean>) => {
             if (response.succeeded) {
               this.showToast('success', 'Success', 'Attendance record deleted successfully');
