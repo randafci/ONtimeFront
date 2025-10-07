@@ -95,3 +95,11 @@
         </ng-template>
     </p-table>
 </div>
+
+<!-- Users Without Roles Modal -->
+<app-users-without-roles-modal
+  [(dialogVisible)]="usersModalVisible"
+  [selectedRole]="selectedRoleForModal"
+  [loading]="loading"
+  (onUsersAssigned)="onUsersAssigned()">
+</app-users-without-roles-modal>

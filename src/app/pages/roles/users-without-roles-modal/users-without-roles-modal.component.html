@@ -1,0 +1,114 @@
+<p-dialog
+  [(visible)]="dialogVisible"
+  [header]="('rolesList.assignUsersModal.title' | translate) + ' - ' + (selectedRole?.name || '')"
+  [modal]="true"
+  [style]="{width: '60vw'}"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="closeDialog()">
+  
+  <div class="mt-4">
+    <p class="text-sm text-600 mb-4">
+      {{ 'rolesList.assignUsersModal.description' | translate }}
+    </p>
+
+    <p-table
+      #dt
+      [value]="users"
+      dataKey="id"
+      [(selection)]="selectedUsers"
+      [rows]="10"
+      [loading]="loadingUsers"
+      [rowHover]="true"
+      [showGridlines]="true"
+      [paginator]="true"
+      [globalFilterFields]="['userName']"
+      responsiveLayout="scroll">
+
+      <ng-template pTemplate="caption">
+        <div class="flex justify-content-between align-items-center">
+          <button 
+            pButton 
+            [label]="'rolesList.assignUsersModal.clearButton' | translate"
+            class="p-button-outlined mb-2" 
+            icon="pi pi-filter-slash" 
+            (click)="clear(dt)">
+          </button>
+          <p-iconfield iconPosition="left" class="ml-auto">
+            <p-inputicon>
+              <i class="pi pi-search"></i>
+            </p-inputicon>
+            <input 
+              pInputText 
+              type="text" 
+              (input)="onGlobalFilter(dt, $event)" 
+              [placeholder]="'rolesList.assignUsersModal.searchPlaceholder' | translate" />
+          </p-iconfield>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 4rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
+          <th pSortableColumn="userName">
+            {{ 'rolesList.assignUsersModal.headers.username' | translate }} 
+            <p-sortIcon field="userName"></p-sortIcon>
+          </th>
+          <th pSortableColumn="isLdapUser">
+            {{ 'rolesList.assignUsersModal.headers.ldapUser' | translate }} 
+            <p-sortIcon field="isLdapUser"></p-sortIcon>
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-user>
+        <tr>
+          <td>
+            <p-tableCheckbox [value]="user"></p-tableCheckbox>
+          </td>
+          <td>{{ user.userName }}</td>
+          <td>
+            <p-tag 
+              [value]="(user.isLdapUser ? 'common.yes' : 'common.no') | translate"
+              [severity]="getSeverity(user.isLdapUser)">
+            </p-tag>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="3">{{ 'rolesList.assignUsersModal.messages.empty' | translate }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="loadingbody">
+        <tr>
+          <td colspan="3">{{ 'rolesList.assignUsersModal.messages.loading' | translate }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+    <button
+      pButton
+      [label]="'common.buttons.cancel' | translate"
+      class="p-button-secondary"
+      type="button"
+      (click)="closeDialog()">
+    </button>
+    <button
+      pButton
+      [label]="'rolesList.assignUsersModal.assignButton' | translate"
+      [loading]="assigningRoles"
+      [disabled]="!selectedUsers || selectedUsers.length === 0"
+      type="button"
+      (click)="assignRoleToSelectedUsers()">
+    </button>
+  </div>
+</p-dialog>
+
+<p-toast></p-toast>

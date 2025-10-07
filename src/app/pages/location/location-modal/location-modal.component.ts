@@ -13,6 +13,7 @@ import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
+import { MapPickerComponent } from './map-picker/map-picker.component';
 
 @Component({
   selector: 'app-location-modal',
@@ -24,7 +25,8 @@ import { TranslationService } from '../../translation-manager/translation-manage
     InputTextModule,
     SelectModule,
     ButtonModule,
-    TranslatePipe
+    TranslatePipe,
+    MapPickerComponent
   ],
   providers: [MessageService],
   template: `
@@ -90,40 +92,13 @@ import { TranslationService } from '../../translation-manager/translation-manage
             </small>
           </div>
 
-          <!-- Longitude Field -->
-          <div class="field">
-            <label for="long" class="block text-sm font-medium mb-2">
-              Longitude
-            </label>
-            <input
-              id="long"
-              type="number"
-              step="any"
-              pInputText
-              class="w-full"
-              formControlName="long"
-              [class.ng-invalid]="locationForm.get('long')?.invalid && locationForm.get('long')?.touched"/>
-            <small class="text-red-500" *ngIf="locationForm.get('long')?.invalid && locationForm.get('long')?.touched">
-              {{ 'common.validation.invalidNumber' | translate }}
-            </small>
-          </div>
-
-          <!-- Latitude Field -->
-          <div class="field">
-            <label for="lat" class="block text-sm font-medium mb-2">
-              Latitude
-            </label>
-            <input
-              id="lat"
-              type="number"
-              step="any"
-              pInputText
-              class="w-full"
-              formControlName="lat"
-              [class.ng-invalid]="locationForm.get('lat')?.invalid && locationForm.get('lat')?.touched"/>
-            <small class="text-red-500" *ngIf="locationForm.get('lat')?.invalid && locationForm.get('lat')?.touched">
-              {{ 'common.validation.invalidNumber' | translate }}
-            </small>
+          <!-- Map Picker -->
+          <div class="field col-span-2">
+            <app-map-picker
+              [selectedLat]="locationForm.get('lat')?.value"
+              [selectedLng]="locationForm.get('long')?.value"
+              (coordinatesChanged)="onMapCoordinatesChanged($event)">
+            </app-map-picker>
           </div>
 
           <!-- Fence Field -->
@@ -378,6 +353,13 @@ export class LocationModalComponent implements OnInit, OnChanges {
   onCancel(): void {
     this.closeDialog();
     this.onCancelEvent.emit();
+  }
+
+  onMapCoordinatesChanged(coordinates: { lat: number; lng: number }): void {
+    this.locationForm.patchValue({
+      lat: coordinates.lat,
+      long: coordinates.lng
+    });
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {

@@ -19,6 +19,7 @@ import { PagedListRequest } from '../../../core/models/api-response.model';
 import { ToastModule } from 'primeng/toast';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
+import { UsersWithoutRolesModalComponent } from '../users-without-roles-modal/users-without-roles-modal.component';
 
 // Define an interface for our mock data
 export interface IRole {
@@ -43,7 +44,8 @@ export interface IRole {
     TranslatePipe, // Import the pipe
     RouterLink,
     ToastModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    UsersWithoutRolesModalComponent
   ],
   templateUrl: './roles-list.component.html',
   styleUrls: ['./roles-list.component.scss'],
@@ -58,6 +60,10 @@ export class RolesListComponent implements OnInit {
   first = 0;
   searchValue = '';
   private translations: any = {};
+
+  // Modal properties
+  usersModalVisible: boolean = false;
+  selectedRoleForModal: RoleDto | null = null;
 
   constructor(
     private roleService: RoleService,
@@ -169,6 +175,19 @@ export class RolesListComponent implements OnInit {
   }
 
   navigateToUsers(role: RoleDto) {
-    this.router.navigate(['/roles', role.id, 'users']);
+    this.selectedRoleForModal = role;
+    this.usersModalVisible = true;
+  }
+
+  onUsersModalVisibleChange(visible: boolean) {
+    this.usersModalVisible = visible;
+    if (!visible) {
+      this.selectedRoleForModal = null;
+    }
+  }
+
+  onUsersAssigned() {
+    // Refresh the roles list if needed
+    this.loadRoles({ first: this.first, rows: this.rows });
   }
 }
