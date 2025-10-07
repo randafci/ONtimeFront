@@ -9,7 +9,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TranslatePipe } from '@/core/pipes/translate.pipe';
 import { TimeShiftService } from '../timeShift.service';
-import { AddOrEditTimeShift } from '../add-or-edit-time-shift/add-or-edit-time-shift';
+import { AddOrEditTimeShiftforTest } from '../add-or-edit-time-shift/add-or-edit-time-shift';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -33,7 +33,7 @@ import { TooltipModule } from 'primeng/tooltip';
     InputIconModule,
     ToastModule,
     ConfirmDialogModule,
-    AddOrEditTimeShift,
+    AddOrEditTimeShiftforTest,
     TranslatePipe,
      CommonModule,
     FormsModule,

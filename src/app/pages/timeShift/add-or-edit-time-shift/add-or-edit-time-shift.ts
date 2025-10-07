@@ -29,7 +29,7 @@ import { forkJoin, Observable } from 'rxjs';
   templateUrl: './add-or-edit-time-shift.html',
   styleUrls: ['./add-or-edit-time-shift.scss']
 })
-export class AddOrEditTimeShift implements OnInit {
+export class AddOrEditTimeShiftforTest implements OnInit {
   /** ✅ Two-way binding */
   @Input() dialogVisible = false;
   @Output() dialogVisibleChange = new EventEmitter<boolean>();

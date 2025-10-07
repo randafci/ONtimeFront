@@ -14,6 +14,7 @@ import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
 import { LookupService } from '../../organization/OrganizationService';
 import { Organization } from '../../../interfaces/organization.interface';
+import { Toast } from "primeng/toast";
 
 @Component({
   selector: 'app-timetable-modal',
@@ -26,12 +27,13 @@ import { Organization } from '../../../interfaces/organization.interface';
     SelectModule,
     ButtonModule,
     CheckboxModule,
-    InputNumberModule
+    InputNumberModule,
+    Toast
   ],
   providers: [MessageService],
   templateUrl: './timetable-modal.component.html',
 })
-export class TimeTableModalComponent implements OnInit, OnChanges {
+export class TimeTableModalComponent implements  OnChanges {
   @Input() dialogVisible: boolean = false;
   @Input() isEditMode: boolean = false;
   @Input() timeTable: TimeTable | null = null;
@@ -55,12 +57,7 @@ export class TimeTableModalComponent implements OnInit, OnChanges {
     this.timeTableForm = this.createForm();
   }
 
-  ngOnInit() {
-    // Load organizations if not provided by parent component
-    if (this.organizationOptions.length === 0) {
-      this.loadOrganizations();
-    }
-  }
+ 
 
   ngOnChanges() {
     if (this.dialogVisible && this.timeTable) {
@@ -333,6 +330,79 @@ export class TimeTableModalComponent implements OnInit, OnChanges {
     }
   }
 
+  // Add this method to handle API validation errors
+  private handleApiValidationErrors(error: any): void {
+    console.log('API Validation Error:', error);
+    
+    if (error.status === 400 && error.error?.errors) {
+      const validationErrors = error.error.errors;
+      
+      // Handle specific field errors
+      Object.keys(validationErrors).forEach(fieldName => {
+        const fieldErrors = validationErrors[fieldName];
+        
+        if (fieldErrors && fieldErrors.length > 0) {
+          // Get the form control
+          const formControl = this.timeTableForm.get(this.mapFieldNameToFormControl(fieldName));
+          
+          if (formControl) {
+            // Set the error on the form control
+            formControl.setErrors({ 
+              apiValidation: fieldErrors[0] 
+            });
+            formControl.markAsTouched();
+          }
+          
+          // Show user-friendly message
+          const fieldDisplayName = this.getFieldDisplayName(fieldName);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Validation Error',
+            detail: `${fieldDisplayName}: ${fieldErrors[0]}`
+          });
+        }
+      });
+      
+      // Mark the form as touched to show validation styles
+      this.markFormGroupTouched(this.timeTableForm);
+    } else {
+      // Generic error handling
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: error.error?.title || 'An unexpected error occurred'
+      });
+    }
+  }
+
+  // Map API field names to form control names
+  private mapFieldNameToFormControl(apiFieldName: string): string {
+    const fieldMap: { [key: string]: string } = {
+      'NameAr': 'nameAr',
+      'NameEn': 'nameEn',
+      'OrganizationId': 'organizationId',
+      'StartTime': 'startTime',
+      'EndTime': 'endTime',
+      // Add more mappings as needed
+    };
+    
+    return fieldMap[apiFieldName] || apiFieldName;
+  }
+
+  // Get user-friendly field names
+  private getFieldDisplayName(fieldName: string): string {
+    const displayNames: { [key: string]: string } = {
+      'NameAr': 'Arabic Name',
+      'NameEn': 'English Name',
+      'OrganizationId': 'Organization',
+      'StartTime': 'Start Time',
+      'EndTime': 'End Time',
+      // Add more display names as needed
+    };
+    
+    return displayNames[fieldName] || fieldName;
+  }
+
   createTimeTable(data: CreateTimeTable): void {
     this.timeTableService.createTimeTable(data).subscribe({
       next: (response: ApiResponse<TimeTable>) => {
@@ -354,11 +424,17 @@ export class TimeTableModalComponent implements OnInit, OnChanges {
       },
       error: (error) => {
         console.error('Error creating timetable:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to create timetable'
-        });
+        
+        // ✅ FIX: Call handleApiValidationErrors here for API errors
+        if (error.status === 400 && error.error?.errors) {
+          this.handleApiValidationErrors(error);
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to create timetable'
+          });
+        }
       }
     });
   }
@@ -384,11 +460,17 @@ export class TimeTableModalComponent implements OnInit, OnChanges {
       },
       error: (error) => {
         console.error('Error updating timetable:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to update timetable'
-        });
+        
+        // ✅ FIX: Call handleApiValidationErrors here for API errors
+        if (error.status === 400 && error.error?.errors) {
+          this.handleApiValidationErrors(error);
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to update timetable'
+          });
+        }
       }
     });
   }

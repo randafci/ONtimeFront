@@ -27,7 +27,7 @@ import { TimeTableService } from '../TimeTableService';
 import { LookupService } from '../../organization/OrganizationService';
 import { AuthService } from '../../../auth/auth.service';
 import { TimeTableModalComponent } from '../timetable-modal/timetable-modal.component';
-import { AddOrEditTimeShift } from '../../timeShift/add-or-edit-time-shift/add-or-edit-time-shift';
+import { AddOrEditTimeShift } from '../time-shift-modal/add-or-edit-time-shift';
 
 @Component({
   selector: 'app-timetable-list',
@@ -157,12 +157,26 @@ export class TimeTableListComponent implements OnInit {
     this.dialogVisible = true;
   }
 
-  openTimeShiftDialog(timeTable: TimeTable): void {
-    this.selectedTimeTable = { ...timeTable };
-    this.selectedTimeTableId = timeTable.id;
-    this.selectedTimeShift = { timeTableId: timeTable.id };
-    this.timeShiftDialogVisible = true;
-  }
+
+openTimeShiftDialog(timeTable: TimeTable): void {
+  console.log('🎯 Opening TimeShift dialog for timeTable:', timeTable);
+  
+  // ✅ FIRST set the timeShift to null/reset it
+  this.selectedTimeShift = null;
+  
+  // ✅ THEN open the dialog
+  this.timeShiftDialogVisible = true;
+  
+  // ✅ THEN set the actual timeShift value (this will trigger ngOnChanges)
+  setTimeout(() => {
+    this.selectedTimeShift = { 
+      timeTableId: timeTable.id,
+      shiftId: null, 
+      dayNumber: null 
+    };
+    console.log('📤 Passing timeShift to dialog:', this.selectedTimeShift);
+  });
+}
 
   // ✅ Save event from TimeTableModal
   onTimeTableSaved(timeTable: TimeTable): void {
@@ -180,6 +194,8 @@ export class TimeTableListComponent implements OnInit {
         detail: 'TimeTable created successfully. Please add shift details.'
       });
     }
+
+    
   }
 
   // ✅ Save event from AddOrEditTimeShift
