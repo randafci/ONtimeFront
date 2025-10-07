@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule, FormArray, AbstractControl } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -24,7 +24,7 @@ import { SelectModule } from 'primeng/select';
     FormsModule,
     DialogModule,
     InputTextModule,
-    SelectModule, // Changed from SelectModule to DropdownModule
+    SelectModule,
     CheckboxModule,
     ButtonModule,
     TranslatePipe
@@ -63,13 +63,13 @@ export class AddOrEditTimeShift implements OnInit, OnChanges {
   shifts: Shift[] = [];
 
   days: DaySelection[] = [
-    { dayName: 'Sunday', dayNumber: 0, isSelected: false, isWeekend: true },
-    { dayName: 'Monday', dayNumber: 1, isSelected: false, isWeekend: false },
-    { dayName: 'Tuesday', dayNumber: 2, isSelected: false, isWeekend: false },
-    { dayName: 'Wednesday', dayNumber: 3, isSelected: false, isWeekend: false },
-    { dayName: 'Thursday', dayNumber: 4, isSelected: false, isWeekend: false },
-    { dayName: 'Friday', dayNumber: 5, isSelected: false, isWeekend: false },
-    { dayName: 'Saturday', dayNumber: 6, isSelected: false, isWeekend: true }
+    { dayName: 'Sunday', dayNumber: 1, isSelected: false, isWeekend: false },
+    { dayName: 'Monday', dayNumber: 2, isSelected: false, isWeekend: false },
+    { dayName: 'Tuesday', dayNumber: 3, isSelected: false, isWeekend: false },
+    { dayName: 'Wednesday', dayNumber: 4, isSelected: false, isWeekend: false },
+    { dayName: 'Thursday', dayNumber: 5, isSelected: false, isWeekend: false },
+    { dayName: 'Friday', dayNumber: 6, isSelected: false, isWeekend: true },
+    { dayName: 'Saturday', dayNumber: 7, isSelected: false, isWeekend: false }
   ];
 
   constructor(
@@ -102,7 +102,7 @@ export class AddOrEditTimeShift implements OnInit, OnChanges {
     this.timeShiftForm = this.fb.group({
       timeTableId: [null, Validators.required],
       shiftId: [null, Validators.required],
-      days: this.fb.array([])
+      days: this.fb.array([], this.daysArrayValidator.bind(this))
     });
     this.initializeDaysFormArray();
   }
@@ -112,13 +112,71 @@ export class AddOrEditTimeShift implements OnInit, OnChanges {
     daysArray.clear();
     
     this.days.forEach(day => {
-      daysArray.push(this.fb.group({
+      const dayGroup = this.fb.group({
         dayName: [day.dayName],
         dayNumber: [day.dayNumber],
         isSelected: [day.isSelected],
         isWeekend: [day.isWeekend]
-      }));
+      });
+
+      // Add change listeners for validation
+      dayGroup.get('isSelected')?.valueChanges.subscribe(() => {
+        this.validateDaySelection(dayGroup);
+      });
+
+      dayGroup.get('isWeekend')?.valueChanges.subscribe(() => {
+        this.validateDaySelection(dayGroup);
+      });
+
+      daysArray.push(dayGroup);
     });
+  }
+
+  /** ✅ Custom validator for days array */
+  private daysArrayValidator(control: AbstractControl) {
+    const daysArray = control as FormArray;
+    let hasError = false;
+
+    for (let i = 0; i < daysArray.length; i++) {
+      const dayGroup = daysArray.at(i) as FormGroup;
+      const isSelected = dayGroup.get('isSelected')?.value;
+      const isWeekend = dayGroup.get('isWeekend')?.value;
+
+      if (isSelected && isWeekend) {
+        hasError = true;
+        break;
+      }
+    }
+
+    return hasError ? { conflictingSelection: true } : null;
+  }
+
+  /** ✅ Validate individual day selection */
+  private validateDaySelection(dayGroup: FormGroup) {
+    const isSelected = dayGroup.get('isSelected')?.value;
+    const isWeekend = dayGroup.get('isWeekend')?.value;
+
+    if (isSelected && isWeekend) {
+      // If both are true, show error and auto-correct by unchecking isSelected
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'A day cannot be both selected and marked as weekend. The selection has been cleared.',
+        life: 5000
+      });
+      
+      // Auto-correct: uncheck isSelected
+      dayGroup.patchValue({ isSelected: false }, { emitEvent: false });
+    }
+
+    // Update the form validity
+    this.timeShiftForm.updateValueAndValidity();
+  }
+
+  /** ✅ Check if any day has both isSelected and isWeekend true */
+  hasConflictingDays(): boolean {
+    const daysArray = this.daysFormArray.value;
+    return daysArray.some((day: any) => day.isSelected && day.isWeekend);
   }
 
   private loadAllData() {
@@ -247,7 +305,43 @@ export class AddOrEditTimeShift implements OnInit, OnChanges {
     }
   }
 
+  /** ✅ Handle weekend checkbox change */
+  onWeekendChange(dayIndex: number) {
+    const dayGroup = this.getDayFormGroup(dayIndex);
+    const isWeekend = dayGroup.get('isWeekend')?.value;
+    
+    if (isWeekend) {
+      // If marking as weekend, automatically uncheck isSelected
+      dayGroup.patchValue({ isSelected: false });
+    }
+  }
+
+  /** ✅ Handle selection checkbox change */
+  onSelectionChange(dayIndex: number) {
+    const dayGroup = this.getDayFormGroup(dayIndex);
+    const isSelected = dayGroup.get('isSelected')?.value;
+    
+    if (isSelected) {
+      // If selecting a day, automatically uncheck isWeekend
+      dayGroup.patchValue({ isWeekend: false });
+    }
+
+    // Call the existing selection change handler for edit mode
+    this.onDaySelectionChange(dayIndex);
+  }
+
   onSubmit() {
+    // Check for conflicting days before submission
+    if (this.hasConflictingDays()) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'Cannot save: Some days are both selected and marked as weekend. Please fix the conflicts.',
+        life: 5000
+      });
+      return;
+    }
+
     if (this.timeShiftForm.invalid) {
       this.timeShiftForm.markAllAsTouched();
       return;
