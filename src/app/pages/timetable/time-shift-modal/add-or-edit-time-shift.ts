@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule, FormArray } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
 import { TranslatePipe } from '@/core/pipes/translate.pipe';
@@ -14,6 +13,7 @@ import { TimeShiftService } from '@/pages/timeShift/timeShift.service';
 import { TimeTableService } from '../TimeTableService';
 import { Shift } from '@/interfaces/employee-shift-assignment.interface';
 import { TimeTable } from '@/interfaces/timetable.interface';
+import { SelectModule } from 'primeng/select';
 
 @Component({
   selector: 'app-add-or-edit-time-shift',
@@ -24,7 +24,7 @@ import { TimeTable } from '@/interfaces/timetable.interface';
     FormsModule,
     DialogModule,
     InputTextModule,
-    SelectModule,
+    SelectModule, // Changed from SelectModule to DropdownModule
     CheckboxModule,
     ButtonModule,
     TranslatePipe
@@ -32,16 +32,31 @@ import { TimeTable } from '@/interfaces/timetable.interface';
   templateUrl: './add-or-edit-time-shift.html',
   styleUrls: ['./add-or-edit-time-shift.scss']
 })
-export class AddOrEditTimeShift implements OnInit , OnChanges{
+export class AddOrEditTimeShift implements OnInit, OnChanges {
   /** ✅ Two-way binding */
   @Input() dialogVisible = false;
   @Output() dialogVisibleChange = new EventEmitter<boolean>();
-  @Input() timeShift: any = null;
+  
+  private _timeShift: any = null;
+  
+  @Input() 
+  set timeShift(value: any) {
+    console.log('🔄 timeShift SETTER called with:', value);
+    this._timeShift = value;
+    // If we have data loaded, patch immediately
+    if (this.timeTables.length > 0 && value) {
+      console.log('🎯 Patching form from setter');
+      this.patchFormValues();
+    }
+  }
+  get timeShift(): any {
+    return this._timeShift;
+  }
 
   /** ✅ Other inputs */
   @Input() isEditMode = false;
   @Input() loading = false;
-  @Output() onSave = new EventEmitter<void>(); // Changed to emit when save is complete
+  @Output() onSave = new EventEmitter<void>();
 
   timeShiftForm!: FormGroup;
   timeTables: TimeTable[] = [];
@@ -65,39 +80,30 @@ export class AddOrEditTimeShift implements OnInit , OnChanges{
   ) {}
 
   ngOnInit(): void {
+    console.log('🏁 AddOrEditTimeShift ngOnInit');
+    console.log('Initial dialogVisible:', this.dialogVisible);
+    console.log('Initial timeShift:', this.timeShift);
     this.initForm();
-    this.loadTimeTables();
-    this.loadShifts();
-    
+  }
 
-    if (this.isEditMode && this.timeShift) {
-      this.patchFormValues();
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('🔔 ngOnChanges triggered:', {
+      dialogVisible: changes['dialogVisible'],
+      timeShift: changes['timeShift']
+    });
+
+    if (changes['dialogVisible'] && this.dialogVisible) {
+      console.log('📂 Dialog opened - loading data');
+      this.loadAllData();
     }
   }
-  ngOnChanges(changes: SimpleChanges): void {
-  if (changes['timeShift'] && this.timeShift?.timeTableId && this.timeTables.length > 0) {
-    // ✅ Dropdowns already loaded → patch immediately
-    this.timeShiftForm.patchValue({ timeTableId: this.timeShift.timeTableId });
-  } else if (changes['timeShift'] && this.timeShift?.timeTableId) {
-    // ✅ Dropdowns not yet loaded → wait and then patch
-    const timer = setInterval(() => {
-      if (this.timeTables.length > 0) {
-        this.timeShiftForm.patchValue({ timeTableId: this.timeShift.timeTableId });
-        clearInterval(timer);
-      }
-    }, 200);
-  }
-}
-
 
   private initForm() {
     this.timeShiftForm = this.fb.group({
       timeTableId: [null, Validators.required],
       shiftId: [null, Validators.required],
-      days: this.fb.array([]) // FormArray for days
+      days: this.fb.array([])
     });
-
-    // Initialize days form array
     this.initializeDaysFormArray();
   }
 
@@ -115,6 +121,114 @@ export class AddOrEditTimeShift implements OnInit , OnChanges{
     });
   }
 
+  private loadAllData() {
+    this.loading = true;
+    console.log('🔄 Loading TimeTables and Shifts...');
+    console.log('📤 Current timeShift:', this.timeShift);
+    
+    forkJoin({
+      timeTables: this.timeTableService.getAllTimeTables(),
+      shifts: this.timeShiftService.getAllShifts()
+    }).subscribe({
+      next: (results) => {
+        console.log('✅ Data loaded successfully:');
+        console.log('- TimeTables:', results.timeTables.data?.length || 0);
+        console.log('- Shifts:', results.shifts.data?.length || 0);
+
+        // Load TimeTables
+        if (results.timeTables.succeeded) {
+          this.timeTables = results.timeTables.data ?? [];
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: results.timeTables.message || 'Failed to load time tables'
+          });
+        }
+
+        // Load Shifts
+        if (results.shifts.succeeded) {
+          this.shifts = results.shifts.data ?? [];
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: results.shifts.message || 'Failed to load shifts'
+          });
+        }
+
+        this.loading = false;
+        
+        // ✅ ALWAYS try to patch after data is loaded
+        console.log('🎯 Attempting to patch form after data load');
+        console.log('timeShift exists:', !!this.timeShift);
+        console.log('timeTables loaded:', this.timeTables.length);
+        
+        if (this.timeShift) {
+          this.patchFormValues();
+        }
+      },
+      error: (error) => {
+        console.error('❌ Error loading data:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load data'
+        });
+        this.loading = false;
+      }
+    });
+  }
+
+  private patchFormValues() {
+    console.log('🛠️ patchFormValues called');
+    console.log('timeShift:', this.timeShift);
+    console.log('timeTables count:', this.timeTables.length);
+    console.log('shifts count:', this.shifts.length);
+
+    if (!this.timeShift) {
+      console.log('⚠️ No timeShift provided - this is a CREATE operation');
+      return;
+    }
+
+    if (this.timeTables.length === 0) {
+      console.log('⚠️ TimeTables not loaded yet - cannot patch');
+      return;
+    }
+
+    console.log('📝 Patching form with values:', {
+      timeTableId: this.timeShift.timeTableId,
+      shiftId: this.timeShift.shiftId
+    });
+
+    // Patch basic form values
+    this.timeShiftForm.patchValue({
+      timeTableId: this.timeShift.timeTableId,
+      shiftId: this.timeShift.shiftId
+    });
+
+    // Verify the patch worked
+    console.log('✅ Form values after patch:', {
+      formTimeTableId: this.timeShiftForm.get('timeTableId')?.value,
+      formShiftId: this.timeShiftForm.get('shiftId')?.value
+    });
+
+    // Update days form array - only if we have dayNumber
+    if (this.timeShift.dayNumber !== null && this.timeShift.dayNumber !== undefined) {
+      console.log('📅 Patching days with dayNumber:', this.timeShift.dayNumber);
+      const daysArray = this.daysFormArray;
+      this.days.forEach((day, index) => {
+        const isSelected = day.dayNumber === this.timeShift.dayNumber;
+        daysArray.at(index).patchValue({
+          isSelected: isSelected,
+          isWeekend: this.timeShift.isWeekend || false
+        });
+      });
+    } else {
+      console.log('📅 No dayNumber provided - skipping days patch');
+    }
+  }
+
   get daysFormArray(): FormArray {
     return this.timeShiftForm.get('days') as FormArray;
   }
@@ -123,27 +237,8 @@ export class AddOrEditTimeShift implements OnInit , OnChanges{
     return this.daysFormArray.at(index) as FormGroup;
   }
 
-  private patchFormValues() {
-    this.timeShiftForm.patchValue({
-      timeTableId: this.timeShift.timeTableId,
-      shiftId: this.timeShift.shiftId
-    });
-
-    // Update days form array based on the timeShift data
-    const daysArray = this.daysFormArray;
-    this.days.forEach((day, index) => {
-      const isSelected = day.dayNumber === this.timeShift.dayNumber;
-      daysArray.at(index).patchValue({
-        isSelected: isSelected,
-        isWeekend: this.timeShift.isWeekend || false
-      });
-    });
-  }
-
-  // Handle day selection change to ensure only one day is selected for edit mode
   onDaySelectionChange(selectedIndex: number) {
     if (this.isEditMode) {
-      // For edit mode, only allow one day selection
       this.daysFormArray.controls.forEach((control, index) => {
         if (index !== selectedIndex) {
           control.patchValue({ isSelected: false });
@@ -152,60 +247,6 @@ export class AddOrEditTimeShift implements OnInit , OnChanges{
     }
   }
 
-loadTimeTables() {
-  this.loading = true;
-  this.timeTableService.getAllTimeTables().subscribe({
-    next: (res) => {
-      if (res.succeeded) {
-        this.timeTables = res.data ?? [];
-      } else {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: res.message || 'Failed to load time tables'
-        });
-      }
-      this.loading = false;
-    },
-    error: () => {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to load time tables'
-      });
-      this.loading = false;
-    }
-  });
-}
-
-
-  loadShifts() {
-    this.loading = true;
-    this.timeShiftService.getAllShifts().subscribe({
-      next: (res) => {
-        if (res.succeeded) {
-          this.shifts = res.data ?? [];
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: res.message || 'Failed to load shifts'
-          });
-        }
-        this.loading = false;
-      },
-      error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load shifts'
-        });
-        this.loading = false;
-      }
-    });
-  }
-
-  /** ✅ When Save is clicked */
   onSubmit() {
     if (this.timeShiftForm.invalid) {
       this.timeShiftForm.markAllAsTouched();
@@ -240,7 +281,7 @@ loadTimeTables() {
 
     selectedDays.forEach(dayNum => {
       const payload: TimeShift = {
-        id:0,
+        id: 0,
         shiftId: this.timeShiftForm.value.shiftId,
         timeTableId: this.timeShiftForm.value.timeTableId,
         dayNumber: dayNum
@@ -284,8 +325,7 @@ loadTimeTables() {
   }
 
   private updateTimeShifts(selectedDays: number[]) {
-    // For edit mode, we typically update one record
-    const dayNum = selectedDays[0]; // Take the first selected day
+    const dayNum = selectedDays[0];
     const payload: TimeShift = {
       id: this.timeShift.id,
       shiftId: this.timeShiftForm.value.shiftId,
@@ -293,7 +333,7 @@ loadTimeTables() {
       dayNumber: dayNum
     };
 
-    this.timeShiftService.update(this.timeShift.id,payload).subscribe({
+    this.timeShiftService.update(this.timeShift.id, payload).subscribe({
       next: (res) => {
         if (res.succeeded) {
           this.messageService.add({
@@ -323,24 +363,10 @@ loadTimeTables() {
 
   private handleSaveComplete() {
     this.loading = false;
-    this.onSave.emit(); // Notify parent that save is complete
+    this.onSave.emit();
     this.closeDialog();
   }
 
-  private getDayName(dayNumber: number): string {
-    const dayMap: { [key: number]: string } = {
-      1: 'Sunday',
-      2: 'Monday', 
-      3: 'Tuesday',
-      4: 'Wednesday',
-      5: 'Thursday',
-      6: 'Friday',
-      7: 'Saturday'
-    };
-    return dayMap[dayNumber] || '';
-  }
-
-  /** ✅ Close dialog properly */
   closeDialog() {
     this.dialogVisible = false;
     this.dialogVisibleChange.emit(false);
@@ -354,5 +380,8 @@ loadTimeTables() {
   resetForm() {
     this.timeShiftForm.reset();
     this.initializeDaysFormArray();
+    // Clear loaded data when dialog closes
+    this.timeTables = [];
+    this.shifts = [];
   }
 }

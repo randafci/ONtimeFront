@@ -111,7 +111,7 @@ export class MenuComponent implements OnInit {
                         items: [
                             { label: this.t('menu.organization.shift'), icon: 'pi pi-fw pi-clock', routerLink: ['/shifts/list'] },
                             { label: 'Time Tables', icon: 'pi pi-fw pi-clock', routerLink: ['/timetables'] },
-                            { label: 'Time Shifts', icon: 'pi pi-fw pi-clock', routerLink: ['/time-shifts/list'] },
+                            //{ label: 'Time Shifts', icon: 'pi pi-fw pi-clock', routerLink: ['/time-shifts/list'] },
                             { label: 'Regularization', icon: 'pi pi-fw pi-clock', routerLink: ['/attendance'] }
                         ]
                     }
