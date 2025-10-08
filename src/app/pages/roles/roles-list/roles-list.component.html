@@ -1,99 +1,212 @@
 <p-toast></p-toast>
-<p-confirmDialog [style]="{width: '450px'}"></p-confirmDialog>
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>
+
 <div class="card">
-    <!-- Page Header -->
-    <div class="flex justify-content-between align-items-center mb-4">
-        <h1 class="font-semibold text-xl m-0">{{ 'rolesList.title' | translate }}</h1>
-        <button
-            pButton
-            [label]="'rolesList.createButton' | translate"
-            icon="pi pi-plus"
-            routerLink="/roles/add">
+  <!-- Page Header -->
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">{{ 'rolesList.title' | translate }}</h2>
+    <div class="flex-grow-1"></div>
+    <button
+      pButton
+      [label]="'rolesList.createButton' | translate"
+      icon="pi pi-plus"
+      class="p-button-sm"
+      routerLink="/roles/add">
+    </button>
+  </div>
+
+<!-- Table Section -->
+<p-table
+  #dt
+  [value]="rolesList"
+  dataKey="id"
+  [rows]="10"
+  [loading]="loading"
+  [rowHover]="true"
+  [showGridlines]="true"
+  [paginator]="true"
+  [totalRecords]="totalRecords"
+  [globalFilterFields]="['name']"
+  responsiveLayout="scroll"
+  (onLazyLoad)="loadRoles($event)"
+  [lazy]="true"
+  [rowsPerPageOptions]="[10, 25, 50]"
+  styleClass="p-datatable-sm">
+
+    <!-- Table Header Toolbar -->
+    <ng-template pTemplate="caption">
+      <div class="flex justify-between items-center flex-column sm:flex-row">
+        <button 
+          pButton 
+          [label]="'rolesList.clearButton' | translate"
+          class="p-button-outlined mb-2" 
+          icon="pi pi-filter-slash" 
+          (click)="clear(dt)">
         </button>
-    </div>
+        <p-iconfield iconPosition="left" class="ml-auto">
+          <p-inputicon>
+            <i class="pi pi-search"></i>
+          </p-inputicon>
+          <input 
+            pInputText 
+            type="text" 
+            (input)="onGlobalFilter(dt, $event)" 
+            [placeholder]="'rolesList.searchPlaceholder' | translate"
+          />
+        </p-iconfield>
+      </div>
+    </ng-template>
 
-    <!-- PrimeNG Table -->
-    <p-table
-        #table
-        [value]="rolesList"
-        [columns]="cols"
-        dataKey="id"
-        [rows]="rows"
-        [totalRecords]="totalRecords"
-        [loading]="loading"
-        [paginator]="true"
-        [rowHover]="true"
-        styleClass="p-datatable-gridlines"
-        [lazy]="true"
-        (onLazyLoad)="loadRoles($event)"
-        [rowsPerPageOptions]="[10, 25, 50]">
+    <!-- Table Header -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="min-width: 12rem">
+          <div class="flex justify-between items-center">
+            {{ 'rolesList.headers.name' | translate }}
+            <p-columnFilter type="text" field="name" display="menu" [placeholder]="'common.searchPlaceholder' | translate"></p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 10rem">
+          <div class="flex justify-between items-center">
+            {{ 'rolesList.headers.isDefault' | translate }}
+            <p-columnFilter field="isDefaultRole" matchMode="equals" display="menu">
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                <p-select 
+                  [ngModel]="value" 
+                  [options]="booleanOptions" 
+                  (onChange)="filter($event.value)" 
+                  [placeholder]="'rolesList.filters.any' | translate"
+                  [style]="{ 'min-width': '12rem' }"
+                >
+                  <ng-template let-option pTemplate="item">
+                    <span>{{ option.label | translate }}</span>
+                  </ng-template>
+                </p-select>
+              </ng-template>
+            </p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 10rem">
+          <div class="flex justify-between items-center">
+            {{ 'rolesList.headers.isHR' | translate }}
+            <p-columnFilter field="isHRRole" matchMode="equals" display="menu">
+              <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                <p-select 
+                  [ngModel]="value" 
+                  [options]="booleanOptions" 
+                  (onChange)="filter($event.value)" 
+                  [placeholder]="'rolesList.filters.any' | translate"
+                  [style]="{ 'min-width': '12rem' }"
+                >
+                  <ng-template let-option pTemplate="item">
+                    <span>{{ option.label | translate }}</span>
+                  </ng-template>
+                </p-select>
+              </ng-template>
+            </p-columnFilter>
+          </div>
+        </th>
+        <th style="min-width: 16rem">{{ 'rolesList.headers.actions' | translate }}</th>
+      </tr>
+    </ng-template>
 
-        <ng-template pTemplate="caption">
-            <div class="flex justify-content-between align-items-center">
-                <button
-                    pButton
-                    pRipple
-                    (click)="clear(table)"
-                    icon="pi pi-filter-slash"
-                    class="p-button-danger"
-                    [label]="'rolesList.clearButton' | translate">
-                </button>
-                <div class="p-input-icon-left">
-                    <i class="pi pi-search"></i>
-                    <input
-                        pInputText
-                        type="text"
-                        [(ngModel)]="searchValue"
-                        (input)="onSearch(table)"
-                        [placeholder]="'rolesList.searchPlaceholder' | translate" />
-                </div>
-            </div>
-        </ng-template>
+    <!-- Table Body -->
+    <ng-template pTemplate="body" let-role>
+      <tr>
+        <!-- Name Column -->
+        <td>{{ role.name }}</td>
 
-        <ng-template pTemplate="header" let-columns>
-            <tr>
-                <th *ngFor="let col of columns" [pSortableColumn]="col.field">
-                    {{ col.headerKey | translate }}
-                    <p-sortIcon *ngIf="col.field !== 'actions'" [field]="col.field"></p-sortIcon>
-                </th>
-            </tr>
-        </ng-template>
+        <!-- Default Role Column -->
+        <td>
+          <p-tag 
+            [value]="(role.isDefaultRole ? 'common.yes' : 'common.no') | translate"
+            [severity]="role.isDefaultRole ? 'success' : 'danger'"
+          ></p-tag>
+        </td>
 
-        <ng-template pTemplate="body" let-role let-columns="columns">
-            <tr>
-                <!-- Name Column -->
-                <td>{{ role.name }}</td>
+        <!-- HR Role Column -->
+        <td>
+          <p-tag 
+            [value]="(role.isHRRole ? 'common.yes' : 'common.no') | translate"
+            [severity]="role.isHRRole ? 'success' : 'danger'"
+          ></p-tag>
+        </td>
 
-                <!-- Default Role Column -->
-                <td>{{ (role.isDefaultRole ? 'common.yes' : 'common.no') | translate }}</td>
+        <!-- Actions -->
+        <td>
+          <div class="flex justify-content-start gap-2 flex-wrap">
+            <button
+              (click)="deleteRole(role)"
+              pButton
+              pRipple
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-text p-button-danger p-button-sm"
+              [pTooltip]="'rolesList.actions.delete' | translate"
+              tooltipPosition="top">
+            </button>
 
-                <!-- HR Role Column -->
-                <td>{{ (role.isHRRole ? 'common.yes' : 'common.no') | translate }}</td>
+            <button
+              (click)="makeAsDefault(role)"
+              pButton
+              pRipple
+              icon="pi pi-star"
+              [class]="role.isDefaultRole ? 'p-button-rounded p-button-text p-button-warning p-button-sm' : 'p-button-rounded p-button-text p-button-help p-button-sm'"
+              [pTooltip]="(role.isDefaultRole ? 'rolesList.actions.unmarkAsDefault' : 'rolesList.actions.markAsDefault') | translate"
+              tooltipPosition="top">
+            </button>
 
-                <!-- Actions Column -->
-                <td>
-                    <div class="flex gap-2">
-                        <button (click)="deleteRole(role)" pButton pRipple type="button" class="p-button-rounded p-button-danger" [pTooltip]="'rolesList.actions.delete' | translate" tooltipPosition="top" [label]="'rolesList.actions.delete' | translate"></button>
-                        <button (click)="makeAsDefault(role)" pButton pRipple type="button" class="p-button-rounded" [pTooltip]="(role.isDefaultRole ? 'rolesList.actions.unmarkAsDefault' : 'rolesList.actions.markAsDefault') | translate" tooltipPosition="top" [label]="(role.isDefaultRole ? 'rolesList.actions.unmarkAsDefault' : 'rolesList.actions.markAsDefault') | translate"></button>
-                        <button (click)="editRole(role)" pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.edit' | translate" tooltipPosition="top" [label]="'rolesList.actions.edit' | translate"></button>
-                        <button (click)="editPermissions(role)" pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.permissions' | translate" tooltipPosition="top" [label]="'rolesList.actions.permissions' | translate"></button>
-                        <button (click)="navigateToUsers(role)" pButton pRipple type="button" class="p-button-rounded" [pTooltip]="'rolesList.actions.systemUsers' | translate" tooltipPosition="top" [label]="'rolesList.actions.systemUsers' | translate"></button>
-                    </div>
-                </td>
-            </tr>
-        </ng-template>
+            <button
+              (click)="editRole(role)"
+              pButton
+              pRipple
+              icon="pi pi-pencil"
+              class="p-button-rounded p-button-text p-button-info p-button-sm"
+              [pTooltip]="'rolesList.actions.edit' | translate"
+              tooltipPosition="top">
+            </button>
 
-        <ng-template pTemplate="emptymessage">
-            <tr>
-                <td [attr.colspan]="cols.length">{{ 'rolesList.messages.noResults' | translate }}</td>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="loadingbody">
-            <tr>
-                <td [attr.colspan]="cols.length">{{ 'rolesList.messages.loading' | translate }}</td>
-            </tr>
-        </ng-template>
-    </p-table>
+            <button
+              (click)="editPermissions(role)"
+              pButton
+              pRipple
+              icon="pi pi-shield"
+              class="p-button-rounded p-button-text p-button-warning p-button-sm"
+              [pTooltip]="'rolesList.actions.permissions' | translate"
+              tooltipPosition="top">
+            </button>
+
+            <button
+              (click)="navigateToUsers(role)"
+              pButton
+              pRipple
+              icon="pi pi-users"
+              class="p-button-rounded p-button-text p-button-success p-button-sm"
+              [pTooltip]="'rolesList.actions.systemUsers' | translate"
+              tooltipPosition="top">
+            </button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <!-- Empty State -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4" class="text-center py-5 text-500">
+          {{ 'rolesList.messages.noResults' | translate }}
+        </td>
+      </tr>
+    </ng-template>
+
+    <!-- Loading State -->
+    <ng-template pTemplate="loadingbody">
+      <tr>
+        <td colspan="4" class="text-center py-5 text-500">
+          {{ 'rolesList.messages.loading' | translate }}
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
 </div>
 
 <!-- Users Without Roles Modal -->

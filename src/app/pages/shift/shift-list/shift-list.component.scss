@@ -1,9 +1,32 @@
-// src/app/features/attendance/shifts/shift-list/shift-list.component.scss
+.card {
+  padding: 1.5rem;
+}
 
-:host ::ng-deep {
-    .p-paginator {
-        .p-paginator-current {
-            margin-left: auto;
-        }
-    }
+.flex {
+  display: flex;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+
+.flex-grow-1 {
+  flex-grow: 1;
+}
+
+.p-button-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
 }
