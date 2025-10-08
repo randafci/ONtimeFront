@@ -13,6 +13,7 @@ import { AttendanceService } from '../AttendanceService';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
+import { Toast } from "primeng/toast";
 
 @Component({
   selector: 'app-attendance-modal',
@@ -24,8 +25,9 @@ import { TranslationService } from '../../translation-manager/translation-manage
     InputTextModule,
     SelectModule,
     ButtonModule,
-    DatePickerModule
-  ],
+    DatePickerModule,
+    Toast
+],
   providers: [MessageService],
   templateUrl: './attendance-modal.component.html'
 })
@@ -147,28 +149,35 @@ export class AttendanceModalComponent implements OnInit, OnChanges {
     return date.toISOString().split('T')[0];
   }
 
-  createAttendance(data: CreateAttendance): void {
-    this.attendanceService.createAttendance(data).subscribe({
-      next: (response: ApiResponse<Attendance>) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Attendance record created successfully'
-        });
-        this.loading = false;
-        this.onSave.emit(response.data);
-        this.closeDialog();
-      },
-      error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to create attendance record'
-        });
-        this.loading = false;
-      }
-    });
-  }
+ createAttendance(data: CreateAttendance): void {
+  this.attendanceService.createAttendance(data).subscribe({
+    next: (response: ApiResponse<Attendance>) => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Attendance record created successfully'
+      });
+      this.loading = false;
+      this.onSave.emit(response.data);
+      this.closeDialog();
+    },
+    error: (error) => {
+      const backendMessage =
+        error?.error?.message ||
+        error?.error?.value ||
+        'Failed to create attendance record';
+
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: backendMessage
+      });
+
+      this.loading = false;
+    }
+  });
+}
+
 
   updateAttendance(data: EditAttendance): void {
     this.attendanceService.updateAttendance(data).subscribe({

@@ -23,29 +23,29 @@
         [globalFilterFields]="['code', 'name', 'nameSE']"
         responsiveLayout="scroll"
     >
-        <ng-template pTemplate="caption">
-            <div class="flex justify-between items-center flex-column sm:flex-row">
-                <button 
-                    pButton 
-                    [label]="'designationList.clearButton' | translate"
-                    class="p-button-outlined mb-2" 
-                    icon="pi pi-filter-slash" 
-                    (click)="clear(dt)"
-                ></button>
-                <p-iconfield iconPosition="left" class="ml-auto">
-                    <p-inputicon>
-                        <i class="pi pi-search"></i>
-                    </p-inputicon>
-                    <input 
-                        pInputText 
-                        type="text" 
-                        #filter
-                        (input)="onGlobalFilter(dt, $event)" 
-                        [placeholder]="'designationList.searchPlaceholder' | translate"
-                    />
-                </p-iconfield>
-            </div>
-        </ng-template>
+       <ng-template pTemplate="caption">
+    <div class="flex justify-between items-center flex-column sm:flex-row">
+        <button 
+            pButton 
+            [label]="'rolesList.clearButton' | translate"
+            class="p-button-outlined mb-2" 
+            icon="pi pi-filter-slash" 
+            (click)="clear(table)"
+        ></button>
+        <p-iconfield iconPosition="left" class="ml-auto">
+            <p-inputicon>
+                <i class="pi pi-search"></i>
+            </p-inputicon>
+            <input 
+                pInputText 
+                type="text" 
+                (input)="onGlobalFilter(table, $event)" 
+                [placeholder]="'rolesList.searchPlaceholder' | translate"
+            />
+        </p-iconfield>
+    </div>
+</ng-template>
+
         
         <ng-template pTemplate="header">
             <tr>

@@ -8,10 +8,6 @@ import { RippleModule } from 'primeng/ripple';
 import { TooltipModule } from 'primeng/tooltip';
 import { TieredMenuModule } from 'primeng/tieredmenu';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-
-
-// Import our custom TranslatePipe
-
 import { Router, RouterLink } from '@angular/router';
 import { RoleDto, RoleService } from '../role.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -20,14 +16,10 @@ import { ToastModule } from 'primeng/toast';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 import { UsersWithoutRolesModalComponent } from '../users-without-roles-modal/users-without-roles-modal.component';
-
-// Define an interface for our mock data
-export interface IRole {
-  id: number;
-  name: string;
-  isDefaultRole: boolean;
-  isHRRole: boolean;
-}
+import { IconField } from "primeng/iconfield";
+import { InputIcon } from "primeng/inputicon";
+import { SelectModule } from 'primeng/select';
+import { Tag } from "primeng/tag";
 
 @Component({
   selector: 'app-roles-list',
@@ -41,17 +33,23 @@ export interface IRole {
     RippleModule,
     TooltipModule,
     TieredMenuModule,
-    TranslatePipe, // Import the pipe
+    TranslatePipe,
     RouterLink,
     ToastModule,
     ConfirmDialogModule,
-    UsersWithoutRolesModalComponent
+    UsersWithoutRolesModalComponent,
+    IconField,
+    InputIcon,
+    SelectModule,
+    Tag
   ],
   templateUrl: './roles-list.component.html',
   styleUrls: ['./roles-list.component.scss'],
   providers: [ConfirmationService, MessageService]
 })
 export class RolesListComponent implements OnInit {
+  @ViewChild('dt') dt!: Table;
+
   rolesList: RoleDto[] = [];
   cols: any[] = [];
   loading = true;
@@ -64,6 +62,11 @@ export class RolesListComponent implements OnInit {
   // Modal properties
   usersModalVisible: boolean = false;
   selectedRoleForModal: RoleDto | null = null;
+
+  booleanOptions = [
+    { label: 'common.yes', value: true },
+    { label: 'common.no', value: false }
+  ];
 
   constructor(
     private roleService: RoleService,
@@ -84,6 +87,17 @@ export class RolesListComponent implements OnInit {
       { field: 'isHRRole', headerKey: 'rolesList.headers.isHR' },
       { field: 'actions', headerKey: 'rolesList.headers.actions' }
     ];
+
+    // Load initial data
+    this.loadInitialData();
+  }
+
+  loadInitialData(): void {
+    const initialEvent: TableLazyLoadEvent = {
+      first: this.first,
+      rows: this.rows
+    };
+    this.loadRoles(initialEvent);
   }
 
   loadRoles(event: TableLazyLoadEvent): void {
@@ -105,34 +119,50 @@ export class RolesListComponent implements OnInit {
         if (response.succeeded) {
           this.rolesList = response.data.items;
           this.totalRecords = response.data.totalCount;
+        } else {
+          this.showToast('error', this.translations.common?.error, response.message || this.translations.rolesList?.messages?.loadError);
         }
         this.loading = false;
       },
-      error: () => {
+      error: (error) => {
+        console.error('Error loading roles:', error);
         this.loading = false;
-        this.showToast('error', this.translations.common?.error, this.translations.rolesList?.messages?.loadError);
+        this.showToast('error', this.translations.common?.error, error.error?.message || this.translations.rolesList?.messages?.loadError);
       }
     });
   }
-  
+
   onSearch(table: Table): void {
+    // Reset to first page when searching
+    this.first = 0;
     table.reset();
   }
 
-  clear(table: Table) {
+  onGlobalFilter(table: Table, event: any): void {
+    const value = event.target.value;
+    this.searchValue = value;
+    // Reset to first page when filtering
+    this.first = 0;
+    table.filterGlobal(value, 'contains');
+  }
+
+  clear(table: Table): void {
     this.searchValue = '';
-    table.reset();
+    this.first = 0;
+    table.clear();
+    // Manually trigger load since clear() might not trigger lazy load
+    this.loadRoles({ first: this.first, rows: this.rows });
   }
 
-  editRole(role: RoleDto) {
+  editRole(role: RoleDto): void {
     this.router.navigate(['/roles/edit', role.id]);
   }
 
-  editPermissions(role: RoleDto) {
+  editPermissions(role: RoleDto): void {
     this.router.navigate(['/permitions/edit', role.id]);
   }
 
-  deleteRole(role: RoleDto) {
+  deleteRole(role: RoleDto): void {
     const messages = this.translations.rolesList?.messages || {};
     const common = this.translations.common || {};
     const message = (messages.deleteConfirm || "Are you sure you want to delete the role '{name}'?").replace('{name}', role.name);
@@ -145,7 +175,7 @@ export class RolesListComponent implements OnInit {
         this.roleService.deleteRole(role.id).subscribe({
           next: () => {
             this.showToast('success', common.success, messages.deleteSuccess);
-            this.loadRoles({ first: this.first, rows: this.rows }); 
+            this.loadInitialData(); // Reload data after deletion
           },
           error: (err) => {
             this.showToast('error', common.error, err.error?.message || messages.deleteError);
@@ -155,14 +185,14 @@ export class RolesListComponent implements OnInit {
     });
   }
 
-  makeAsDefault(role: RoleDto) {
+  makeAsDefault(role: RoleDto): void {
     const wasAlreadyDefault = role.isDefaultRole;
     const updatedRole = { ...role, isDefaultRole: !wasAlreadyDefault };
 
     this.roleService.updateRole(role.id, updatedRole).subscribe({
       next: () => {
         this.showToast('success', this.translations.common?.success, this.translations.rolesList?.messages?.updateSuccess);
-        this.loadRoles({ first: this.first, rows: this.rows }); 
+        this.loadInitialData(); // Reload data after update
       },
       error: (err) => {
         this.showToast('error', this.translations.common?.error, err.error?.message || this.translations.rolesList?.messages?.updateError);
@@ -174,20 +204,20 @@ export class RolesListComponent implements OnInit {
     this.messageService.add({ severity, summary, detail });
   }
 
-  navigateToUsers(role: RoleDto) {
+  navigateToUsers(role: RoleDto): void {
     this.selectedRoleForModal = role;
     this.usersModalVisible = true;
   }
 
-  onUsersModalVisibleChange(visible: boolean) {
+  onUsersModalVisibleChange(visible: boolean): void {
     this.usersModalVisible = visible;
     if (!visible) {
       this.selectedRoleForModal = null;
     }
   }
 
-  onUsersAssigned() {
-    // Refresh the roles list if needed
-    this.loadRoles({ first: this.first, rows: this.rows });
+  onUsersAssigned(): void {
+    // Refresh the roles list
+    this.loadInitialData();
   }
 }

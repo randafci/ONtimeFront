@@ -160,7 +160,9 @@ import { AuthService } from '../../../auth/auth.service';
 
     <p-toast></p-toast>
     <p-confirmDialog></p-confirmDialog>
-  `
+  `,
+    styleUrls: ['./location-list.component.scss'] // Add this line
+
 })
 export class LocationListComponent implements OnInit {
   @ViewChild('dt') dt!: Table;

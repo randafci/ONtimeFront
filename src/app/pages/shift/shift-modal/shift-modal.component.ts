@@ -18,6 +18,7 @@ import { ShiftService } from '../ShiftService';
 import { AuthService } from '../../../auth/auth.service';
 import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 import { CheckboxModule } from 'primeng/checkbox';
+import { Toast } from "primeng/toast";
 
 // Project Specific Imports
 
@@ -27,8 +28,9 @@ import { CheckboxModule } from 'primeng/checkbox';
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, TranslatePipe,
-    DialogModule, SelectModule, ButtonModule, CheckboxModule
-  ],
+    DialogModule, SelectModule, ButtonModule, CheckboxModule,
+    Toast
+],
   providers: [MessageService], // Provide MessageService here if not already provided in root
   templateUrl: './shift-modal.component.html'
 })
@@ -125,12 +127,16 @@ export class ShiftModalComponent implements OnInit, OnChanges {
 }
   }
 
-  createShift(data: CreateShiftDto): void {
-    this.shiftService.createShift(data).subscribe({
-      next: (response) => this.handleSuccess(response, 'createSuccess'),
-      error: () => this.handleError('createError')
-    });
-  }
+createShift(data: CreateShiftDto): void {
+  this.shiftService.createShift(data).subscribe({
+    next: (response) => this.handleSuccess(response, 'createSuccess'),
+    error: (error) => {
+      const backendMessage = error?.error?.message || 'An unexpected error occurred.';
+      this.handleError(backendMessage);
+    }
+  });
+}
+
 
   updateShift(data: UpdateShiftDto): void {
     this.shiftService.updateShift(data).subscribe({
