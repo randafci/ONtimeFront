@@ -15,6 +15,7 @@ export interface DaySelection {
   dayNumber: number;
   isSelected: boolean;
   isWeekend: boolean;
+  timeShiftId?:number;
 }
 
 // Additional interfaces for backend integration
@@ -29,4 +30,11 @@ export interface UpdateTimeShift {
   shiftId: number;
   timeTableId: number;
   dayNumber: number;
+}
+
+export interface GroupedTimeShift {
+  id: number;           
+  shiftId: number;
+  timeTableId: number;
+  days: TimeShift[];
 }
