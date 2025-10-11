@@ -42,7 +42,8 @@ import { AuthService } from '../../../auth/auth.service';
     TooltipModule,
     DatePickerModule,
     TagModule,
-    AttendanceModalComponent
+    AttendanceModalComponent,
+    TranslatePipe
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './attendance-list.html',
@@ -306,4 +307,5 @@ export class AttendanceListComponent implements OnInit {
   private showToast(severity: string, summary: string, detail: string): void {
     this.messageService.add({ severity, summary, detail });
   }
+
 }

@@ -26,7 +26,8 @@ import { Toast } from "primeng/toast";
     SelectModule,
     ButtonModule,
     DatePickerModule,
-    Toast
+    Toast,
+    TranslatePipe
 ],
   providers: [MessageService],
   templateUrl: './attendance-modal.component.html'
@@ -128,17 +129,20 @@ export class AttendanceModalComponent implements OnInit, OnChanges {
     this.loading = true;
     const formData = this.attendanceForm.value;
 
+    // Convert to local timezone string instead of UTC
+    const localDateTime = this.formatLocalDateTime(formData.punchDateTime);
+
     if (this.isEditMode) {
       const editData: EditAttendance = {
         id: formData.id,
         employeeId: formData.employeeId,
-        punchDateTime: formData.punchDateTime.toISOString()
+        punchDateTime: localDateTime
       };
       this.updateAttendance(editData);
     } else {
       const createData: CreateAttendance = {
         employeeId: formData.employeeId,
-        punchDateTime: formData.punchDateTime.toISOString()
+        punchDateTime: localDateTime
       };
       this.createAttendance(createData);
     }
@@ -147,6 +151,20 @@ export class AttendanceModalComponent implements OnInit, OnChanges {
   private formatDate(date: Date): string {
     if (!date) return '';
     return date.toISOString().split('T')[0];
+  }
+
+  private formatLocalDateTime(date: Date): string {
+    if (!date) return '';
+    
+    // Format the date and time in local timezone
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
   }
 
  createAttendance(data: CreateAttendance): void {

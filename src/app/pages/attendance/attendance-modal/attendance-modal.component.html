@@ -1,7 +1,7 @@
 <!-- Create/Edit Dialog -->
 <p-dialog 
   [(visible)]="dialogVisible" 
-  [header]="(isEditMode ? 'Edit Attendance Record' : 'Add Attendance Record')"
+  [header]="(isEditMode ? 'attendance.modal.title.edit' : 'attendance.modal.title.add') | translate"
   [modal]="true" 
   [style]="{width: '50vw'}"
   [draggable]="false" 
@@ -12,7 +12,7 @@
       <!-- Employee Field -->
       <div class="field">
         <label for="employeeId" class="block text-sm font-medium mb-2">
-          Employee <span class="text-red-500">*</span>
+          {{ 'attendance.modal.labels.employee' | translate }} <span class="text-red-500">*</span>
         </label>
         <p-select 
           id="employeeId" 
@@ -20,7 +20,7 @@
           [options]="employees" 
           optionLabel="displayName"
           optionValue="id"
-          placeholder="Select Employee"
+          [placeholder]="'attendance.modal.placeholders.selectEmployee' | translate"
           class="w-full"
           appendTo="body"
           [class.ng-invalid]="attendanceForm.get('employeeId')?.invalid && attendanceForm.get('employeeId')?.touched"
@@ -30,19 +30,19 @@
           </ng-template>
         </p-select>
         <small class="text-red-500" *ngIf="attendanceForm.get('employeeId')?.invalid && attendanceForm.get('employeeId')?.touched">
-          Employee is required
+          {{ 'attendance.modal.validation.employeeRequired' | translate }}
         </small>
       </div>
 
       <!-- Punch Date Time Field -->
       <div class="field">
         <label for="punchDateTime" class="block text-sm font-medium mb-2">
-          Punch Date & Time <span class="text-red-500">*</span>
+          {{ 'attendance.modal.labels.punchDateTime' | translate }} <span class="text-red-500">*</span>
         </label>
         <p-datepicker 
           id="punchDateTime" 
           formControlName="punchDateTime"
-          placeholder="Select Date and Time"
+          [placeholder]="'attendance.modal.placeholders.selectDateTime' | translate"
           [showTime]="true"
           [showSeconds]="false"
           dateFormat="yy-mm-dd"
@@ -52,7 +52,7 @@
           [class.ng-invalid]="attendanceForm.get('punchDateTime')?.invalid && attendanceForm.get('punchDateTime')?.touched"
         ></p-datepicker>
         <small class="text-red-500" *ngIf="attendanceForm.get('punchDateTime')?.invalid && attendanceForm.get('punchDateTime')?.touched">
-          Punch Date & Time is required
+          {{ 'attendance.modal.validation.punchDateTimeRequired' | translate }}
         </small>
       </div>
 
@@ -61,14 +61,14 @@
     <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
       <button 
         pButton 
-        label="Cancel" 
+        [label]="'common.buttons.cancel' | translate" 
         class="p-button-secondary" 
         type="button"
         (click)="onCancel()">
       </button>
       <button 
         pButton 
-        [label]="(isEditMode ? 'Update' : 'Save')" 
+        [label]="(isEditMode ? 'common.buttons.update' : 'common.buttons.save') | translate" 
         [loading]="loading"
         type="submit">
       </button>

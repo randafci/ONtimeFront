@@ -537,35 +537,106 @@
           <button 
             *ngIf="isEditMode"
             pButton 
-            label="Manage Shift Assignments" 
-            icon="pi pi-calendar" 
-            class="p-button-outlined p-button-sm"
-            (click)="navigateToShiftAssignments()"
+            label="Add Assignment" 
+            icon="pi pi-plus" 
+            class="p-button-sm"
+            type="button"
+            (click)="openShiftAssignmentModal($event)"
           ></button>
         </div>
         
-        <div class="bg-gray-50 rounded-lg p-6">
+        <!-- Shift Assignments Table -->
+        <div *ngIf="isEditMode" class="shift-assignments-section">
+          <p-table
+            #dt
+            [value]="shiftAssignments"
+            dataKey="id"
+            [rows]="5"
+            [loading]="loadingShiftAssignments"
+            [rowHover]="true"
+            [showGridlines]="true"
+            [paginator]="true"
+            [globalFilterFields]="['shift.name', 'priority', 'startDateTime']"
+            responsiveLayout="scroll"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="min-width: 12rem">Shift</th>
+                <th style="min-width: 10rem">Type</th>
+                <th style="min-width: 12rem">From Date</th>
+                <th style="min-width: 12rem">To Date</th>
+                <th style="min-width: 8rem">Status</th>
+                <th style="min-width: 8rem">Actions</th>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="body" let-assignment>
+              <tr>
+                <td>{{ assignment.shift?.name || 'N/A' }}</td>
+                <td>
+                  <p-tag 
+                    [value]="getPriorityLabel(assignment.priority)" 
+                    [severity]="getPrioritySeverity(assignment.priority)"
+                  ></p-tag>
+                </td>
+                <td>{{ assignment.startDateTime ? (assignment.startDateTime | date:'shortDate') : 'N/A' }}</td>
+                <td>{{ assignment.endDateTime ? (assignment.endDateTime | date:'shortDate') : 'N/A' }}</td>
+                <td>
+                  <p-tag 
+                    [value]="getStatusLabel(assignment.isCurrent)" 
+                    [severity]="getSeverity(assignment.isCurrent)"
+                  ></p-tag>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button 
+                      pButton 
+                      icon="pi pi-pencil" 
+                      class="p-button-rounded p-button-text p-button-sm"
+                      type="button"
+                      (click)="editShiftAssignment(assignment, $event)"
+                      pTooltip="Edit Assignment"
+                      tooltipPosition="top"
+                    ></button>
+                    <button 
+                      pButton 
+                      icon="pi pi-trash" 
+                      class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                      type="button"
+                      (click)="deleteShiftAssignment(assignment, $event)"
+                      pTooltip="Delete Assignment"
+                      tooltipPosition="top"
+                    ></button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="6">No shift assignments found</td>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="loadingbody">
+              <tr>
+                <td colspan="6">Loading shift assignments...</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        
+        <!-- Message for new employees -->
+        <div *ngIf="!isEditMode" class="bg-gray-50 rounded-lg p-6">
           <div class="text-center">
             <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <i class="pi pi-calendar text-2xl text-blue-600"></i>
             </div>
             <h4 class="text-lg font-medium text-gray-900 mb-2">Shift Assignment Management</h4>
-            <p class="text-gray-600 mb-4" *ngIf="isEditMode">
-              Manage employee shift assignments, schedules, and work patterns.
-            </p>
-            <p class="text-gray-600 mb-4" *ngIf="!isEditMode">
+            <p class="text-gray-600 mb-4">
               Save the employee first to manage shift assignments.
             </p>
             <button 
-              *ngIf="isEditMode"
-              pButton 
-              label="View Shift Assignments" 
-              icon="pi pi-eye" 
-              class="p-button-sm"
-              (click)="navigateToShiftAssignments()"
-            ></button>
-            <button 
-              *ngIf="!isEditMode"
               pButton 
               label="Save Employee First" 
               icon="pi pi-save" 
@@ -576,6 +647,263 @@
         </div>
       </div>
     </div>
+
+    <!-- Shift Assignment Modal -->
+    <p-dialog 
+      [(visible)]="shiftAssignmentDialogVisible" 
+      [header]="(isEditShiftAssignment ? 'Edit Shift Assignment' : 'Add Shift Assignment')"
+      [modal]="true" 
+      [style]="{width: '60vw'}"
+      [draggable]="false" 
+      [resizable]="false"
+      [closable]="false"
+      [dismissableMask]="false"
+      (onHide)="closeShiftAssignmentDialog()"
+      [closeOnEscape]="true"
+    >
+      <!-- Custom Close Button -->
+      <ng-template pTemplate="header">
+        <div class="flex justify-between items-center w-full">
+          <span class="text-lg font-semibold">{{ isEditShiftAssignment ? 'Edit Shift Assignment' : 'Add Shift Assignment' }}</span>
+          <button 
+            type="button"
+            (click)="closeShiftAssignmentDialog($event)"
+            class="close-button"
+            title="Close">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+      </ng-template>
+      
+      <form [formGroup]="shiftAssignmentForm" (ngSubmit)="onShiftAssignmentSubmit($event)">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          
+          <!-- Type Selection -->
+          <div class="field md:col-span-2">
+            <label class="block text-sm font-medium mb-2 text-gray-700">
+              Type <span class="text-red-500">*</span>
+            </label>
+            <div class="flex gap-4">
+              <div class="flex items-center">
+                <input 
+                  type="radio"
+                  id="temporary"
+                  name="priority"
+                  [value]="0"
+                  formControlName="priority"
+                  class="mr-2 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300">
+                <label for="temporary" class="text-sm text-gray-700">Temporary</label>
+              </div>
+              <div class="flex items-center">
+                <input 
+                  type="radio"
+                  id="permanent"
+                  name="priority"
+                  [value]="1"
+                  formControlName="priority"
+                  class="mr-2 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300">
+                <label for="permanent" class="text-sm text-gray-700">Permanent</label>
+              </div>
+            </div>
+            <small class="text-red-500" *ngIf="shiftAssignmentForm.get('priority')?.invalid && shiftAssignmentForm.get('priority')?.touched">
+              Type is required
+            </small>
+          </div>
+
+          <!-- Day Selection - Only for Temporary -->
+          <div class="field md:col-span-2" *ngIf="shiftAssignmentForm.get('priority')?.value === 0">
+            <label class="block text-sm font-medium mb-2 text-gray-700">Days</label>
+            <div class="grid grid-cols-7 gap-2">
+              <div *ngFor="let day of weekdays" class="flex items-center">
+                <input 
+                  type="checkbox"
+                  [id]="day.value"
+                  [value]="day.value"
+                  (change)="onDayChange($event)"
+                  [checked]="selectedDays.includes(day.value)"
+                  class="mr-2 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                <label [for]="day.value" class="text-sm text-gray-700">{{ day.label }}</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- From Date -->
+          <div class="field">
+            <label for="startDateTime" class="block text-sm font-medium mb-2 text-gray-700">
+              From date <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input 
+                id="startDateTime"
+                type="date"
+                formControlName="startDateTime"
+                class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                [class.ng-invalid]="shiftAssignmentForm.get('startDateTime')?.invalid && shiftAssignmentForm.get('startDateTime')?.touched">
+            </div>
+            <small class="text-red-500" *ngIf="shiftAssignmentForm.get('startDateTime')?.invalid && shiftAssignmentForm.get('startDateTime')?.touched">
+              From date is required
+            </small>
+          </div>
+
+          <!-- To Date - Only for Temporary -->
+          <div class="field" *ngIf="shiftAssignmentForm.get('priority')?.value === 0">
+            <label for="endDateTime" class="block text-sm font-medium mb-2 text-gray-700">
+              To date <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input 
+                id="endDateTime"
+                type="date"
+                formControlName="endDateTime"
+                class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                [class.ng-invalid]="shiftAssignmentForm.get('endDateTime')?.invalid && shiftAssignmentForm.get('endDateTime')?.touched">
+            </div>
+            <small class="text-red-500" *ngIf="shiftAssignmentForm.get('endDateTime')?.invalid && shiftAssignmentForm.get('endDateTime')?.touched">
+              To date is required
+            </small>
+          </div>
+
+          <!-- Shift Selection -->
+          <div class="field">
+            <label for="shiftId" class="block text-sm font-medium mb-2 text-gray-700">
+              Shift <span class="text-red-500">*</span>
+            </label>
+            <p-select 
+              id="shiftId"
+              formControlName="shiftId"
+              placeholder="Select shift"
+              [options]="shifts"
+              optionLabel="name"
+              optionValue="id"
+              class="w-full"
+              [class.ng-invalid]="shiftAssignmentForm.get('shiftId')?.invalid && shiftAssignmentForm.get('shiftId')?.touched">
+            </p-select>
+            <small class="text-red-500" *ngIf="shiftAssignmentForm.get('shiftId')?.invalid && shiftAssignmentForm.get('shiftId')?.touched">
+              Shift is required
+            </small>
+          </div>
+
+          <!-- Attachment -->
+          <div class="field">
+            <label class="block text-sm font-medium mb-2 text-gray-700">Attachment</label>
+            <div class="flex items-center gap-2">
+              <input 
+                type="file"
+                #fileInput
+                (change)="onFileSelect($event)"
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                class="hidden">
+              <button 
+                type="button"
+                pButton 
+                label="Choose File" 
+                class="p-button-outlined p-button-sm"
+                (click)="fileInput.click()">
+              </button>
+              <span class="text-sm text-gray-500">{{ selectedFileName || 'No file chosen' }}</span>
+            </div>
+          </div>
+
+          <!-- Additional Options - Only for Temporary -->
+          <div class="field md:col-span-2" *ngIf="shiftAssignmentForm.get('priority')?.value === 0">
+            <div class="flex items-center gap-6">
+              <div class="flex items-center">
+                <input 
+                  type="checkbox"
+                  id="isOtShift"
+                  formControlName="isOtShift"
+                  class="mr-3 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                <label for="isOtShift" class="text-sm text-gray-700">Overtime Shift</label>
+              </div>
+
+              <div class="flex items-center">
+                <input 
+                  type="checkbox"
+                  id="isOverwriteHolidays"
+                  formControlName="isOverwriteHolidays"
+                  class="mr-3 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                <label for="isOverwriteHolidays" class="text-sm text-gray-700">Overwrite holidays</label>
+              </div>
+
+              <div class="flex items-center">
+                <input 
+                  type="checkbox"
+                  id="isPunchNotRequired"
+                  formControlName="isPunchNotRequired"
+                  class="mr-3 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                <label for="isPunchNotRequired" class="text-sm text-gray-700">Punch not required</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+          <button 
+            pButton 
+            label="Cancel" 
+            class="p-button-secondary" 
+            type="button"
+            (click)="closeShiftAssignmentDialog($event)">
+          </button>
+          <button 
+            pButton 
+            label="{{ isEditShiftAssignment ? 'Update' : 'Add' }}" 
+            class="p-button-danger" 
+            [loading]="loadingShiftAssignment"
+            type="submit">
+          </button>
+        </div>
+      </form>
+    </p-dialog>
+
+    <!-- Confirmation Dialog -->
+    <p-confirmDialog></p-confirmDialog>
+
+    <!-- Custom Delete Confirmation Dialog -->
+    <p-dialog 
+      [(visible)]="deleteConfirmationVisible" 
+      [modal]="true" 
+      [style]="{width: '400px'}"
+      [draggable]="false" 
+      [resizable]="false"
+      [closable]="false"
+      [dismissableMask]="false"
+    >
+      <!-- Custom Close Button for Delete Dialog -->
+      <ng-template pTemplate="header">
+        <div class="flex justify-between items-center w-full">
+          <span class="text-lg font-semibold">Confirm Deletion</span>
+          <button 
+            type="button"
+            (click)="cancelDelete($event)"
+            class="close-button"
+            title="Close">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+      </ng-template>
+      <div class="flex items-center gap-3 mb-4">
+        <i class="pi pi-exclamation-triangle text-orange-500 text-2xl"></i>
+        <span>Are you sure you want to delete this shift assignment?</span>
+      </div>
+      
+      <div class="flex justify-end gap-3">
+        <button 
+          pButton 
+          label="No" 
+          class="p-button-secondary" 
+          type="button"
+          (click)="cancelDelete()">
+        </button>
+        <button 
+          pButton 
+          label="Yes" 
+          class="p-button-danger" 
+          type="button"
+          (click)="confirmDelete()">
+        </button>
+      </div>
+    </p-dialog>
 
     <!-- Policies Tab -->
     <div *ngIf="activeTabIndex === 6" class="tab-content">
@@ -589,13 +917,35 @@
     </div>
 
     <!-- Form Actions -->
-    <div class="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
-      <button 
-        pButton 
-        [label]="'employees.formPage.buttons.cancel' | translate" 
-        class="p-button-secondary" 
-        (click)="onBack()">
-      </button>
+    <div class="flex justify-between gap-3 mt-8 pt-6 border-t border-gray-200">
+      <div class="flex gap-3">
+        <button 
+          pButton 
+          [label]="'employees.formPage.buttons.cancel' | translate" 
+          class="p-button-secondary" 
+          type="button"
+          (click)="onBack($event)">
+        </button>
+        <button 
+          pButton 
+          [label]="'employees.formPage.buttons.previous' | translate" 
+          icon="pi pi-arrow-left"
+          class="p-button-outlined" 
+          type="button"
+          [disabled]="activeTabIndex === 0"
+          (click)="onPreviousTab($event)">
+        </button>
+        <button 
+          pButton 
+          [label]="'employees.formPage.buttons.next' | translate" 
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          class="p-button-outlined" 
+          type="button"
+          [disabled]="activeTabIndex === 6"
+          (click)="onNextTab($event)">
+        </button>
+      </div>
       <button 
         pButton 
         [label]="(isEditMode ? 'employees.formPage.buttons.update' : 'employees.formPage.buttons.create') | translate"

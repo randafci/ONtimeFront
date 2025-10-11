@@ -6,8 +6,13 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';
 import { SelectModule } from 'primeng/select';
+import { TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
 
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { Employee, CreateEmployee, EditEmployee } from '../../../interfaces/employee.interface';
 import { EmployeeService } from '../EmployeeService';
@@ -18,6 +23,8 @@ import { TabPersistenceService } from '../../../core/services/tab-persistence.se
 import { TAB_CONFIGS } from '../../../core/constants/tab-configs';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { EmployeeShiftAssignment } from '../../../interfaces/employee-shift-assignment.interface';
+import { EmployeeShiftAssignmentService } from '../EmployeeShiftAssignmentService';
 
 @Component({
   selector: 'app-add-or-edit-employee',
@@ -31,10 +38,15 @@ import { takeUntil } from 'rxjs/operators';
     CardModule,
     ToastModule,
     SelectModule,
+    TableModule,
+    TagModule,
+    TooltipModule,
+    ConfirmDialogModule,
+    DialogModule,
     RouterModule,
     TranslatePipe
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './add-or-edit-employee.html',
   styleUrl: './add-or-edit-employee.scss'
 })
@@ -53,16 +65,49 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
   private translations: any = {};
   private destroy$ = new Subject<void>();
 
+  // Shift assignments
+  shiftAssignments: EmployeeShiftAssignment[] = [];
+  loadingShiftAssignments: boolean = false;
+  
+  // Shift assignment modal
+  shiftAssignmentDialogVisible: boolean = false;
+  isEditShiftAssignment: boolean = false;
+  shiftAssignmentForm: FormGroup;
+  loadingShiftAssignment: boolean = false;
+  
+  // Delete confirmation
+  deleteConfirmationVisible: boolean = false;
+  assignmentToDelete: EmployeeShiftAssignment | null = null;
+  
+  // Shift assignment form data
+  shifts: any[] = [];
+  selectedDays: string[] = [];
+  selectedFileName: string = '';
+  selectedFile: File | null = null;
+  
+  weekdays = [
+    { label: 'Sun', value: '0' },
+    { label: 'Mon', value: '1' },
+    { label: 'Tue', value: '2' },
+    { label: 'Wed', value: '3' },
+    { label: 'Thu', value: '4' },
+    { label: 'Fri', value: '5' },
+    { label: 'Sat', value: '6' }
+  ];
+
   constructor(
     private fb: FormBuilder,
     private employeeService: EmployeeService,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
     private router: Router,
     private route: ActivatedRoute,
     private translationService: TranslationService,
-    private tabPersistenceService: TabPersistenceService
+    private tabPersistenceService: TabPersistenceService,
+    private employeeShiftAssignmentService: EmployeeShiftAssignmentService
   ) {
     this.employeeForm = this.createForm();
+    this.shiftAssignmentForm = this.createShiftAssignmentForm();
   }
 
   ngOnInit() {
@@ -85,11 +130,33 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
 
     if (this.isEditMode && this.employeeId) {
       this.loadEmployee(this.employeeId);
+      this.loadShiftAssignments();
+      this.loadShifts();
     }
   }
 
   onTabChange(tabIndex: number): void {
     this.tabPersistenceService.changeTab(tabIndex, this.route, TAB_CONFIGS.EMPLOYEE_FORM);
+  }
+
+  onNextTab(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    if (this.activeTabIndex < 6) {
+      this.onTabChange(this.activeTabIndex + 1);
+    }
+  }
+
+  onPreviousTab(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    if (this.activeTabIndex > 0) {
+      this.onTabChange(this.activeTabIndex - 1);
+    }
   }
 
   ngOnDestroy(): void {
@@ -180,6 +247,21 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
       displayInReport: [true],
       displayInReportsDashboard: [true],
       imageUrl: ['']
+    });
+  }
+
+  createShiftAssignmentForm(): FormGroup {
+    return this.fb.group({
+      id: [null],
+      employeeId: [this.employeeId],
+      shiftId: [null, [Validators.required]],
+      priority: [null, [Validators.required]],
+      startDateTime: [null, [Validators.required]],
+      endDateTime: [null],
+      isOtShift: [false],
+      isOverwriteHolidays: [false],
+      isPunchNotRequired: [false],
+      attachment: [null]
     });
   }
 
@@ -400,7 +482,11 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
     });
   }
 
-  onBack() {
+  onBack(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     this.router.navigate(['/employees']);
   }
 
@@ -426,5 +512,311 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
     
     const employeeName = this.fullName || 'Employee';
     this.router.navigate(['/employees/shift-assignments', this.employeeId, employeeName]);
+  }
+
+  // Shift Assignment Methods
+  loadShiftAssignments() {
+    if (!this.isEditMode || !this.employeeId) return;
+    
+    this.loadingShiftAssignments = true;
+    this.employeeShiftAssignmentService.getEmployeeShiftAssignmentsByEmployeeId(this.employeeId).subscribe({
+      next: (response: ApiResponse<EmployeeShiftAssignment[]>) => {
+        if (response.succeeded) {
+          this.shiftAssignments = response.data || [];
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: response.message || 'Failed to load shift assignments'
+          });
+        }
+        this.loadingShiftAssignments = false;
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load shift assignments'
+        });
+        this.loadingShiftAssignments = false;
+      }
+    });
+  }
+
+  loadShifts() {
+    this.employeeShiftAssignmentService.getAllShifts().subscribe({
+      next: (response: ApiResponse<any[]>) => {
+        if (response.succeeded) {
+          this.shifts = response.data || [];
+        }
+      },
+      error: (error) => {
+        console.error('Error loading shifts:', error);
+      }
+    });
+  }
+
+  openShiftAssignmentModal(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    if (!this.isEditMode || !this.employeeId) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please save the employee first before managing shift assignments'
+      });
+      return;
+    }
+    
+    this.isEditShiftAssignment = false;
+    this.shiftAssignmentForm.reset({
+      employeeId: this.employeeId,
+      priority: null,
+      isOtShift: false,
+      isOverwriteHolidays: false,
+      isPunchNotRequired: false
+    });
+    this.selectedDays = [];
+    this.selectedFileName = '';
+    this.selectedFile = null;
+    this.shiftAssignmentDialogVisible = true;
+  }
+
+  editShiftAssignment(assignment: EmployeeShiftAssignment, event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    if (!this.isEditMode || !this.employeeId) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please save the employee first before managing shift assignments'
+      });
+      return;
+    }
+    
+    this.isEditShiftAssignment = true;
+    this.shiftAssignmentForm.patchValue({
+      id: assignment.id,
+      employeeId: assignment.employeeId,
+      shiftId: assignment.shiftId,
+      priority: assignment.priority,
+      startDateTime: assignment.startDateTime ? assignment.startDateTime.split('T')[0] : null,
+      endDateTime: assignment.endDateTime ? assignment.endDateTime.split('T')[0] : null,
+      isOtShift: assignment.isOtShift || false,
+      isOverwriteHolidays: assignment.isOverwriteHolidays || false,
+      isPunchNotRequired: assignment.isPunchNotRequired || false
+    });
+    this.selectedDays = [];
+    this.selectedFileName = '';
+    this.shiftAssignmentDialogVisible = true;
+  }
+
+  closeShiftAssignmentDialog(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.shiftAssignmentDialogVisible = false;
+    this.isEditShiftAssignment = false;
+    this.shiftAssignmentForm.reset();
+    this.selectedDays = [];
+    this.selectedFileName = '';
+    this.selectedFile = null;
+  }
+
+  onShiftAssignmentSubmit(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (this.shiftAssignmentForm.invalid) {
+      this.markFormGroupTouched();
+      return;
+    }
+
+    this.loadingShiftAssignment = true;
+    const formData = this.shiftAssignmentForm.value;
+
+    const assignmentData = {
+      employeeId: this.employeeId!,
+      shiftId: formData.shiftId,
+      shiftName: this.shifts.find(s => s.id === formData.shiftId)?.name || '',
+      priority: formData.priority,
+      startDateTime: formData.startDateTime,
+      endDateTime: formData.endDateTime,
+      isCurrent: true,
+      weekdays: this.selectedDays.map(day => parseInt(day)),
+      isOtShift: formData.isOtShift || false,
+      isOverwriteHolidays: formData.isOverwriteHolidays || false,
+      isPunchNotRequired: formData.isPunchNotRequired || false,
+      attachment: this.selectedFile
+    };
+
+    if (this.isEditShiftAssignment) {
+      this.employeeShiftAssignmentService.updateEmployeeShiftAssignment(formData.id, assignmentData).subscribe({
+        next: (response: ApiResponse<EmployeeShiftAssignment>) => {
+          if (response.succeeded) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Shift assignment updated successfully'
+            });
+            this.closeShiftAssignmentDialog();
+            this.loadShiftAssignments();
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: response.message || 'Failed to update shift assignment'
+            });
+          }
+          this.loadingShiftAssignment = false;
+        },
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to update shift assignment'
+          });
+          this.loadingShiftAssignment = false;
+        }
+      });
+    } else {
+      this.employeeShiftAssignmentService.createEmployeeShiftAssignment(assignmentData).subscribe({
+        next: (response: ApiResponse<EmployeeShiftAssignment>) => {
+          if (response.succeeded) {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Shift assignment created successfully'
+            });
+            this.closeShiftAssignmentDialog();
+            this.loadShiftAssignments();
+          } else {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: response.message || 'Failed to create shift assignment'
+            });
+          }
+          this.loadingShiftAssignment = false;
+        },
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to create shift assignment'
+          });
+          this.loadingShiftAssignment = false;
+        }
+      });
+    }
+  }
+
+  onDayChange(event: any) {
+    const dayValue = event.target.value;
+    if (event.target.checked) {
+      if (!this.selectedDays.includes(dayValue)) {
+        this.selectedDays.push(dayValue);
+      }
+    } else {
+      this.selectedDays = this.selectedDays.filter(day => day !== dayValue);
+    }
+  }
+
+  onFileSelect(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      this.selectedFileName = file.name;
+    }
+  }
+
+
+  deleteShiftAssignment(assignment: EmployeeShiftAssignment, event?: Event) {
+    console.log('Delete button clicked for assignment:', assignment);
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    if (!assignment || !assignment.id) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Invalid shift assignment selected for deletion'
+      });
+      return;
+    }
+    
+    this.assignmentToDelete = assignment;
+    this.deleteConfirmationVisible = true;
+  }
+
+  cancelDelete(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.deleteConfirmationVisible = false;
+    this.assignmentToDelete = null;
+  }
+
+  confirmDelete() {
+    if (!this.assignmentToDelete) {
+      return;
+    }
+    
+    console.log('User confirmed deletion, calling API...');
+    this.employeeShiftAssignmentService.deleteEmployeeShiftAssignment(this.assignmentToDelete.id).subscribe({
+      next: (response: ApiResponse<boolean>) => {
+        if (response.succeeded) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Shift assignment deleted successfully'
+          });
+          this.loadShiftAssignments();
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: response.message || 'Failed to delete shift assignment'
+          });
+        }
+        this.deleteConfirmationVisible = false;
+        this.assignmentToDelete = null;
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to delete shift assignment'
+        });
+        this.deleteConfirmationVisible = false;
+        this.assignmentToDelete = null;
+      }
+    });
+  }
+
+  getPriorityLabel(priority: string | number): string {
+    return priority === 1 || priority === '1' ? 'Permanent' : 'Temporary';
+  }
+
+  getPrioritySeverity(priority: string | number): string {
+    return priority === 1 || priority === '1' ? 'success' : 'info';
+  }
+
+  getStatusLabel(isCurrent: boolean): string {
+    return isCurrent ? 'Current' : 'Previous';
+  }
+
+  getSeverity(isCurrent: boolean): string {
+    return isCurrent ? 'success' : 'info';
   }
 }
