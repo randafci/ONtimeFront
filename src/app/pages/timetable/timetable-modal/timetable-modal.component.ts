@@ -15,6 +15,7 @@ import { AuthService } from '../../../auth/auth.service';
 import { LookupService } from '../../organization/OrganizationService';
 import { Organization } from '../../../interfaces/organization.interface';
 import { Toast } from "primeng/toast";
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 
 @Component({
   selector: 'app-timetable-modal',
@@ -28,7 +29,8 @@ import { Toast } from "primeng/toast";
     ButtonModule,
     CheckboxModule,
     InputNumberModule,
-    Toast
+    Toast,
+    TranslatePipe
   ],
   providers: [MessageService],
   templateUrl: './timetable-modal.component.html',
@@ -193,13 +195,17 @@ export class TimeTableModalComponent implements  OnChanges {
     });
   }
 
-  onShiftTypeChange() {
+  onShiftTypeChange(changedField?: 'night' | 'preNight') {
     const isNightShift = this.timeTableForm.get('isNightShift')?.value;
     const isPreNightShift = this.timeTableForm.get('isPreNightShift')?.value;
     
-    // Pre-night shift can only be enabled for night shifts
-    if (!isNightShift && isPreNightShift) {
-      this.timeTableForm.patchValue({ isPreNightShift: false });
+    
+    if (changedField === 'night' && isNightShift && isPreNightShift) {
+     
+      this.timeTableForm.patchValue({ isPreNightShift: false }, { emitEvent: false });
+    } else if (changedField === 'preNight' && isPreNightShift && isNightShift) {
+     
+      this.timeTableForm.patchValue({ isNightShift: false }, { emitEvent: false });
     }
 
     // Revalidate the form when shift type changes
@@ -210,20 +216,28 @@ export class TimeTableModalComponent implements  OnChanges {
     const startTime = formGroup.get('startTime')?.value;
     const endTime = formGroup.get('endTime')?.value;
     const isNightShift = formGroup.get('isNightShift')?.value;
+    const isPreNightShift = formGroup.get('isPreNightShift')?.value;
 
     if (!startTime || !endTime) {
-      return null; // Let required validators handle empty values
+      return null; 
     }
 
     const startTimeMinutes = this.timeToMinutes(startTime);
     const endTimeMinutes = this.timeToMinutes(endTime);
 
     if (isNightShift) {
-      // Night shift: end time must be earlier than start time (spans midnight)
       if (endTimeMinutes >= startTimeMinutes) {
         return { 
           nightShiftTimeError: {
             message: 'Night shift end time must be earlier than start time (shift spans midnight).'
+          }
+        };
+      }
+    } else if (isPreNightShift) {
+      if (endTimeMinutes <= startTimeMinutes) {
+        return { 
+          preNightShiftTimeError: {
+            message: 'Pre-Night shift end time must be later than start time.'
           }
         };
       }
@@ -251,6 +265,9 @@ export class TimeTableModalComponent implements  OnChanges {
     if (errors?.['nightShiftTimeError']) {
       return errors['nightShiftTimeError'].message;
     }
+    if (errors?.['preNightShiftTimeError']) {
+      return errors['preNightShiftTimeError'].message;
+    }
     if (errors?.['regularShiftTimeError']) {
       return errors['regularShiftTimeError'].message;
     }
@@ -261,6 +278,7 @@ export class TimeTableModalComponent implements  OnChanges {
     const startTime = this.timeTableForm.get('startTime')?.value;
     const endTime = this.timeTableForm.get('endTime')?.value;
     const isNightShift = this.timeTableForm.get('isNightShift')?.value;
+    const isPreNightShift = this.timeTableForm.get('isPreNightShift')?.value;
 
     if (!startTime || !endTime || this.getTimeValidationError()) {
       return null;
@@ -274,6 +292,9 @@ export class TimeTableModalComponent implements  OnChanges {
     if (isNightShift) {
       // Night shift spans midnight: (24:00 - start) + end
       totalMinutes = (24 * 60 - startMinutes) + endMinutes;
+    } else if (isPreNightShift) {
+      // Pre-night shift: normal time calculation (end - start)
+      totalMinutes = endMinutes - startMinutes;
     } else {
       // Regular shift: end - start
       totalMinutes = endMinutes - startMinutes;
@@ -509,7 +530,7 @@ export class TimeTableModalComponent implements  OnChanges {
       isActive: Boolean(formValue.isActive),
       isWeekend: Boolean(formValue.isWeekend),
       isNightShift: Boolean(formValue.isNightShift),
-      isPreNightShift: Boolean(formValue.isPreNightShift && formValue.isNightShift),
+      isPreNightShift: Boolean(formValue.isPreNightShift),
       isOpenShift: Boolean(formValue.isOpenShift),
       isTrainingCourse: Boolean(formValue.isTrainingCourse),
       isCheckInOutRangeEnabled: Boolean(formValue.isCheckInOutRangeEnabled),

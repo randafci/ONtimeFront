@@ -1,10 +1,10 @@
 <div class="card">
   <div class="flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0">Time Tables</h2>
+    <h2 class="mb-0">{{ 'timetable.listPage.title' | translate }}</h2>
     <div class="flex-grow-1"></div>
     <button 
       pButton 
-      label="Add Time Table"
+      [label]="'timetable.listPage.addButton' | translate"
       icon="pi pi-plus" 
       class="p-button-sm"
       (click)="openCreateDialog()"
@@ -27,7 +27,7 @@
       <div class="flex justify-between items-center flex-column sm:flex-row">
         <button 
           pButton 
-          label="Clear"
+          [label]="'timetable.listPage.clearButton' | translate"
           class="p-button-outlined mb-2" 
           icon="pi pi-filter-slash" 
           (click)="clear(dt)"
@@ -41,7 +41,7 @@
             type="text" 
             #filter
             (input)="onGlobalFilter(dt, $event)" 
-            placeholder="Search timetables..."
+            [placeholder]="'timetable.listPage.searchPlaceholder' | translate"
           />
         </p-iconfield>
       </div>
@@ -51,44 +51,44 @@
       <tr>
         <th style="min-width: 150px">
           <div class="flex align-items-center">
-            Name
+            {{ 'timetable.listPage.headers.name' | translate }}
             <p-columnFilter type="text" field="nameEn" display="menu"></p-columnFilter>
           </div>
         </th>
         <th style="min-width: 120px">
           <div class="flex align-items-center">
-            Organization
+            {{ 'timetable.listPage.headers.organization' | translate }}
             <p-columnFilter type="text" field="organizationName" display="menu"></p-columnFilter>
           </div>
         </th>
         <th style="min-width: 100px">
           <div class="flex align-items-center">
-            Shift Time
+            {{ 'timetable.listPage.headers.shiftTime' | translate }}
           </div>
         </th>
         <th style="min-width: 100px">
           <div class="flex align-items-center">
-            Duration
+            {{ 'timetable.listPage.headers.duration' | translate }}
           </div>
         </th>
         <th style="min-width: 120px">
           <div class="flex align-items-center">
-            Shift Type
+            {{ 'timetable.listPage.headers.shiftType' | translate }}
           </div>
         </th>
         <th style="min-width: 100px">
           <div class="flex align-items-center">
-            Status
+            {{ 'timetable.listPage.headers.status' | translate }}
             <p-columnFilter type="boolean" field="isActive" display="menu"></p-columnFilter>
           </div>
         </th>
         <th style="min-width: 100px">
           <div class="flex align-items-center">
-            Flexible Range
+            {{ 'timetable.listPage.headers.flexibleRange' | translate }}
           </div>
         </th>
         <th style="min-width: 120px">
-          Actions
+          {{ 'timetable.listPage.headers.actions' | translate }}
         </th>
       </tr>
     </ng-template>
@@ -112,7 +112,7 @@
             </div>
             <div *ngIf="timeTable.isNightShift" class="text-muted text-xs">
               <i class="pi pi-moon mr-1"></i>
-              Night shift spans day
+              {{ 'timetable.listPage.nightShiftNote' | translate }}
             </div>
           </div>
         </td>
@@ -130,7 +130,7 @@
         </td>
         <td>
           <p-tag 
-            [value]="timeTable.isActive ? 'Active' : 'Inactive'" 
+            [value]="(timeTable.isActive ? 'timetable.listPage.status.active' : 'timetable.listPage.status.inactive') | translate" 
             [severity]="timeTable.isActive ? 'success' : 'danger'"
           ></p-tag>
         </td>
@@ -147,14 +147,14 @@
           </div>
           <div *ngIf="!timeTable.isCheckInOutRangeEnabled" class="text-muted">
             <i class="pi pi-minus"></i>
-            Fixed Time
+            {{ 'timetable.listPage.fixedTime' | translate }}
           </div>
         </td>
         <td>
           <div class="action-buttons">
             <button 
               pButton 
-              pTooltip="Edit"
+              [pTooltip]="'timetable.listPage.tooltips.edit' | translate"
               tooltipPosition="top"
               icon="pi pi-pencil" 
               class="p-button-rounded p-button-text p-button-info p-button-sm mr-2"
@@ -162,7 +162,7 @@
             ></button>
              <button 
               pButton 
-              pTooltip="Edit Time Shift"
+              [pTooltip]="'timetable.listPage.tooltips.editTimeShift' | translate"
               tooltipPosition="top"
               icon="pi pi-pencil" 
               class="p-button-rounded p-button-text p-button-info p-button-sm mr-2"
@@ -170,7 +170,7 @@
             ></button>
             <button 
               pButton 
-              pTooltip="Delete"
+              [pTooltip]="'timetable.listPage.tooltips.delete' | translate"
               tooltipPosition="top"
               icon="pi pi-trash" 
               class="p-button-rounded p-button-text p-button-danger p-button-sm"
@@ -185,8 +185,8 @@
       <tr>
         <td colspan="8" class="text-center py-6">
           <i class="pi pi-calendar text-muted text-4xl mb-3 block"></i>
-          <div class="text-muted font-medium">No timetables found</div>
-          <div class="text-sm text-muted mt-2">Create your first timetable to get started</div>
+          <div class="text-muted font-medium">{{ 'timetable.listPage.emptyMessage' | translate }}</div>
+          <div class="text-sm text-muted mt-2">{{ 'timetable.listPage.emptyHint' | translate }}</div>
         </td>
       </tr>
     </ng-template>

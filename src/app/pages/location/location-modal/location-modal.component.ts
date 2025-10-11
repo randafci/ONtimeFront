@@ -111,7 +111,11 @@ import { MapPickerComponent } from './map-picker/map-picker.component';
               type="text"
               pInputText
               class="w-full"
-              formControlName="fence"/>
+              formControlName="fence"
+              [class.ng-invalid]="locationForm.get('fence')?.invalid && locationForm.get('fence')?.touched"/>
+            <small class="text-red-500" *ngIf="locationForm.get('fence')?.invalid && locationForm.get('fence')?.touched">
+              Please enter a valid number (e.g., 100 or 100.5)
+            </small>
           </div>
 
           <!-- Parent Location Field -->
@@ -224,7 +228,7 @@ export class LocationModalComponent implements OnInit, OnChanges {
       indexValue: [0, [Validators.required, Validators.min(0)]],
       long: [null, [Validators.pattern(/^[-+]?[0-9]*\.?[0-9]+$/)]],
       lat: [null, [Validators.pattern(/^[-+]?[0-9]*\.?[0-9]+$/)]],
-      fence: [null],
+      fence: [null, [Validators.pattern(/^[0-9]*\.?[0-9]+$/)]],
       parentId: [null],
       organizationId: [null, Validators.required]
     });

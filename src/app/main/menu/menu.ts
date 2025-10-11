@@ -79,7 +79,7 @@ export class MenuComponent implements OnInit {
                         label: this.t('menu.users.groupLabel'),
                         items: [
                             { label: this.t('menu.users.user'), icon: 'pi pi-fw pi-sitemap', routerLink: ['/users/list'] },
-                            { label: this.t('menu.users.role'), icon: 'pi pi-fw pi-key', routerLink: ['/roles'] },
+                            { label: this.t('menu.users.role'), icon: 'pi pi-fw pi-key', routerLink: ['/roles/list'] },
                         ]
                     },
                     {
@@ -110,9 +110,9 @@ export class MenuComponent implements OnInit {
                         label: this.t('menu.attendance.groupLabel'),
                         items: [
                             { label: this.t('menu.organization.shift'), icon: 'pi pi-fw pi-clock', routerLink: ['/shifts/list'] },
-                            { label: 'Time Tables', icon: 'pi pi-fw pi-clock', routerLink: ['/timetables'] },
+                            { label: this.t('menu.timetable.timetable'), icon: 'pi pi-fw pi-clock', routerLink: ['/timetables'] },
                             //{ label: 'Time Shifts', icon: 'pi pi-fw pi-clock', routerLink: ['/time-shifts/list'] },
-                            { label: 'Regularization', icon: 'pi pi-fw pi-clock', routerLink: ['/attendance'] }
+                            { label: this.t('menu.attendance.regularization'), icon: 'pi pi-fw pi-clock', routerLink: ['/attendance'] }
                         ]
                     }
                     ,

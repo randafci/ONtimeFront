@@ -28,6 +28,8 @@ import { LookupService } from '../../organization/OrganizationService';
 import { AuthService } from '../../../auth/auth.service';
 import { TimeTableModalComponent } from '../timetable-modal/timetable-modal.component';
 import { AddOrEditTimeShift } from '../time-shift-modal/add-or-edit-time-shift';
+import { TranslatePipe } from '../../../core/pipes/translate.pipe';
+import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 
 @Component({
   selector: 'app-timetable-list',
@@ -51,7 +53,8 @@ import { AddOrEditTimeShift } from '../time-shift-modal/add-or-edit-time-shift';
     ConfirmDialogModule,
     TooltipModule,
     TimeTableModalComponent,
-    AddOrEditTimeShift
+    AddOrEditTimeShift,
+    TranslatePipe
   ],
   providers: [MessageService, ConfirmationService, DatePipe],
   templateUrl: './timetable-list.html',
@@ -60,6 +63,7 @@ import { AddOrEditTimeShift } from '../time-shift-modal/add-or-edit-time-shift';
 export class TimeTableListComponent implements OnInit {
   timeTables: TimeTable[] = [];
   loading = true;
+  private translations: any = {};
 
   dialogVisible = false;
   isEditMode = false;
@@ -83,10 +87,14 @@ export class TimeTableListComponent implements OnInit {
     private confirmationService: ConfirmationService,
     private router: Router,
     private authService: AuthService,
-    private organizationService: LookupService
+    private organizationService: LookupService,
+    private translationService: TranslationService
   ) {}
 
   ngOnInit(): void {
+    this.translationService.translations$.subscribe(trans => {
+      this.translations = trans;
+    });
     this.isSuperAdmin = this.checkIsSuperAdmin();
     this.loadTimeTables();
     this.loadOrganizations();
@@ -249,11 +257,15 @@ openTimeShiftDialog(timeTable: TimeTable): void {
   }
 
   getShiftTypeDisplay(timeTable: TimeTable): string {
-    if (timeTable.isNightShift) return 'Night Shift';
-    if (timeTable.isPreNightShift) return 'Pre-Night';
-    if (timeTable.isWeekend) return 'Weekend';
-    if (timeTable.isTrainingCourse) return 'Training';
-    return 'Regular';
+    if (timeTable.isNightShift) return this.getTranslation('timetable.listPage.shiftTypes.nightShift') || 'Night Shift';
+    if (timeTable.isPreNightShift) return this.getTranslation('timetable.listPage.shiftTypes.preNight') || 'Pre-Night';
+    if (timeTable.isWeekend) return this.getTranslation('timetable.listPage.shiftTypes.weekend') || 'Weekend';
+    if (timeTable.isTrainingCourse) return this.getTranslation('timetable.listPage.shiftTypes.training') || 'Training';
+    return this.getTranslation('timetable.listPage.shiftTypes.regular') || 'Regular';
+  }
+
+  private getTranslation(key: string): string {
+    return key.split('.').reduce((obj, k) => obj && obj[k], this.translations) || key;
   }
 
   getShiftTypeSeverity(timeTable: TimeTable): string {

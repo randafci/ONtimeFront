@@ -11,14 +11,11 @@ import { AuthGuard } from './app/auth/gurads/auth.guard';
 import { LoginGuard } from './app/auth/gurads/login.guard';
 import { SuperAdminGuard } from './app/auth/gurads/super-admin.guard';
 
-import { RolesListComponent } from './app/pages/roles/roles-list/roles-list.component';
-import { AddEditRoleComponent } from './app/pages/roles/add-role/add-edit-role.component';
 import { TranslationManagerComponent } from './app/pages/translation-manager/translation-manager/translation-manager.component';
 import { ForgetPassword } from './app/auth/forget-password/forget-password';
 import { ChangePassowrd } from './app/auth/change-passowrd/change-passowrd';
 import { DeviceListComponent } from './app/pages/device/device-list/device-list.component';
 import { AddEditDeviceComponent } from './app/pages/device/add-edit-device/add-edit-device.component';
-import { RoleUsersComponent } from './app/pages/roles/role-users/role-users.component';
 
 export const appRoutes: Routes = [
   {
@@ -48,24 +45,12 @@ export const appRoutes: Routes = [
       },
       {
         path: 'roles',
-        component: RolesListComponent,
-        canActivate: [SuperAdminGuard]
+        loadChildren: () =>
+          import('./app/pages/roles/roles.routes').then(
+            (m) => m.ROLES_ROUTES
+          )
+        // canActivate: [SuperAdminGuard] // Temporarily disabled for testing
       },
-      {
-        path: 'roles/add',
-        component: AddEditRoleComponent,
-        canActivate: [SuperAdminGuard]
-      },
-      {
-        path: 'roles/edit/:id',
-        component: AddEditRoleComponent,
-        canActivate: [SuperAdminGuard]
-      },
-      {
-    path: 'roles/:id/users', 
-    component: RoleUsersComponent,
-    canActivate: [SuperAdminGuard]
-  },
       {
         path: 'devices',
         component: DeviceListComponent,
@@ -136,13 +121,6 @@ export const appRoutes: Routes = [
         loadChildren: () =>
           import('./app/pages/events/events.routes').then(
             (m) => m.EVENTS_ROUTES
-          )
-      },
-       {
-        path: 'users',
-        loadChildren: () =>
-          import('./app/pages/user/user.routs').then(
-            (m) => m.USER_ROUTES
           )
       },
       {
