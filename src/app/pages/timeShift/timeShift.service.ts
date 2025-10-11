@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { ApiResponse } from '@/core/models/api-response.model';
 import { AuthService } from '@/auth/auth.service';
 import { AppConfigService } from '../service/app-config.service';
-import { TimeShift, CreateTimeShift, UpdateTimeShift } from '@/interfaces/time-shift.interface';
+import { TimeShift, CreateTimeShift, UpdateTimeShift, GroupedTimeShift } from '@/interfaces/time-shift.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -104,4 +104,13 @@ export class TimeShiftService {
       });
     });
   }
+
+  /** Get time shifts by timetable ID */
+getByTimeTableId(id: number): Observable<ApiResponse<GroupedTimeShift[]>> {
+  return this.http.get<ApiResponse<GroupedTimeShift[]>>(
+    `${this.apiUrl}/bytimetable/${id}`, 
+    this.headers
+  );
+}
+
 }

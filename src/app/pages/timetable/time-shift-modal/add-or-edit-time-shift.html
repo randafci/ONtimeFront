@@ -7,10 +7,88 @@
   [resizable]="false"
   (onHide)="closeDialog()">
 
+  <!-- Grouped Time Shifts Accordion -->
+  <div class="border rounded-xl shadow-sm mt-4">
+    <div class="p-4 bg-gray-50 font-semibold rounded-t-xl">
+      {{ 'Grouped Time Shifts' | translate }}
+    </div>
+
+    <div class="divide-y divide-gray-200">
+      <div *ngFor="let group of groupedTimeShifts; let i = index" class="border-b">
+        <button
+          type="button"
+          class="w-full flex justify-between items-center px-4 py-3 bg-gray-100 hover:bg-gray-200"
+          (click)="toggleAccordion(i)"
+        >
+          <span>
+            {{ getShiftName(group.shiftId) }} - {{ getTimeTableName(group.timeTableId) }}
+          </span>
+          <span class="text-gray-500">
+            {{ activeAccordionIndex === i ? '−' : '+' }}
+          </span>
+        </button>
+
+
+<div *ngIf="activeAccordionIndex === i" class="p-4 bg-white">
+
+  <table class="w-full border-collapse text-sm">
+    <thead>
+      <tr class="bg-gray-50">
+        <th class="p-2 text-left">Day</th>
+        <th class="p-2 text-left">Shift</th>
+        <th class="p-2 text-left">Time Table</th>
+        <th class="p-2 text-center">Selected</th>
+        <th class="p-2 text-center">Weekend</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let day of group?.daySelections || []" class="border-t">
+        <td class="p-2">{{ day?.dayName }}</td>
+        <td class="p-2">{{ getShiftName(group?.shiftId) }}</td>
+        <td class="p-2">{{ getTimeTableName(group?.timeTableId) }}</td>
+        <td class="p-2 text-center">
+          <input
+            type="checkbox"
+            [checked]="day?.isSelected"
+            (change)="toggleDaySelection(group, day?.dayNumber, $event)"
+          />
+        </td>
+        <td class="p-2 text-center">
+          <input
+            type="checkbox"
+            [checked]="day?.isWeekend"
+            (change)="onWeekendChange(day, $event)"
+            [disabled]="day?.isSelected"
+          />
+        </td>
+      <!--   <td class="p-2 text-center text-xs">
+          <div>Selected: {{ day?.isSelected ? 'Yes' : 'No' }}</div>
+          <div>Weekend: {{ day?.isWeekend ? 'Yes' : 'No' }}</div>
+        </td> -->
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="text-right mt-3">
+    <button
+      pButton
+      label="Update"
+      icon="pi pi-save"
+      class="p-button-sm p-button-success"
+      (click)="updateTimeShift(group?.timeTableId, group?.shiftId)"
+      [loading]="loading"
+    ></button>
+  </div>
+</div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Section -->
   <form [formGroup]="timeShiftForm" (ngSubmit)="onSubmit()">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-
-      <!-- Time Table Field - ONLY CHANGE p-select to p-dropdown -->
+      <!-- Time Table -->
       <div class="field">
         <label for="timeTableId" class="block text-sm font-medium mb-2">
           {{ 'timeShiftForm.labels.timeTable' | translate }} <span class="text-red-500">*</span>
@@ -24,15 +102,11 @@
           [placeholder]="'timeShiftForm.placeholders.selectTimeTable' | translate"
           class="w-full"
           appendTo="body"
-          [class.ng-invalid]="timeShiftForm.get('timeTableId')?.invalid && timeShiftForm.get('timeTableId')?.touched"
-          [loading]="loading" 
-        ></p-select>  
-        <small class="text-red-500" *ngIf="timeShiftForm.get('timeTableId')?.invalid && timeShiftForm.get('timeTableId')?.touched">
-          {{ 'timeShiftForm.validation.timeTableRequired' | translate }}
-        </small>
+          [loading]="loading">
+        </p-select>
       </div>
 
-      <!-- Shift Field - ONLY CHANGE p-select to p-dropdown -->
+      <!-- Shift -->
       <div class="field">
         <label for="shiftId" class="block text-sm font-medium mb-2">
           {{ 'timeShiftForm.labels.shift' | translate }} <span class="text-red-500">*</span>
@@ -46,16 +120,12 @@
           [placeholder]="'timeShiftForm.placeholders.selectShift' | translate"
           class="w-full"
           appendTo="body"
-          [class.ng-invalid]="timeShiftForm.get('shiftId')?.invalid && timeShiftForm.get('shiftId')?.touched"
-          [loading]="loading" 
-        ></p-select>  <!-- ← CLOSING TAG CHANGED -->
-        <small class="text-red-500" *ngIf="timeShiftForm.get('shiftId')?.invalid && timeShiftForm.get('shiftId')?.touched">
-          {{ 'timeShiftForm.validation.shiftRequired' | translate }}
-        </small>
+          [loading]="loading">
+        </p-select>
       </div>
     </div>
 
-    <!-- Days Table - ADD (onChange) EVENT -->
+    <!-- Days Table -->
     <div class="mt-6">
       <h4 class="mb-3 font-medium">{{ 'timeShiftForm.labels.days' | translate }}</h4>
       <div class="overflow-x-auto">
@@ -71,17 +141,10 @@
             <tr *ngFor="let day of daysFormArray.controls; let i = index" class="border-t" [formGroupName]="i">
               <td class="px-3 py-2">{{ getDayFormGroup(i).get('dayName')?.value }}</td>
               <td class="px-3 py-2 text-center">
-                <p-checkbox 
-                  formControlName="isSelected"
-                  [binary]="true"
-                  (onChange)="onDaySelectionChange(i)">  <!-- ← ADDED THIS LINE -->
-                </p-checkbox>
+                <p-checkbox formControlName="isSelected" [binary]="true" (onChange)="onDaySelectionChange(i)"></p-checkbox>
               </td>
               <td class="px-3 py-2 text-center">
-                <p-checkbox 
-                  formControlName="isWeekend"
-                  [binary]="true">
-                </p-checkbox>
+                <p-checkbox formControlName="isWeekend" [binary]="true"></p-checkbox>
               </td>
             </tr>
           </tbody>
@@ -89,7 +152,7 @@
       </div>
     </div>
 
-    <!-- Action Buttons - NO CHANGES NEEDED -->
+    <!-- Action Buttons -->
     <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
       <button 
         pButton 
