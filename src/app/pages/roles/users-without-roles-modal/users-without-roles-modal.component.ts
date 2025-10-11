@@ -13,7 +13,7 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { UserDto } from '../../../interfaces/user.interface';
 import { UserService } from '../../user/userService';
-import { RoleDto } from '../role.service';
+import { RoleDto, RoleService } from '../role.service';
 import { TranslatePipe } from '../../../core/pipes/translate.pipe';
 import { TranslationService } from '../../translation-manager/translation-manager/translation.service';
 import { ApiResponse } from '../../../core/models/api-response.model';
@@ -56,6 +56,7 @@ export class UsersWithoutRolesModalComponent implements OnInit, OnChanges {
 
   constructor(
     private userService: UserService,
+    private roleService: RoleService,
     private messageService: MessageService,
     private translationService: TranslationService
   ) {}
@@ -74,21 +75,37 @@ export class UsersWithoutRolesModalComponent implements OnInit, OnChanges {
 
   loadUsersWithoutRoles(): void {
     this.loadingUsers = true;
-    // For now, we'll get all users and filter those without roles
-    // You might want to create a specific API endpoint for this
-    this.userService.getAll().subscribe({
-      next: (response: ApiResponse<UserDto[]>) => {
-        if (response.succeeded) {
-          // Filter users without roles - this is a simplified approach
-          // You might want to create a specific API endpoint for users without roles
-          this.users = response.data || [];
-        } else {
-          this.showToast('error', this.translations.common?.error, response.message || 'Failed to load users');
-        }
-        this.loadingUsers = false;
+    
+    if (!this.selectedRole) {
+      this.loadingUsers = false;
+      return;
+    }
+
+    // Get users in this role first
+    this.roleService.getUsersInRole(this.selectedRole.id).subscribe({
+      next: (roleUsersResponse) => {
+        const usersInRole = roleUsersResponse.succeeded ? (roleUsersResponse.data || []) : [];
+        const userIdsInRole = new Set(usersInRole.map(u => u.id));
+
+        // Then get all users and filter out those who already have this role
+        this.userService.getAll().subscribe({
+          next: (response: ApiResponse<UserDto[]>) => {
+            if (response.succeeded) {
+              // Filter to show only users who DON'T have this role
+              this.users = (response.data || []).filter(user => !userIdsInRole.has(user.id));
+            } else {
+              this.showToast('error', this.translations.common?.error, response.message || 'Failed to load users');
+            }
+            this.loadingUsers = false;
+          },
+          error: () => {
+            this.showToast('error', this.translations.common?.error, 'Failed to load users');
+            this.loadingUsers = false;
+          }
+        });
       },
       error: () => {
-        this.showToast('error', this.translations.common?.error, 'Failed to load users');
+        this.showToast('error', this.translations.common?.error, 'Failed to load role users');
         this.loadingUsers = false;
       }
     });
