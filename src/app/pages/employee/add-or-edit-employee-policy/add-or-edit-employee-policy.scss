@@ -1,0 +1,25 @@
+:host ::ng-deep {
+    .field {
+        margin-bottom: 1.5rem;
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .p-error {
+            display: block;
+            margin-top: 0.25rem;
+        }
+    }
+
+    .p-datepicker,
+    .p-select {
+        width: 100%;
+    }
+
+    .p-inputtext {
+        width: 100%;
+    }
+}
+

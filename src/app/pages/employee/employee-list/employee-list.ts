@@ -150,6 +150,7 @@ employees: Employee[] = [];
     this.router.navigate(['/employees/employments', employee.id, employeeName]);
   }
 
+
   deleteEmployee(employee: Employee) {
     const trans = this.translations.employees?.listPage?.messages || {};
     const commonTrans = this.translations.common || {};
