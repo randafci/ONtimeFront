@@ -1,0 +1,25 @@
+:host ::ng-deep {
+    .p-datatable {
+        .p-datatable-header {
+            border: 1px solid var(--surface-d);
+            padding: 1rem;
+        }
+
+        .p-paginator {
+            border: 1px solid var(--surface-d);
+        }
+
+        .p-datatable-thead > tr > th {
+            background: var(--surface-b);
+        }
+
+        .p-datatable-tbody > tr > td {
+            cursor: auto;
+        }
+
+        .p-dropdown-label:not(.p-placeholder) {
+            text-transform: uppercase;
+        }
+    }
+}
+

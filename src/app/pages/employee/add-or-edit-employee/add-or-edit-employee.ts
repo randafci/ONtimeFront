@@ -25,6 +25,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { EmployeeShiftAssignment } from '../../../interfaces/employee-shift-assignment.interface';
 import { EmployeeShiftAssignmentService } from '../EmployeeShiftAssignmentService';
+import { EmployeePolicy, CreateEmployeePolicy, EditEmployeePolicy, PolicyType, GeneralPolicy } from '../../../interfaces/employee-policy.interface';
+import { EmployeePolicyService } from '../EmployeePolicyService';
+import { EmployeeEmploymentService } from '../EmployeeEmploymentService';
 
 @Component({
   selector: 'app-add-or-edit-employee',
@@ -95,6 +98,34 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
     { label: 'Sat', value: '6' }
   ];
 
+  // Employee Policy data
+  employeePolicies: EmployeePolicy[] = [];
+  loadingEmployeePolicies: boolean = false;
+  
+  // Policy form
+  policyForm: FormGroup;
+  
+  // Policy assignment modal
+  policyDialogVisible: boolean = false;
+  isEditPolicy: boolean = false;
+  loadingPolicy: boolean = false;
+  
+  // Policy delete confirmation
+  policyDeleteConfirmationVisible: boolean = false;
+  policyToDelete: EmployeePolicy | null = null;
+  
+  // Policy form data
+  employeeEmployments: any[] = [];
+  policyTypes: any[] = [];
+  generalPolicies: GeneralPolicy[] = [];
+  filteredPolicies: any[] = [];
+  selectedEmploymentId: number | null = null;
+  isEmploymentLocked: boolean = false;
+  
+  // Policy file upload
+  selectedPolicyFileName: string = '';
+  selectedPolicyFile: File | null = null;
+
   constructor(
     private fb: FormBuilder,
     private employeeService: EmployeeService,
@@ -104,10 +135,13 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private translationService: TranslationService,
     private tabPersistenceService: TabPersistenceService,
-    private employeeShiftAssignmentService: EmployeeShiftAssignmentService
+    private employeeShiftAssignmentService: EmployeeShiftAssignmentService,
+    private employeePolicyService: EmployeePolicyService,
+    private employeeEmploymentService: EmployeeEmploymentService
   ) {
     this.employeeForm = this.createForm();
     this.shiftAssignmentForm = this.createShiftAssignmentForm();
+    this.policyForm = this.createPolicyForm();
   }
 
   ngOnInit() {
@@ -132,6 +166,8 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
       this.loadEmployee(this.employeeId);
       this.loadShiftAssignments();
       this.loadShifts();
+      this.loadEmployeePolicies();
+      this.loadPolicyDropdownData();
     }
   }
 
@@ -207,6 +243,15 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
         value: key
       }));
     }
+
+    // Initialize policy types
+    this.initializePolicyTypes();
+  }
+
+  initializePolicyTypes() {
+    this.policyTypes = [
+      { label: 'General Policy', value: PolicyType.General }
+    ];
   }
 
   createForm(): FormGroup {
@@ -261,6 +306,18 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
       isOtShift: [false],
       isOverwriteHolidays: [false],
       isPunchNotRequired: [false],
+      attachment: [null]
+    });
+  }
+
+  createPolicyForm(): FormGroup {
+    return this.fb.group({
+      id: [null],
+      employeeEmploymentId: [null, Validators.required],
+      policyType: [PolicyType.General, Validators.required],
+      policyId: [null, Validators.required],
+      startDateTime: [new Date(), Validators.required],
+      endDateTime: [null, Validators.required],
       attachment: [null]
     });
   }
@@ -475,7 +532,7 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
     }
   }
 
-  markFormGroupTouched() {
+  markEmployeeFormGroupTouched() {
     Object.keys(this.employeeForm.controls).forEach(key => {
       const control = this.employeeForm.get(key);
       control?.markAsTouched();
@@ -635,7 +692,7 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     
     if (this.shiftAssignmentForm.invalid) {
-      this.markFormGroupTouched();
+      this.markEmployeeFormGroupTouched();
       return;
     }
 
@@ -737,6 +794,14 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
     }
   }
 
+  onPolicyFileSelect(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedPolicyFile = file;
+      this.selectedPolicyFileName = file.name;
+    }
+  }
+
 
   deleteShiftAssignment(assignment: EmployeeShiftAssignment, event?: Event) {
     console.log('Delete button clicked for assignment:', assignment);
@@ -818,5 +883,373 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
 
   getSeverity(isCurrent: boolean): string {
     return isCurrent ? 'success' : 'info';
+  }
+
+  // Employee Policy Methods
+  loadEmployeePolicies() {
+    if (!this.isEditMode || !this.employeeId) return;
+    
+    this.loadingEmployeePolicies = true;
+    this.employeePolicyService.getEmployeePoliciesByEmployeeId(this.employeeId).subscribe({
+      next: (response: ApiResponse<EmployeePolicy[]>) => {
+        if (response.succeeded) {
+          this.employeePolicies = response.data || [];
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: response.message || 'Failed to load employee policies'
+          });
+        }
+        this.loadingEmployeePolicies = false;
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load employee policies'
+        });
+        this.loadingEmployeePolicies = false;
+      }
+    });
+  }
+
+  loadPolicyDropdownData() {
+    // Load employee employments for the current employee and auto-select current employment
+    if (this.employeeId) {
+      this.employeeEmploymentService.getEmployeeEmploymentsByEmployeeId(this.employeeId).subscribe({
+        next: (response: ApiResponse<any[]>) => {
+          if (response.succeeded) {
+            const employments = response.data || [];
+            this.employeeEmployments = employments.map((e: any) => ({
+              label: `${e.employeeName || 'Employee'} - ${e.companyName || 'Company'}`,
+              value: e.id,
+              isCurrent: e.isCurrent === 1 || e.isCurrent === true
+            }));
+
+            const current = this.employeeEmployments.find((x: any) => x.isCurrent) || this.employeeEmployments[0];
+            if (current) {
+              this.selectedEmploymentId = current.value;
+              this.policyForm.patchValue({ employeeEmploymentId: current.value });
+              this.isEmploymentLocked = true;
+            }
+          }
+        },
+        error: (error: unknown) => {
+          console.error('Error loading employee employments:', error);
+        }
+      });
+    }
+
+    // Load general policies
+    this.employeePolicyService.getActiveGeneralPolicies().subscribe({
+      next: (response: ApiResponse<GeneralPolicy[]>) => {
+        if (response.succeeded) {
+          this.generalPolicies = response.data || [];
+          this.updateFilteredPolicies();
+        }
+      },
+      error: (error) => {
+        console.error('Error loading general policies:', error);
+      }
+    });
+
+  }
+
+  onPolicyTypeChange() {
+    this.policyForm.patchValue({ policyId: null });
+    this.updateFilteredPolicies();
+  }
+
+  updateFilteredPolicies() {
+    const policyType = this.policyForm.get('policyType')?.value;
+    
+    if (policyType === PolicyType.General) {
+      this.filteredPolicies = this.generalPolicies.map(policy => ({
+        label: policy.nameEn || policy.nameAr || 'N/A',
+        value: policy.id
+      }));
+    }
+  }
+
+  openPolicyModal(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    if (!this.isEditMode || !this.employeeId) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please save the employee first before managing policies'
+      });
+      return;
+    }
+    
+    this.isEditPolicy = false;
+    this.policyForm.reset({
+      policyType: PolicyType.General,
+      startDateTime: new Date()
+    });
+    this.selectedPolicyFileName = '';
+    this.selectedPolicyFile = null;
+    this.updateFilteredPolicies();
+    this.policyDialogVisible = true;
+
+    // Ensure employment is preselected if available
+    if (this.selectedEmploymentId) {
+      this.policyForm.patchValue({ employeeEmploymentId: this.selectedEmploymentId });
+    }
+  }
+
+  editPolicy(policy: EmployeePolicy, event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    if (!this.isEditMode || !this.employeeId) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please save the employee first before managing policies'
+      });
+      return;
+    }
+    
+    this.isEditPolicy = true;
+    this.policyForm.patchValue({
+      id: policy.id,
+      employeeEmploymentId: policy.employeeEmploymentId,
+      policyType: policy.policyType,
+      policyId: policy.policyId,
+      startDateTime: new Date(policy.startDateTime),
+      endDateTime: new Date(policy.endDateTime)
+    });
+    this.selectedPolicyFileName = '';
+    this.selectedPolicyFile = null;
+    this.updateFilteredPolicies();
+    this.policyDialogVisible = true;
+  }
+
+  closePolicyDialog(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.policyDialogVisible = false;
+    this.isEditPolicy = false;
+    this.policyForm.reset();
+    this.selectedPolicyFileName = '';
+    this.selectedPolicyFile = null;
+  }
+
+  onPolicySubmit(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (this.policyForm.invalid) {
+      this.markFormGroupTouched(this.policyForm);
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: 'Please fill all required fields'
+      });
+      return;
+    }
+
+    this.loadingPolicy = true;
+    const formData = this.policyForm.value;
+
+    if (this.isEditPolicy) {
+      const editData: EditEmployeePolicy = {
+        id: formData.id,
+        employeeEmploymentId: formData.employeeEmploymentId,
+        policyId: formData.policyId,
+        startDateTime: formData.startDateTime,
+        endDateTime: formData.endDateTime,
+        policyType: formData.policyType,
+        attachmentURL: this.selectedPolicyFile ? this.selectedPolicyFile.name : undefined
+      };
+      this.updatePolicy(editData);
+    } else {
+      const createData: CreateEmployeePolicy = {
+        employeeEmploymentId: formData.employeeEmploymentId,
+        policyId: formData.policyId,
+        startDateTime: formData.startDateTime,
+        endDateTime: formData.endDateTime,
+        policyType: formData.policyType,
+        attachmentURL: this.selectedPolicyFile ? this.selectedPolicyFile.name : undefined
+      };
+      this.createPolicy(createData);
+    }
+  }
+
+  createPolicy(data: CreateEmployeePolicy) {
+    this.employeePolicyService.createEmployeePolicy(data).subscribe({
+      next: (response: ApiResponse<EmployeePolicy>) => {
+        if (response.succeeded) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Employee policy created successfully'
+          });
+          this.closePolicyDialog();
+          this.loadEmployeePolicies();
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: response.message || 'Failed to create policy'
+          });
+        }
+        this.loadingPolicy = false;
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to create policy'
+        });
+        this.loadingPolicy = false;
+      }
+    });
+  }
+
+  updatePolicy(data: EditEmployeePolicy) {
+    this.employeePolicyService.updateEmployeePolicy(data.id, data).subscribe({
+      next: (response: ApiResponse<EmployeePolicy>) => {
+        if (response.succeeded) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Employee policy updated successfully'
+          });
+          this.closePolicyDialog();
+          this.loadEmployeePolicies();
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: response.message || 'Failed to update policy'
+          });
+        }
+        this.loadingPolicy = false;
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to update policy'
+        });
+        this.loadingPolicy = false;
+      }
+    });
+  }
+
+  deletePolicy(policy: EmployeePolicy, event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    if (!policy || !policy.id) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Invalid policy selected for deletion'
+      });
+      return;
+    }
+    
+    this.policyToDelete = policy;
+    this.policyDeleteConfirmationVisible = true;
+  }
+
+  cancelPolicyDelete(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.policyDeleteConfirmationVisible = false;
+    this.policyToDelete = null;
+  }
+
+  confirmPolicyDelete() {
+    if (!this.policyToDelete) {
+      return;
+    }
+    
+    this.employeePolicyService.deleteEmployeePolicy(this.policyToDelete.id).subscribe({
+      next: (response: ApiResponse<boolean>) => {
+        if (response.succeeded) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Employee policy deleted successfully'
+          });
+          this.loadEmployeePolicies();
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: response.message || 'Failed to delete policy'
+          });
+        }
+        this.policyDeleteConfirmationVisible = false;
+        this.policyToDelete = null;
+      },
+      error: () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to delete policy'
+        });
+        this.policyDeleteConfirmationVisible = false;
+        this.policyToDelete = null;
+      }
+    });
+  }
+
+  getPolicyTypeName(type: PolicyType): string {
+    return type === PolicyType.General ? 'General Policy' : 'Permission Policy';
+  }
+
+  getPolicyTypeSeverity(type: PolicyType): "success" | "info" | "warn" | "danger" | "secondary" | "contrast" {
+    return type === PolicyType.General ? 'info' : 'success';
+  }
+
+  isPolicyActive(policy: EmployeePolicy): boolean {
+    const now = new Date();
+    const startDate = new Date(policy.startDateTime);
+    const endDate = new Date(policy.endDateTime);
+    return now >= startDate && now <= endDate;
+  }
+
+  getPolicyStatusSeverity(policy: EmployeePolicy): "success" | "info" | "warn" | "danger" | "secondary" | "contrast" {
+    return this.isPolicyActive(policy) ? 'success' : 'secondary';
+  }
+
+  getPolicyStatusLabel(policy: EmployeePolicy): string {
+    return this.isPolicyActive(policy) ? 'Active' : 'Inactive';
+  }
+
+  markFormGroupTouched(formGroup: FormGroup) {
+    Object.values(formGroup.controls).forEach(control => {
+      control.markAsTouched();
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      }
+    });
+  }
+
+  getSelectedEmploymentLabel(): string {
+    if (!this.selectedEmploymentId || !this.employeeEmployments.length) {
+      return 'Loading employment...';
+    }
+    
+    const selected = this.employeeEmployments.find(emp => emp.value === this.selectedEmploymentId);
+    return selected ? selected.label : 'Current Employment';
   }
 }

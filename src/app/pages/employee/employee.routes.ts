@@ -24,5 +24,5 @@ export const EMPLOYEE_ROUTES: Routes = [
     {
         path: 'shift-assignments/:employeeId/:employeeName',
         component: EmployeeShiftAssignmentComponent
-    }
+    },
 ];
