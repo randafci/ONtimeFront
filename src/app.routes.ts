@@ -234,6 +234,13 @@ export const appRoutes: Routes = [
             (m) => m.SHIFT_ROUTES
           )
       },
+      {
+        path: 'workflow',
+        loadChildren: () =>
+          import('./app/pages/workflow/workflow.routes').then(
+            (m) => m.WORKFLOW_ROUTES
+          )
+      },
       { path: 'test', component: Layout },
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
       {
