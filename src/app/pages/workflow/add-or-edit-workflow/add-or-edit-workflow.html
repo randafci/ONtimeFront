@@ -1,0 +1,208 @@
+<div class="card p-fluid max-w-[900px] mx-auto">
+
+
+    <div class="flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">{{ (isEditMode ? 'workflow.formPage.title.edit' : 'workflow.formPage.title.add') | translate }}
+        </h2>
+        <button pButton type="button" [label]="'common.backButton' | translate" class="p-button-text"
+            (click)="onCancel()"></button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Workflow Name -->
+            <div class="field">
+                <label for="workflowName">
+                    {{ 'workflow.formPage.labels.workflowName' | translate }}
+                    <span class="required-star">*</span>
+                </label>
+                <input id="workflowName" type="text" pInputText class="w-full" formControlName="workflowName" [ngClass]="{
+            'field-error': form.controls['workflowName'].invalid &&
+                          (form.controls['workflowName'].touched || submitted)
+          }" />
+                <small *ngIf="form.controls['workflowName'].errors?.['required'] &&
+                 (form.controls['workflowName'].touched || submitted)" class="p-error">
+                    {{ 'common.validation.required' | translate }}
+                </small>
+            </div>
+
+            <!-- Workflow Type -->
+            <div class="field">
+                <label for="workflowType">
+                    {{ 'workflow.formPage.labels.workflowType' | translate }}
+                    <span class="required-star">*</span>
+                </label>
+                <p-select id="workflowType" [options]="workflowTypes" optionLabel="name" optionValue="value"
+                    formControlName="workflowType"
+                    [placeholder]="'workflow.formPage.placeholders.selectWorkflowType' | translate" [showClear]="true"
+                    [filter]="true" [ngClass]="{
+            'field-error': form.controls['workflowType'].invalid &&
+                          (form.controls['workflowType'].touched || submitted)
+          }" class="w-full"></p-select>
+            </div>
+
+            <!-- Requester Type -->
+            <div class="field">
+                <label for="requesterType">
+                    {{ 'workflow.formPage.labels.requesterType' | translate }}
+                    <span class="required-star">*</span>
+                </label>
+                <p-select id="requesterType" [options]="requesterTypes" optionLabel="name" optionValue="value"
+                    formControlName="requesterType"
+                    [placeholder]="'workflow.formPage.placeholders.selectRequesterType' | translate" [showClear]="true"
+                    [filter]="true"
+                    class="w-full"
+                    ></p-select>
+            </div>
+
+            <!-- Organization -->
+            <div class="field">
+                <label for="organizationId">
+                    {{ 'workflow.formPage.labels.organization' | translate }}
+                    <span class="required-star">*</span>
+                </label>
+                <p-select id="organizationId" [options]="organizations" optionLabel="name" optionValue="id"
+                    formControlName="organizationId"
+                    [placeholder]="'workflow.formPage.placeholders.selectOrganization' | translate" [showClear]="true"
+                    [filter]="true" [loading]="loading"
+                    class="w-full"
+                    ></p-select>
+            </div>
+
+            <!-- Company -->
+            <div class="field">
+                <label for="companyId">
+                    {{ 'workflow.formPage.labels.company' | translate }}
+                    <span class="required-star">*</span>
+                </label>
+                <p-select id="companyId" [options]="companies" optionLabel="name" optionValue="id"
+                    formControlName="companyId"
+                    [placeholder]="'workflow.formPage.placeholders.selectCompany' | translate" [showClear]="true"
+                    [filter]="true" [loading]="loading" class="w-full"></p-select>
+            </div>
+
+            <!-- Department -->
+            <div class="field">
+                <label for="departementId">
+                    {{ 'workflow.formPage.labels.department' | translate }}
+                    <span class="required-star">*</span>
+                </label>
+                <p-select id="departementId" [options]="departments" optionLabel="name" optionValue="id"
+                    formControlName="departementId"
+                    [placeholder]="'workflow.formPage.placeholders.selectDepartment' | translate" [showClear]="true"
+                    [filter]="true" [loading]="loading" class="w-full"></p-select>
+            </div>
+
+            <!-- Is Active -->
+            <div class="field col-span-2">
+                <label for="isActive" class="block mb-2">
+                    {{ 'workflow.formPage.labels.active' | translate }}
+                </label>
+                <p-toggleButton id="isActive" formControlName="isActive" [onLabel]="'common.yes' | translate"
+                    [offLabel]="'common.no' | translate"></p-toggleButton>
+            </div>
+        </div>
+
+       <!-- Workflow Steps -->
+<!-- Workflow Steps -->
+<div formArrayName="workflowSteps" class="mt-6">
+  <div class="flex justify-between align-items-center mb-3">
+    <h3 class="mb-0">{{ 'workflow.formPage.labels.steps' | translate }}</h3>
+    <button
+      pButton
+      type="button"
+      icon="pi pi-plus"
+      [label]="'workflow.formPage.buttons.addStep' | translate"
+      class="p-button-sm"
+      (click)="addStep()">
+    </button>
+  </div>
+
+  <p-table
+    [value]="steps.controls"
+    [tableStyle]="{ 'min-width': '700px' }"
+    [showGridlines]="true"
+    [responsiveLayout]="'scroll'"
+    styleClass="p-datatable-sm p-datatable-striped"
+  >
+    <!-- Header -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th class="w-1 text-center">#</th>
+        <th>{{ 'workflow.formPage.labels.approverType' | translate }}</th>
+        <th>{{ 'workflow.formPage.labels.approverEmployeeId' | translate }}</th>
+        <th class="text-center">{{ 'workflow.formPage.labels.mustApprove' | translate }}</th>
+        <th class="text-center">{{ 'common.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <!-- Body -->
+    <ng-template pTemplate="body" let-step let-i="rowIndex">
+      <tr [formGroupName]="i">
+        <td class="text-center font-medium">{{ i + 1 }}</td>
+
+        <!-- Approver Type -->
+        <td>
+          <p-select
+            [options]="approverTypes"
+            optionLabel="name"
+            optionValue="value"
+            formControlName="approverType"
+            [placeholder]="'workflow.formPage.placeholders.selectApproverType' | translate"
+            [showClear]="true"
+            [filter]="true"
+            styleClass="w-full">
+          </p-select>
+        </td>
+
+        <!-- Approver Employee ID -->
+        <td>
+          <input type="number" pInputText formControlName="approverEmployeeId" class="w-full" />
+        </td>
+
+        <!-- Must Approve -->
+        <td class="text-center">
+          <p-toggleButton
+            formControlName="mustApprove"
+            [onLabel]="'common.yes' | translate"
+            [offLabel]="'common.no' | translate">
+          </p-toggleButton>
+        </td>
+
+        <!-- Actions -->
+        <td class="text-center">
+          <button
+            pButton
+            type="button"
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-text p-button-danger p-button-sm"
+            tooltipPosition="top"
+            (click)="removeStep(i)">
+          </button>
+        </td>
+      </tr>
+    </ng-template>
+
+    <!-- Empty Message -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="text-center py-5 text-500">
+          {{ 'workflow.formPage.labels.noSteps' | translate }}
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+
+        <!-- Buttons -->
+        <div class="flex justify-content-start gap-2 mt-4">
+            <p-button type="button" [label]="'common.buttons.cancel' | translate" class="p-button-secondary"
+                (click)="onCancel()" [disabled]="loading"></p-button>
+            <p-button type="submit" [label]="(isEditMode ? 'common.buttons.update' : 'common.buttons.save') | translate"
+                [disabled]="form.invalid || loading"></p-button>
+        </div>
+    </form>
+</div>
+
+<p-toast></p-toast>

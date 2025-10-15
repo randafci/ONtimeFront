@@ -125,6 +125,16 @@ export class MenuComponent implements OnInit {
 
                         ]
                     }
+ ,
+                    {
+                        label: this.t('menu.workflow.groupLabel'),
+                        items: [
+                            { label: this.t('menu.workflow.workflow'), icon: 'pi pi-fw pi-users', routerLink: ['/workflow'] },
+          
+
+                        ]
+                    }
+
                 ]
             }
         ];
