@@ -8,7 +8,7 @@ import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessageService } from 'primeng/api';
 import { LeaveType } from '../../../interfaces/leave-type.interface';
-import { LeaveTypeService, CreateLeaveType, EditLeaveType } from '../LeaveTypeService';
+import { LeaveTypeService } from '../LeaveTypeService';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { AuthService } from '../../../auth/auth.service';
 import { Organization } from '../../../interfaces/organization.interface';
@@ -81,6 +81,7 @@ export class LeaveTypeModalComponent implements OnInit, OnChanges {
       reason: ['', [Validators.required, Validators.maxLength(500)]],
       isAttachmentRequired: [false],
       isCommentRequired: [false],
+      isDeleted: [false],
       organizationId: [null, Validators.required]
     });
   }
@@ -92,7 +93,12 @@ export class LeaveTypeModalComponent implements OnInit, OnChanges {
   }
 
   resetForm(): void {
-    this.leaveTypeForm.reset({ isAttachmentRequired: false, isCommentRequired: false });
+    this.leaveTypeForm.reset({ 
+      isAttachmentRequired: false, 
+      isCommentRequired: false,
+      isDeleted: false,
+      id: null
+    });
     if (!this.isSuperAdmin) {
       const orgId = this.authService.getOrgId();
       if (orgId) {
@@ -111,15 +117,26 @@ export class LeaveTypeModalComponent implements OnInit, OnChanges {
     const action = this.isEditMode ? this.updateLeaveType(formData) : this.createLeaveType(formData);
   }
 
-  createLeaveType(data: CreateLeaveType): void {
-    this.leaveTypeService.createLeaveType(data).subscribe({
+  createLeaveType(data: any): void {
+    // For create, remove id and set isDeleted to false
+    const createData: LeaveType = {
+      ...data,
+      id: 0, // Backend will ignore this for create
+      isDeleted: false
+    };
+    this.leaveTypeService.createLeaveType(createData).subscribe({
       next: (response: ApiResponse<LeaveType>) => this.handleSuccess(response, 'createSuccess'),
       error: (error) => this.handleError('createError')
     });
   }
 
-  updateLeaveType(data: EditLeaveType): void {
-    this.leaveTypeService.updateLeaveType(data).subscribe({
+  updateLeaveType(data: any): void {
+    // For update, use the existing id
+    const updateData: LeaveType = {
+      ...data,
+      id: this.leaveType!.id
+    };
+    this.leaveTypeService.updateLeaveType(this.leaveType!.id, updateData).subscribe({
       next: (response: ApiResponse<LeaveType>) => this.handleSuccess(response, 'updateSuccess'),
       error: (error) => this.handleError('updateError')
     });

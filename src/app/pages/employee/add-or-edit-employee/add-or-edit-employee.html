@@ -1005,18 +1005,29 @@
           </div>
 
           <!-- End Date Time -->
-          <div class="field">
+          <div class="field" *ngIf="!policyForm.get('isPermanentPolicy')?.value">
             <label class="block text-sm font-medium mb-2 text-gray-700">
-              End Date & Time <span class="text-red-500">*</span>
+              End Date & Time
             </label>
             <input
               type="datetime-local"
               formControlName="endDateTime"
               class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
             />
-            <small class="text-red-500" *ngIf="policyForm.get('endDateTime')?.invalid && policyForm.get('endDateTime')?.touched">
-              End Date & Time is required
+            <small class="text-gray-500 mt-1">
+              Leave empty for permanent policy
             </small>
+          </div>
+
+          <!-- Permanent Policy Checkbox -->
+          <div class="field-checkbox">
+            <input 
+              type="checkbox" 
+              id="isPermanentPolicy"
+              formControlName="isPermanentPolicy"
+              class="mr-2"
+            />
+            <label for="isPermanentPolicy" class="ml-2">Permanent Policy</label>
           </div>
 
           <!-- Attachment -->

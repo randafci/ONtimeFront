@@ -28,7 +28,7 @@ export class LeaveTypeService {
     return this.http.get<ApiResponse<LeaveType[]>>(`${this.apiUrl}/LeaveType`, this.headers);
   }
 
-  createLeaveType(data: CreateLeaveType): Observable<ApiResponse<LeaveType>> {
+  createLeaveType(data: LeaveType): Observable<ApiResponse<LeaveType>> {
     return this.http.post<ApiResponse<LeaveType>>(`${this.apiUrl}/LeaveType`, data, this.headers);
   }
 
@@ -36,20 +36,10 @@ export class LeaveTypeService {
     return this.http.get<ApiResponse<LeaveType>>(`${this.apiUrl}/LeaveType/${id}`, this.headers);
   }
 
-  updateLeaveType(data: EditLeaveType): Observable<ApiResponse<LeaveType>> {
+  updateLeaveType(id: number, data: LeaveType): Observable<ApiResponse<LeaveType>> {
     return this.http.put<ApiResponse<LeaveType>>(
-      `${this.apiUrl}/LeaveType/${data.id}`,
-      {
-        code: data.code,
-        name: data.name,
-        nameSE: data.nameSE,
-        description: data.description,
-        symbol: data.symbol,
-        reason: data.reason,
-        isAttachmentRequired: data.isAttachmentRequired,
-        isCommentRequired: data.isCommentRequired,
-        organizationId: data.organizationId
-      }, 
+      `${this.apiUrl}/LeaveType/${id}`,
+      data,
       this.headers
     );
   }
@@ -63,27 +53,3 @@ export class LeaveTypeService {
   }
 }
 
-export interface CreateLeaveType {
-  code: string;
-  name: string;
-  nameSE: string;
-  description?: string;
-  symbol: string;
-  reason: string;
-  isAttachmentRequired: boolean;
-  isCommentRequired: boolean;
-  organizationId: number;
-}
-
-export interface EditLeaveType {
-  id: number;
-  code: string;
-  name: string;
-  nameSE: string;
-  description?: string;
-  symbol: string;
-  reason: string;
-  isAttachmentRequired: boolean;
-  isCommentRequired: boolean;
-  organizationId: number;
-}

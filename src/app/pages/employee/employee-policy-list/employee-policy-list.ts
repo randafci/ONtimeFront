@@ -119,6 +119,9 @@ export class EmployeePolicyListComponent implements OnInit {
     isActive(policy: EmployeePolicy): boolean {
         const now = new Date();
         const startDate = new Date(policy.startDateTime);
+        if (!policy.endDateTime) {
+            return now >= startDate;
+        }
         const endDate = new Date(policy.endDateTime);
         return now >= startDate && now <= endDate;
     }

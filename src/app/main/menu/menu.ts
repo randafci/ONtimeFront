@@ -103,6 +103,7 @@ export class MenuComponent implements OnInit {
                             { label: this.t('menu.hr.holidays'), icon: 'pi pi-fw pi-calendar', routerLink: ['/holidays/list'] },
                             { label: this.t('menu.hr.holidayTypes'), icon: 'pi pi-fw pi-tags', routerLink: ['/holiday-types/list'] },
                             { label: this.t('menu.hr.leaveTypes'), icon: 'pi pi-fw pi-calendar-plus', routerLink: ['/leave-types/list'] },
+                            { label: 'Leave Requests', icon: 'pi pi-fw pi-file', routerLink: ['/leave-requests/list'] },
                             { label: this.t('menu.hr.ramadanPeriods'), icon: 'pi pi-fw pi-moon', routerLink: ['/ramadan-periods/list'] }
                         ]
                     },
