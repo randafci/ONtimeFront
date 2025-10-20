@@ -1,0 +1,186 @@
+<!-- Create/Edit Dialog -->
+<p-dialog 
+  [(visible)]="dialogVisible" 
+  [header]="isEditMode ? 'Edit Leave Request' : 'Create Leave Request'"
+  [modal]="true" 
+  [style]="{width: '60vw'}"
+  [draggable]="false" 
+  [resizable]="false"
+  (onHide)="onDialogHide()">
+  <form [formGroup]="leaveRequestForm" (ngSubmit)="onSubmit()">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <!-- Employee Employment Field -->
+      <div class="field">
+        <label for="employeeEmploymentId" class="block text-sm font-medium mb-2">
+          Employee Employment
+        </label>
+        <p-select
+          id="employeeEmploymentId"
+          formControlName="employeeEmploymentId"
+          [options]="employeeEmployments"
+          optionLabel="employeeName"
+          optionValue="id"
+          placeholder="Select Employee"
+          [showClear]="true"
+          [filter]="true"
+          filterBy="employeeName"
+          class="w-full"
+        />
+      </div>
+
+      <!-- Leave Type Field -->
+      <div class="field">
+        <label for="leaveTypeId" class="block text-sm font-medium mb-2">
+          Leave Type <span class="text-red-500">*</span>
+        </label>
+        <p-select
+          id="leaveTypeId"
+          formControlName="leaveTypeId"
+          [options]="leaveTypes"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="Select Leave Type"
+          [showClear]="true"
+          [filter]="true"
+          filterBy="name"
+          class="w-full"
+          [class.ng-invalid]="leaveRequestForm.get('leaveTypeId')?.invalid && leaveRequestForm.get('leaveTypeId')?.touched"
+        />
+        <small class="text-red-500" *ngIf="leaveRequestForm.get('leaveTypeId')?.invalid && leaveRequestForm.get('leaveTypeId')?.touched">
+          This field is required
+        </small>
+      </div>
+
+      <!-- From Date Field -->
+      <div class="field">
+        <label for="fromDate" class="block text-sm font-medium mb-2">
+          From Date <span class="text-red-500">*</span>
+        </label>
+        <input 
+          id="fromDate" 
+          type="date" 
+          pInputText 
+          class="w-full"
+          formControlName="fromDate" 
+          [class.ng-invalid]="leaveRequestForm.get('fromDate')?.invalid && leaveRequestForm.get('fromDate')?.touched"
+        />
+        <small class="text-red-500" *ngIf="leaveRequestForm.get('fromDate')?.invalid && leaveRequestForm.get('fromDate')?.touched">
+          This field is required
+        </small>
+      </div>
+
+      <!-- To Date Field -->
+      <div class="field">
+        <label for="toDate" class="block text-sm font-medium mb-2">
+          To Date <span class="text-red-500">*</span>
+        </label>
+        <input 
+          id="toDate" 
+          type="date" 
+          pInputText 
+          class="w-full"
+          formControlName="toDate" 
+          [class.ng-invalid]="leaveRequestForm.get('toDate')?.invalid && leaveRequestForm.get('toDate')?.touched"
+        />
+        <small class="text-red-500" *ngIf="leaveRequestForm.get('toDate')?.invalid && leaveRequestForm.get('toDate')?.touched">
+          This field is required
+        </small>
+      </div>
+
+      <!-- Workflow Field -->
+      <div class="field">
+        <label for="workflowId" class="block text-sm font-medium mb-2">
+          Workflow
+        </label>
+        <p-select
+          id="workflowId"
+          formControlName="workflowId"
+          [options]="workflows"
+          optionLabel="workflowName"
+          optionValue="id"
+          placeholder="Select Workflow"
+          [showClear]="true"
+          [filter]="true"
+          filterBy="workflowName"
+          class="w-full"
+        />
+      </div>
+
+      <!-- Number of Days Field -->
+      <div class="field">
+        <label class="block text-sm font-medium mb-2">
+          Number of Days
+        </label>
+        <div class="p-inputgroup">
+          <input 
+            type="text" 
+            [value]="numberOfDays" 
+            readonly 
+            class="p-inputtext w-full"
+            placeholder="0"
+          />
+          <span class="p-inputgroup-addon">Days</span>
+        </div>
+      </div>
+
+      <!-- Attachment File Upload Field -->
+      <div class="field md:col-span-2">
+        <label class="block text-sm font-medium mb-2">
+          Attachment
+        </label>
+        <p-fileUpload 
+          mode="basic" 
+          name="attachment"
+          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+          maxFileSize="10000000"
+          chooseLabel="Choose File"
+          chooseIcon="pi pi-upload"
+          [auto]="false"
+          (onSelect)="onFileSelected($event)"
+          (onRemove)="onFileRemoved($event)"
+          class="w-full">
+          <ng-template #empty>
+            <div class="text-center text-gray-500 py-4">
+              <i class="pi pi-cloud-upload text-3xl mb-2 block"></i>
+              <p>Click to upload or drag and drop</p>
+              <small class="text-xs">PDF, DOC, DOCX, JPG, PNG (Max 10MB)</small>
+            </div>
+          </ng-template>
+        </p-fileUpload>
+      </div>
+
+      <!-- Comments Field -->
+      <div class="field md:col-span-2">
+        <label for="comments" class="block text-sm font-medium mb-2">
+          Comments
+        </label>
+        <textarea 
+          id="comments" 
+          class="w-full p-inputtext"
+          formControlName="comments" 
+          placeholder="Enter comments"
+          rows="4"
+          style="min-height: 100px; resize: vertical;"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+      <button 
+        pButton 
+        label="Cancel" 
+        class="p-button-secondary" 
+        type="button"
+        (click)="onCancel()">
+      </button>
+      <button 
+        pButton 
+        [label]="isEditMode ? 'Update' : 'Save'" 
+        [loading]="loading"
+        type="submit">
+      </button>
+    </div>
+  </form>
+</p-dialog>
+
+<p-toast></p-toast>

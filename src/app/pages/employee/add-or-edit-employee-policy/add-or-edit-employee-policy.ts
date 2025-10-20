@@ -10,6 +10,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { ToastModule } from 'primeng/toast';
 import { CardModule } from 'primeng/card';
 import { FileUploadModule } from 'primeng/fileupload';
+import { CheckboxModule } from 'primeng/checkbox';
 import { EmployeePolicyService } from '../EmployeePolicyService';
 import { EmployeeEmploymentService } from '../EmployeeEmploymentService';
 import { 
@@ -37,6 +38,7 @@ import { TranslationService } from '../../translation-manager/translation-manage
         ToastModule,
         CardModule,
         FileUploadModule,
+        CheckboxModule,
         TranslatePipe
     ],
     providers: [MessageService],
@@ -90,22 +92,32 @@ export class AddOrEditEmployeePolicyComponent implements OnInit {
                 this.selectedEmploymentId = +params['employmentId'];
                 this.policyForm.patchValue({ employeeEmploymentId: +params['employmentId'] });
             } else if (params['employeeId']) {
-                // Load employments for the employee and auto-select current
-                this.loadEmployeeEmployments(+params['employeeId']);
+                const employeeId = +params['employeeId'];
+                this.policyForm.patchValue({ employeeId: employeeId });
+                this.loadEmployeeEmployments(employeeId);
             }
         });
 
         this.loadDropdownData();
+        
+        // Subscribe to permanent policy changes
+        this.policyForm.get('isPermanentPolicy')?.valueChanges.subscribe(isPermanent => {
+            if (isPermanent) {
+                this.policyForm.patchValue({ endDateTime: null });
+            }
+        });
     }
 
     createForm(): FormGroup {
         return this.fb.group({
             employeeEmploymentId: [null, Validators.required],
+            employeeId: [null, Validators.required],
             policyType: [PolicyType.General, Validators.required],
             policyId: [null, Validators.required],
             startDateTime: [new Date(), Validators.required],
-            endDateTime: [null, Validators.required],
-            attachmentURL: [null]
+            endDateTime: [null],
+            attachmentURL: [null],
+            isPermanentPolicy: [false]
         });
     }
 
@@ -189,6 +201,7 @@ export class AddOrEditEmployeePolicyComponent implements OnInit {
         this.updateFilteredPolicies();
     }
 
+
     updateFilteredPolicies() {
         const policyType = this.policyForm.get('policyType')?.value;
         
@@ -208,11 +221,13 @@ export class AddOrEditEmployeePolicyComponent implements OnInit {
                     const policy = response.data;
                     this.policyForm.patchValue({
                         employeeEmploymentId: policy.employeeEmploymentId,
+                        employeeId: policy.employeeId,
                         policyType: policy.policyType,
                         policyId: policy.policyId,
                         startDateTime: new Date(policy.startDateTime),
-                        endDateTime: new Date(policy.endDateTime),
-                        attachmentURL: policy.attachmentURL
+                        endDateTime: policy.endDateTime ? new Date(policy.endDateTime) : null,
+                        attachmentURL: policy.attachmentURL,
+                        isPermanentPolicy: policy.isPermanentPolicy
                     });
                     this.updateFilteredPolicies();
                 }

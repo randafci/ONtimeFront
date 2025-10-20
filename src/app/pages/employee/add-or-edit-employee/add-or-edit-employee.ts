@@ -11,6 +11,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
+import { CheckboxModule } from 'primeng/checkbox';
 
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
@@ -46,6 +47,7 @@ import { EmployeeEmploymentService } from '../EmployeeEmploymentService';
     TooltipModule,
     ConfirmDialogModule,
     DialogModule,
+    CheckboxModule,
     RouterModule,
     TranslatePipe
   ],
@@ -169,6 +171,13 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
       this.loadEmployeePolicies();
       this.loadPolicyDropdownData();
     }
+    
+    // Subscribe to permanent policy changes
+    this.policyForm.get('isPermanentPolicy')?.valueChanges.subscribe(isPermanent => {
+      if (isPermanent) {
+        this.policyForm.patchValue({ endDateTime: null });
+      }
+    });
   }
 
   onTabChange(tabIndex: number): void {
@@ -314,11 +323,13 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
     return this.fb.group({
       id: [null],
       employeeEmploymentId: [null, Validators.required],
+      employeeId: [null, Validators.required],
       policyType: [PolicyType.General, Validators.required],
       policyId: [null, Validators.required],
       startDateTime: [new Date(), Validators.required],
-      endDateTime: [null, Validators.required],
-      attachment: [null]
+      endDateTime: [null],
+      attachment: [null],
+      isPermanentPolicy: [false]
     });
   }
 
@@ -961,6 +972,7 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
     this.updateFilteredPolicies();
   }
 
+
   updateFilteredPolicies() {
     const policyType = this.policyForm.get('policyType')?.value;
     
@@ -990,16 +1002,19 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
     this.isEditPolicy = false;
     this.policyForm.reset({
       policyType: PolicyType.General,
-      startDateTime: new Date()
+      startDateTime: new Date(),
+      isPermanentPolicy: false
     });
     this.selectedPolicyFileName = '';
     this.selectedPolicyFile = null;
     this.updateFilteredPolicies();
     this.policyDialogVisible = true;
 
-    // Ensure employment is preselected if available
     if (this.selectedEmploymentId) {
-      this.policyForm.patchValue({ employeeEmploymentId: this.selectedEmploymentId });
+      this.policyForm.patchValue({ 
+        employeeEmploymentId: this.selectedEmploymentId,
+        employeeId: this.employeeId
+      });
     }
   }
 
@@ -1022,10 +1037,12 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
     this.policyForm.patchValue({
       id: policy.id,
       employeeEmploymentId: policy.employeeEmploymentId,
+      employeeId: policy.employeeId,
       policyType: policy.policyType,
       policyId: policy.policyId,
       startDateTime: new Date(policy.startDateTime),
-      endDateTime: new Date(policy.endDateTime)
+      endDateTime: policy.endDateTime ? new Date(policy.endDateTime) : null,
+      isPermanentPolicy: policy.isPermanentPolicy
     });
     this.selectedPolicyFileName = '';
     this.selectedPolicyFile = null;
@@ -1066,21 +1083,25 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
       const editData: EditEmployeePolicy = {
         id: formData.id,
         employeeEmploymentId: formData.employeeEmploymentId,
+        employeeId: formData.employeeId,
         policyId: formData.policyId,
         startDateTime: formData.startDateTime,
         endDateTime: formData.endDateTime,
         policyType: formData.policyType,
-        attachmentURL: this.selectedPolicyFile ? this.selectedPolicyFile.name : undefined
+        attachmentURL: this.selectedPolicyFile ? this.selectedPolicyFile.name : undefined,
+        isPermanentPolicy: formData.isPermanentPolicy
       };
       this.updatePolicy(editData);
     } else {
       const createData: CreateEmployeePolicy = {
         employeeEmploymentId: formData.employeeEmploymentId,
+        employeeId: formData.employeeId,
         policyId: formData.policyId,
         startDateTime: formData.startDateTime,
         endDateTime: formData.endDateTime,
         policyType: formData.policyType,
-        attachmentURL: this.selectedPolicyFile ? this.selectedPolicyFile.name : undefined
+        attachmentURL: this.selectedPolicyFile ? this.selectedPolicyFile.name : undefined,
+        isPermanentPolicy: formData.isPermanentPolicy
       };
       this.createPolicy(createData);
     }
@@ -1223,6 +1244,9 @@ export class AddEditEmployeeComponent implements OnInit, OnDestroy {
   isPolicyActive(policy: EmployeePolicy): boolean {
     const now = new Date();
     const startDate = new Date(policy.startDateTime);
+    if (!policy.endDateTime) {
+      return now >= startDate;
+    }
     const endDate = new Date(policy.endDateTime);
     return now >= startDate && now <= endDate;
   }

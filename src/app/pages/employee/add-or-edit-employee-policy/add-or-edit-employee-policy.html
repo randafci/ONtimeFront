@@ -110,11 +110,10 @@
                 </div>
 
                 <!-- End Date Time -->
-                <div class="col-12 md:col-6">
+                <div class="col-12 md:col-6" *ngIf="!policyForm.get('isPermanentPolicy')?.value">
                     <div class="field">
                         <label for="endDateTime" class="font-semibold">
                             {{ 'employeePolicies.formPage.fields.endDateTime' | translate }}
-                            <span class="text-red-500">*</span>
                         </label>
                         <p-datePicker
                             id="endDateTime"
@@ -125,12 +124,22 @@
                             [placeholder]="'employeePolicies.formPage.placeholders.selectEndDateTime' | translate"
                             class="w-full"
                         />
-                        <small 
-                            *ngIf="policyForm.get('endDateTime')?.invalid && policyForm.get('endDateTime')?.touched" 
-                            class="p-error"
-                        >
-                            {{ 'employeePolicies.formPage.validations.endDateTimeRequired' | translate }}
+                        <small class="text-gray-500 mt-1 block">
+                            Leave empty for permanent policy
                         </small>
+                    </div>
+                </div>
+
+                <!-- Permanent Policy Checkbox -->
+                <div class="col-12 md:col-6">
+                    <div class="field-checkbox">
+                        <input 
+                            type="checkbox" 
+                            id="isPermanentPolicy"
+                            formControlName="isPermanentPolicy"
+                            class="mr-2"
+                        />
+                        <label for="isPermanentPolicy" class="ml-2">Permanent Policy</label>
                     </div>
                 </div>
 
