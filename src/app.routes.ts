@@ -248,6 +248,13 @@ export const appRoutes: Routes = [
             (m) => m.WORKFLOW_ROUTES
           )
       },
+       {
+        path: 'overTime',
+        loadChildren: () =>
+          import('./app/pages/OverTime/overTime.routes').then(
+            (m) => m.OVER_TIME_ROUTES
+          )
+      },
       { path: 'test', component: Layout },
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
       {
