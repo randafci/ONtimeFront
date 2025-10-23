@@ -209,7 +209,9 @@ export class MenuComponent implements OnInit, OnDestroy {
       { permission: 'Permissions.HolidayTypes.Page', label: 'menu.hr.holidayTypes', icon: 'pi pi-fw pi-tags', route: '/holiday-types/list' },
       { permission: 'Permissions.LeaveTypes.Page', label: 'menu.hr.leaveTypes', icon: 'pi pi-fw pi-calendar-plus', route: '/leave-types/list' },
       { permission: 'Permissions.RamadanPeriods.Page', label: 'menu.hr.ramadanPeriods', icon: 'pi pi-fw pi-moon', route: '/ramadan-periods/list' },
-      { permission: 'Permissions.OvertimeRequests.Page', label: 'menu.hr.overTime', icon: 'pi pi-fw pi-moon', route: '/overTime/list' }
+      { permission: 'Permissions.OvertimeRequests.Page', label: 'menu.hr.overTime', icon: 'pi pi-fw pi-clock', route: '/overTime/list' },
+      { permission: 'Permissions.OvertimeRequests.Page', label: 'menu.hr.permitionRequest', icon: 'pi pi-file-edit', route: '/permission-requests/list' }
+
     ];
 
     const visibleItems = items.filter(item => 
