@@ -94,11 +94,13 @@ private claims: any = null;
       );
   }
 
-getAuthUserInfo(): Observable<any> {
+/* getAuthUserInfo(): Observable<any> {
   const token = localStorage.getItem('token'); // adjust the key you use
   const headers = new HttpHeaders({
     'Authorization': `Bearer ${token}`
   });
+
+  
 
   return this.http.get<any>(
     `${this.apiUrl}/api/account/user-claims`,
@@ -111,10 +113,45 @@ getAuthUserInfo(): Observable<any> {
       }
     })
   );
+} */
+
+
+
+  getAuthUserInfo(): Observable<any> {
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+
+  return this.http.get<any>(
+    `${this.apiUrl}/api/account/user-claims`,
+    { headers }
+  ).pipe(
+    tap((response: any) => {
+      console.log("=== GET AUTH USER INFO - STORING PERMISSIONS ===");
+      
+      if (response && response.data) {
+        // Extract permission IDs from the response data
+        const permissionIds = response.data.map((item: any) => item.id);
+        console.log("Extracted permissions:", permissionIds);
+        
+        // 1. Store in standalone permissions
+        localStorage.setItem("permissions", JSON.stringify(permissionIds));
+        
+        // 2. Update authData with permissions
+        const authData = JSON.parse(localStorage.getItem("authData") || "{}");
+        authData.permissions = permissionIds;
+        localStorage.setItem("authData", JSON.stringify(authData));
+        
+        // 3. Update the service permissions array (THIS IS THE KEY FIX)
+        this.permissions = permissionIds;
+        
+        console.log("Updated this.permissions:", this.permissions);
+        console.log("Updated authData.permissions:", authData.permissions);
+      }
+    })
+  );
 }
-
-
-
 
   getUserDataFromLocalStorage(): {
     expireIn: string;
@@ -146,13 +183,56 @@ getAuthUserInfo(): Observable<any> {
       employeeId: item?.employeeId ?? 0,
     };
   }
-  loadPermissions() {
+/*   loadPermissions() {
     const userDataFromStorage = this.getUserDataFromLocalStorage();
     if (!(userDataFromStorage && userDataFromStorage.token)) {
       this.authorizations = [];
     }
     this.authorizations = userDataFromStorage?.permissions ?? [];
+  } */
+
+
+    loadPermissions() {
+  console.log("=== LOAD PERMISSIONS ===");
+  
+  const userDataFromStorage = this.getUserDataFromLocalStorage();
+  
+  if (!(userDataFromStorage && userDataFromStorage.token)) {
+    this.authorizations = [];
+    this.permissions = []; // Also clear permissions
+    return;
   }
+
+  // Load into authorizations (for backward compatibility)
+  this.authorizations = userDataFromStorage?.permissions ?? [];
+  
+  // ALSO load into permissions array (for new methods)
+  if (userDataFromStorage.permissions && userDataFromStorage.permissions.length > 0) {
+    this.permissions = userDataFromStorage.permissions;
+  } else {
+    // Fallback: try to load from standalone permissions storage
+    const storedPermissions = localStorage.getItem("permissions");
+    if (storedPermissions) {
+      try {
+        const parsed = JSON.parse(storedPermissions);
+        // Handle both formats: array of strings or array of objects
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          if (typeof parsed[0] === 'string') {
+            this.permissions = parsed;
+          } else if (parsed[0].id) {
+            this.permissions = parsed.map((item: any) => item.id);
+          }
+        }
+      } catch (e) {
+        console.error("Error parsing permissions:", e);
+        this.permissions = [];
+      }
+    }
+  }
+  
+  console.log("Loaded authorizations:", this.authorizations);
+  console.log("Loaded permissions:", this.permissions);
+}
 
   autoLogin() {
     const userData = this.getUserDataFromLocalStorage();
@@ -305,16 +385,67 @@ forgotPassword(Email: string): Observable<any> {
     this.permissions = stored ? JSON.parse(stored) : [];
   }
 
-  hasPermission(required: string): boolean {
-    return this.permissions.includes(required);
+hasPermission(required: string): boolean {
+  console.log("=== AUTH SERVICE hasPermission DEBUG ===");
+  console.log("Required permission:", required);
+  console.log("Current permissions array:", this.permissions);
+  console.log("Type of permissions:", typeof this.permissions);
+  console.log("Is array?", Array.isArray(this.permissions));
+  console.log("Array length:", this.permissions?.length);
+  
+  // Check what's actually in the permissions array
+  if (this.permissions && this.permissions.length > 0) {
+    console.log("First few permissions in array:");
+    this.permissions.slice(0, 5).forEach((perm, index) => {
+      console.log(`  [${index}]:`, perm, `(type: ${typeof perm})`);
+    });
+  }
+  
+  const result = this.permissions.includes(required);
+  console.log("Direct comparison result:", result);
+  
+  // Also check with string conversion in case of type issues
+  const stringResult = this.permissions.some(perm => String(perm) === String(required));
+  console.log("String comparison result:", stringResult);
+  
+  console.log("=====================================");
+  
+  return result;
+}
+ isAuthorized(requiredList: string[], any: boolean = false): boolean {
+  console.log("=== AUTH SERVICE isAuthorized DEBUG ===");
+  console.log("Required permissions list:", requiredList);
+  console.log("any flag:", any);
+  console.log("Current permissions array:", this.permissions);
+  console.log("Permissions array length:", this.permissions?.length);
+  
+  if (!requiredList || requiredList.length === 0) {
+    console.log("Empty required list - returning true");
+    return true;
   }
 
-  isAuthorized(requiredList: string[], any: boolean = false): boolean {
-    if (!requiredList || requiredList.length === 0) return true;
-    if (any) return requiredList.some(r => this.permissions.includes(r));
-    return requiredList.every(r => this.permissions.includes(r));
+  // Debug each permission check
+  const checkResults = requiredList.map(permission => {
+    const hasPerm = this.permissions.includes(permission);
+    console.log(`Checking "${permission}": ${hasPerm}`);
+    return hasPerm;
+  });
+
+  let result: boolean;
+  
+  if (any) {
+    result = checkResults.some(r => r);
+    console.log("OR logic result (any true):", result);
+  } else {
+    result = checkResults.every(r => r);
+    console.log("AND logic result (all true):", result);
   }
 
+  console.log("Final result:", result);
+  console.log("======================================");
+  
+  return result;
+}
 // Enhanced getHeaders method with better debugging
 getHeaders(isFileUpload: boolean = false): HttpHeaders {
   try {

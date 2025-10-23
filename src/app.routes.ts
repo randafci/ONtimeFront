@@ -253,6 +253,12 @@ export const appRoutes: Routes = [
         loadChildren: () =>
           import('./app/pages/permissionRequest/permission_request.routes').then(
             (m) => m.PERMITION_REQUESTS_ROUTES
+          )},
+       {
+        path: 'overTime',
+        loadChildren: () =>
+          import('./app/pages/OverTime/overTime.routes').then(
+            (m) => m.OVER_TIME_ROUTES
           )
       },
       { path: 'test', component: Layout },

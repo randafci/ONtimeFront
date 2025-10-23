@@ -86,37 +86,39 @@ export class Login {
      this.layoutService.initFromApi(2); // 👈 load settings for org
 
 
-      this.authService.getAuthUserInfo().subscribe({
-        next: (info: any) => {
-          const user = new User(
-            info?.name ?? "",
-            token,
-            expiresAt,
-            refreshToken,
-            info?.referenceId ?? 0,
-            info?.userReferenceType ?? 0,
-            info?.language ?? environment.defaultLanguage,
-            info?.permissions
-          );
+    this.authService.getAuthUserInfo().subscribe({
+  next: (info: any) => {
+    const user = new User(
+      info?.name ?? "",
+      token,
+      expiresAt,
+      refreshToken,
+      info?.referenceId ?? 0,
+      info?.userReferenceType ?? 0,
+      info?.language ?? environment.defaultLanguage,
+      info?.permissions
+    );
 
-          localStorage.setItem("token", token);
-          localStorage.setItem("authData", JSON.stringify(user));
-          localStorage.setItem("lan", environment.defaultLanguage);
+    localStorage.setItem("token", token);
+    localStorage.setItem("authData", JSON.stringify(user));
+    localStorage.setItem("lan", environment.defaultLanguage);
 
-          this.authService.loadPermissions();
-          this.doAction();
+    // Remove this line - permissions are already loaded in getAuthUserInfo
+    // this.authService.loadPermissions();
+    
+    this.doAction();
 
-          if (info?.permissions?.includes("SYSTEM_PERMISSION_CODE.Dashboard_PAGE")) {
-            this.router.navigate(["/dashboard"]);
-          } else {
-            this.router.navigate([""]);
-          }
-        },
-        error: () => {
-          this.doAction();
-          this.isAuthFailed = true;
-        }
-      });
+    if (info?.permissions?.includes("SYSTEM_PERMISSION_CODE.Dashboard_PAGE")) {
+      this.router.navigate(["/dashboard"]);
+    } else {
+      this.router.navigate([""]);
+    }
+  },
+  error: () => {
+    this.doAction();
+    this.isAuthFailed = true;
+  }
+});
     },
     error: () => {
       this.doAction();

@@ -1,0 +1,198 @@
+<div class="card">
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="font-semibold text-xl mb-0">
+      {{ 'overtime.listPage.title' | translate }}
+    </h1>
+    <div class="flex-grow-1"></div>
+    <button
+      pButton
+      [label]="'overtime.listPage.addButton' | translate"
+      icon="pi pi-plus"
+      class="p-button-sm"
+      (click)="openCreateDialog()"
+    ></button>
+  </div>
+
+  <p-table
+    #dt
+    [value]="requests"
+    dataKey="id"
+    [rows]="10"
+    [loading]="loading"
+    [paginator]="true"
+    [rowHover]="true"
+    [showGridlines]="true"
+    responsiveLayout="scroll"
+    [globalFilterFields]="['employeeName', 'status']"
+    [currentPageReportTemplate]="'overtime.listPage.paginatorReport' | translate"
+    [showCurrentPageReport]="true"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex justify-between items-center flex-column sm:flex-row">
+        <button
+          pButton
+          [label]="'overtime.listPage.clearButton' | translate"
+          class="p-button-outlined mb-2"
+          icon="pi pi-filter-slash"
+          (click)="clear(dt)"
+        ></button>
+        <p-iconfield iconPosition="left" class="ml-auto">
+          <p-inputicon>
+            <i class="pi pi-search"></i>
+          </p-inputicon>
+          <input
+            pInputText
+            type="text"
+            #filter
+            (input)="onGlobalFilter(dt, $event)"
+            [placeholder]="'overtime.listPage.searchPlaceholder' | translate"
+          />
+        </p-iconfield>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>{{ 'overtime.headers.employee' | translate }}</th>
+        <th>{{ 'overtime.headers.date' | translate }}</th>
+        <th>{{ 'overtime.headers.hours' | translate }}</th>
+        <th>{{ 'overtime.headers.status' | translate }}</th>
+        <th>{{ 'overtime.headers.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item>
+      <tr>
+        <td>{{ item.employeeName || '-' }}</td>
+        <td>{{ item.requestDate | date: 'MM/dd/yyyy' }}</td>
+        <td>{{ item.overTimeHours }}</td>
+        <td>
+          <p-tag
+            [value]="item.status || 'Pending'"
+            [severity]="getSeverity(item.status)"
+          ></p-tag>
+        </td>
+        <td>
+          <button
+            pButton
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-text p-button-sm"
+            (click)="openEditDialog(item)"
+          ></button>
+          <button
+            pButton
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-text p-button-danger p-button-sm"
+            (click)="delete(item)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5">{{ 'overtime.listPage.emptyMessage' | translate }}</td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="loadingbody">
+      <tr>
+        <td colspan="5">{{ 'overtime.listPage.loadingMessage' | translate }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<!-- Create/Edit Dialog -->
+<p-dialog
+  [(visible)]="dialogVisible"
+  [header]="isEditMode ? 'Edit Overtime Request' : 'Create Overtime Request'"
+  [modal]="true"
+  [style]="{ width: '50vw' }"
+>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <!-- Employee -->
+      <div class="field">
+        <label  class="block text-sm font-medium mb-2" for="employeeEmploymentId">Employee</label>
+        <p-select
+          id="employeeEmploymentId"
+          [options]="employees"
+          optionLabel="firstName"
+          optionValue="id"
+          placeholder="Select Employee"
+          formControlName="employeeEmploymentId"
+          class="w-full"
+        ></p-select>
+      </div>
+
+      <!-- Workflow -->
+      <div class="field">
+        <label  class="block text-sm font-medium mb-2" for="workflowId">Workflow</label>
+        <p-select
+          id="workflowId"
+          [options]="workflows"
+          optionLabel="workflowName"
+          optionValue="id"
+          placeholder="Select Workflow"
+          formControlName="workflowId"
+          class="w-full"
+        ></p-select>
+      </div>
+
+      <div class="field">
+        <label class="block text-sm font-medium mb-2" for="requestDate">Request Date</label>
+        <input class="w-full" id="requestDate" type="date" pInputText formControlName="requestDate" />
+      </div>
+
+      <div class="field">
+        <label class="block text-sm font-medium mb-2" for="punchDate">Punch Date</label>
+        <input class="w-full" id="punchDate" type="date" pInputText formControlName="punchDate" />
+      </div>
+
+      <div class="field">
+        <label class="block text-sm font-medium mb-2" for="overTimeHours">Overtime Hours</label>
+        <input class="w-full" id="overTimeHours" type="number" pInputText formControlName="overTimeHours" />
+      </div>
+
+      <div class="field">
+        <label class="block text-sm font-medium mb-2" for="aOverTimeHours">Actual Overtime Hours</label>
+        <input class="w-full" id="aOverTimeHours" type="number" pInputText formControlName="aOverTimeHours" />
+      </div>
+
+      <div class="field">
+        <label class="block text-sm font-medium mb-2" for="allowedOvertimeHours">Allowed Overtime Hours</label>
+        <input class="w-full" id="allowedOvertimeHours" type="number" pInputText formControlName="allowedOvertimeHours" />
+      </div>
+
+      <div class="field">
+        <label class="block text-sm font-medium mb-2" for="approvedOvertimeHours">Approved Overtime Hours</label>
+        <input class="w-full" id="approvedOvertimeHours" type="number" pInputText formControlName="approvedOvertimeHours" />
+      </div>
+
+      <div class="field">
+        <label class="block text-sm font-medium mb-2" for="status">Status</label>
+        <p-select
+          id="status"
+          [options]="[
+            { label: 'Pending', value: 'Pending' },
+            { label: 'Approved', value: 'Approved' },
+            { label: 'Rejected', value: 'Rejected' }
+          ]"
+          placeholder="Select Status"
+          formControlName="status"
+          class="w-full"
+        ></p-select>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+      <button pButton label="Cancel" class="p-button-secondary" type="button" (click)="closeDialog()"></button>
+      <button pButton [label]="isEditMode ? 'Update' : 'Save'" type="submit" [loading]="loading"></button>
+    </div>
+  </form>
+</p-dialog>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
