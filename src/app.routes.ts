@@ -248,6 +248,13 @@ export const appRoutes: Routes = [
             (m) => m.WORKFLOW_ROUTES
           )
       },
+      {
+        path: 'permission-requests',
+        loadChildren: () =>
+          import('./app/pages/permissionRequest/permission_request.routes').then(
+            (m) => m.PERMITION_REQUESTS_ROUTES
+          )
+      },
       { path: 'test', component: Layout },
       { path: 'pages', loadChildren: () => import('./app/pages/pages.routes') },
       {
