@@ -8,7 +8,9 @@ import { AuthService } from '../../auth/auth.service';
 import { APIOperationResponse, ApiResponse, PagedListRequest, PaginatedList } from '../../core/models/api-response.model';
 import { CreateShiftDto, Shift, UpdateShiftDto } from '../../interfaces/shift.interface';
 
-
+export interface GetShiftsByIdsRequest {
+  ids: number[];
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -26,6 +28,10 @@ export class ShiftService {
     // This assumes an endpoint `GET /api/Shifts/all-list` exists that returns the full list.
     // If your paginated endpoint can return all by default, you can use that.
     return this.http.get<ApiResponse<Shift[]>>(`${this.apiUrl}/all-list`, this.headers);
+  }
+  getShiftsByIds(ids: number[]): Observable<ApiResponse<Shift[]>> {
+    const request: GetShiftsByIdsRequest = { ids: ids };
+    return this.http.post<ApiResponse<Shift[]>>(`${this.apiUrl}/by-ids`, request, this.headers);
   }
   
 //   POST method for paginated data if you want to keep it

@@ -231,6 +231,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   private getAttendanceSection(isSuperAdmin: boolean): any[] {
     const items = [
       { permission: 'Permissions.Shifts.Page', label: 'menu.organization.shift', icon: 'pi pi-fw pi-clock', route: '/shifts/list' },
+      { permission: 'Permissions.GeneralPolicies.Page', label: 'menu.attendance.generalPolicies', icon: 'pi pi-fw pi-book', route: '/general-policy/list' },
       { permission: 'Permissions.Timetables.Page', label: 'menu.timetable.timetable', icon: 'pi pi-fw pi-clock', route: '/timetables' },
       { permission: 'Permissions.RegularizationRequests.Page', label: 'menu.attendance.regularization', icon: 'pi pi-fw pi-clock', route: '/attendance' }
     ];

@@ -1,0 +1,74 @@
+<div class="card">
+  <!-- Header -->
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">{{ 'policies.listPage.title' | translate }}</h2>
+    <button pButton [label]="'policies.listPage.createButton' | translate" icon="pi pi-plus" class="p-button-sm" (click)="navigateToAdd()"></button>
+  </div>
+  
+  <!-- Table -->
+  <p-table #dt [value]="policies" dataKey="id" [rows]="10" [loading]="loading" [rowHover]="true"
+           [showGridlines]="true" [paginator]="true" [globalFilterFields]="['nameEn', 'nameAr']" responsiveLayout="scroll">
+    <ng-template pTemplate="caption">
+      <div class="flex justify-content-between items-center flex-column sm:flex-row">
+        <button pButton [label]="'common.buttons.clear' | translate" class="p-button-outlined mb-2" icon="pi pi-filter-slash" (click)="clear(dt)"></button>
+        <p-iconfield iconPosition="left" class="ml-auto">
+          <p-inputicon><i class="pi pi-search"></i></p-inputicon>
+          <input #filter pInputText type="text" (input)="onGlobalFilter(dt, $event)" [placeholder]="'common.searchPlaceholder' | translate" />
+        </p-iconfield>
+      </div>
+    </ng-template>
+    
+    <ng-template pTemplate="header">
+      <tr>
+        <!-- Updated Headers to match available data -->
+        <th>{{ 'policies.listPage.headers.name' | translate }}</th>
+        <th>{{ 'policies.listPage.headers.isActive' | translate }}</th>  
+        <th>{{ 'policies.listPage.headers.late' | translate }} (mins)</th>
+        <th>{{ 'policies.listPage.headers.early' | translate }} (mins)</th>
+        <th>{{ 'policies.listPage.headers.default' | translate }}</th>
+        <th style="width: 15rem;">{{ 'policies.listPage.headers.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="body" let-policy>
+      <tr>
+        <!-- FIX: Use correct property names from GeneralPolicyDto -->
+        <td>{{ policy.nameEn }}</td>
+        <td>
+            <p-tag [severity]="policy.isActive ? 'success' : 'danger'" [value]="policy.isActive ? 'Yes' : 'No'"></p-tag>
+        </td>
+        <td>{{ policy.lateGracePeriod }}</td>
+        <td>{{ policy.earlyGracePeriod }}</td>
+        <td>{{ (policy.isDefault ? 'common.yes' : 'common.no') | translate }}</td>
+        <td>
+          <div class="flex gap-2">
+            <button pButton pRipple type="button" icon="pi pi-clone" class="p-button-rounded p-button-text"
+                    [pTooltip]="'policies.listPage.actions.duplicate' | translate" tooltipPosition="top"
+                    (click)="duplicatePolicy(policy)"></button>
+            <button pButton pRipple type="button" icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-success" 
+                    [pTooltip]="'policies.listPage.actions.edit' | translate" tooltipPosition="top" 
+                    (click)="navigateToEdit(policy.id)"></button>
+            <button pButton pRipple type="button" icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" 
+                    [pTooltip]="'policies.listPage.actions.delete' | translate" tooltipPosition="top"
+                    (click)="deletePolicy(policy)"></button>
+            <!-- FIX: Use 'isDefault' for the button logic -->
+            <button pButton pRipple type="button" class="p-button-sm" *ngIf="!policy.isDefault"
+                    [label]="'policies.listPage.actions.markDefault' | translate"
+                    (click)="makeAsDefault(policy)"></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    
+    <ng-template pTemplate="emptymessage">
+      <tr><td [attr.colspan]="6" class="text-center">{{ 'policies.listPage.messages.empty' | translate }}</td></tr>
+    </ng-template>
+    
+    <ng-template pTemplate="loadingbody">
+      <tr><td [attr.colspan]="6" class="text-center">{{ 'policies.listPage.messages.loading' | translate }}</td></tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
