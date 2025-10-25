@@ -114,7 +114,7 @@
           [class.active]="activeTabIndex === 6"
           (click)="onTabChange(6)">
           <i class="pi pi-shield mr-2"></i>
-          {{ 'employees.formPage.tabs.policies' | translate }}
+          Policies
         </button>
       </nav>
     </div>
@@ -905,14 +905,338 @@
       </div>
     </p-dialog>
 
+    <!-- Policy Assignment Modal -->
+    <p-dialog 
+      [(visible)]="policyDialogVisible" 
+      [header]="(isEditPolicy ? 'Edit Policy Assignment' : 'Add Policy Assignment')"
+      [modal]="true" 
+      [style]="{width: '60vw'}"
+      [draggable]="false" 
+      [resizable]="false"
+      [closable]="false"
+      [dismissableMask]="false"
+      (onHide)="closePolicyDialog()"
+      [closeOnEscape]="true"
+    >
+      <!-- Custom Close Button -->
+      <ng-template pTemplate="header">
+        <div class="flex justify-between items-center w-full">
+          <span class="text-lg font-semibold">{{ isEditPolicy ? 'Edit Policy Assignment' : 'Add Policy Assignment' }}</span>
+          <button 
+            type="button"
+            (click)="closePolicyDialog($event)"
+            class="close-button"
+            title="Close">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+      </ng-template>
+      
+      <form [formGroup]="policyForm" (ngSubmit)="onPolicySubmit($event)">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+          
+          <!-- Employee Employment (Read-only) -->
+          <div class="field md:col-span-2">
+            <label class="block text-sm font-medium mb-2 text-gray-700">
+              Employee Employment <span class="text-red-500">*</span>
+            </label>
+            <div class="p-3 bg-gray-50 border border-gray-300 rounded-md">
+              <div class="flex items-center gap-2">
+                <i class="pi pi-building text-gray-500"></i>
+                <span class="text-gray-700 font-medium">{{ getSelectedEmploymentLabel() }}</span>
+                <span class="text-xs text-gray-500 bg-green-100 px-2 py-1 rounded">Current Employment</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Policy Type -->
+          <div class="field">
+            <label class="block text-sm font-medium mb-2 text-gray-700">
+              Policy Type <span class="text-red-500">*</span>
+            </label>
+            <p-select
+              formControlName="policyType"
+              [options]="policyTypes"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select Policy Type"
+              (onChange)="onPolicyTypeChange()"
+              class="w-full"
+            />
+            <small class="text-red-500" *ngIf="policyForm.get('policyType')?.invalid && policyForm.get('policyType')?.touched">
+              Policy Type is required
+            </small>
+          </div>
+
+          <!-- Policy -->
+          <div class="field">
+            <label class="block text-sm font-medium mb-2 text-gray-700">
+              Policy <span class="text-red-500">*</span>
+            </label>
+            <p-select
+              formControlName="policyId"
+              [options]="filteredPolicies"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select Policy"
+              [filter]="true"
+              filterBy="label"
+              [showClear]="true"
+              class="w-full"
+            />
+            <small class="text-red-500" *ngIf="policyForm.get('policyId')?.invalid && policyForm.get('policyId')?.touched">
+              Policy is required
+            </small>
+          </div>
+
+          <!-- Start Date Time -->
+          <div class="field">
+            <label class="block text-sm font-medium mb-2 text-gray-700">
+              Start Date & Time <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="datetime-local"
+              formControlName="startDateTime"
+              class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+            />
+            <small class="text-red-500" *ngIf="policyForm.get('startDateTime')?.invalid && policyForm.get('startDateTime')?.touched">
+              Start Date & Time is required
+            </small>
+          </div>
+
+          <!-- End Date Time -->
+          <div class="field" *ngIf="!policyForm.get('isPermanentPolicy')?.value">
+            <label class="block text-sm font-medium mb-2 text-gray-700">
+              End Date & Time
+            </label>
+            <input
+              type="datetime-local"
+              formControlName="endDateTime"
+              class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+            />
+            <small class="text-gray-500 mt-1">
+              Leave empty for permanent policy
+            </small>
+          </div>
+
+          <!-- Permanent Policy Checkbox -->
+          <div class="field-checkbox">
+            <input 
+              type="checkbox" 
+              id="isPermanentPolicy"
+              formControlName="isPermanentPolicy"
+              class="mr-2"
+            />
+            <label for="isPermanentPolicy" class="ml-2">Permanent Policy</label>
+          </div>
+
+          <!-- Attachment -->
+          <div class="field md:col-span-2">
+            <label class="block text-sm font-medium mb-2 text-gray-700">
+              Attachment
+            </label>
+            <div class="flex items-center gap-2">
+              <input 
+                type="file"
+                #policyFileInput
+                (change)="onPolicyFileSelect($event)"
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                class="hidden">
+              <button 
+                type="button"
+                pButton 
+                label="Choose File" 
+                class="p-button-outlined p-button-sm"
+                (click)="policyFileInput.click()">
+              </button>
+              <span class="text-sm text-gray-500">{{ selectedPolicyFileName || 'No file chosen' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 mt-6 pt-4 border-t">
+          <button 
+            pButton 
+            label="Cancel" 
+            class="p-button-secondary" 
+            type="button"
+            (click)="closePolicyDialog($event)">
+          </button>
+          <button 
+            pButton 
+            label="{{ isEditPolicy ? 'Update' : 'Add' }}" 
+            class="p-button-danger" 
+            [loading]="loadingPolicy"
+            type="submit">
+          </button>
+        </div>
+      </form>
+    </p-dialog>
+
+    <!-- Policy Delete Confirmation Dialog -->
+    <p-dialog 
+      [(visible)]="policyDeleteConfirmationVisible" 
+      [modal]="true" 
+      [style]="{width: '400px'}"
+      [draggable]="false" 
+      [resizable]="false"
+      [closable]="false"
+      [dismissableMask]="false"
+    >
+      <!-- Custom Close Button for Delete Dialog -->
+      <ng-template pTemplate="header">
+        <div class="flex justify-between items-center w-full">
+          <span class="text-lg font-semibold">Confirm Deletion</span>
+          <button 
+            type="button"
+            (click)="cancelPolicyDelete($event)"
+            class="close-button"
+            title="Close">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+      </ng-template>
+      <div class="flex items-center gap-3 mb-4">
+        <i class="pi pi-exclamation-triangle text-orange-500 text-2xl"></i>
+        <span>Are you sure you want to delete this policy assignment?</span>
+      </div>
+      
+      <div class="flex justify-end gap-3">
+        <button 
+          pButton 
+          label="No" 
+          class="p-button-secondary" 
+          type="button"
+          (click)="cancelPolicyDelete()">
+        </button>
+        <button 
+          pButton 
+          label="Yes" 
+          class="p-button-danger" 
+          type="button"
+          (click)="confirmPolicyDelete()">
+        </button>
+      </div>
+    </p-dialog>
+
     <!-- Policies Tab -->
     <div *ngIf="activeTabIndex === 6" class="tab-content">
-      <div class="text-center py-12">
-        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <i class="pi pi-shield text-2xl text-gray-400"></i>
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-medium text-gray-900">Policies</h3>
+          <button 
+            *ngIf="isEditMode"
+            pButton 
+            label="Add Policy" 
+            icon="pi pi-plus" 
+            class="p-button-sm"
+            type="button"
+            (click)="openPolicyModal($event)"
+          ></button>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">{{ 'employees.formPage.tabs.policies' | translate }}</h3>
-        <p class="text-gray-500">{{ 'employees.formPage.policies.comingSoon' | translate }}</p>
+        
+        <!-- Employee Policies Table -->
+        <div *ngIf="isEditMode" class="policies-section">
+          <p-table
+            #dt
+            [value]="employeePolicies"
+            dataKey="id"
+            [rows]="5"
+            [loading]="loadingEmployeePolicies"
+            [rowHover]="true"
+            [showGridlines]="true"
+            [paginator]="true"
+            [globalFilterFields]="['policyName', 'policyType']"
+            responsiveLayout="scroll"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="min-width: 8rem">ID</th>
+                <th style="min-width: 12rem">Policy Type</th>
+                <th style="min-width: 12rem">Policy Name</th>
+                <th style="min-width: 12rem">Start Date</th>
+                <th style="min-width: 12rem">End Date</th>
+                <th style="min-width: 8rem">Status</th>
+                <th style="min-width: 10rem">Actions</th>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="body" let-policy>
+              <tr>
+                <td>{{ policy.id }}</td>
+                <td>
+                  <p-tag 
+                    [value]="getPolicyTypeName(policy.policyType)" 
+                    [severity]="getPolicyTypeSeverity(policy.policyType)"
+                  />
+                </td>
+                <td>{{ policy.policyName || 'N/A' }}</td>
+                <td>{{ policy.startDateTime | date:'short' }}</td>
+                <td>{{ policy.endDateTime | date:'short' }}</td>
+                <td>
+                  <p-tag 
+                    [value]="getPolicyStatusLabel(policy)" 
+                    [severity]="getPolicyStatusSeverity(policy)"
+                  />
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button 
+                      pButton 
+                      icon="pi pi-pencil" 
+                      class="p-button-rounded p-button-text p-button-sm"
+                      type="button"
+                      (click)="editPolicy(policy, $event)"
+                      pTooltip="Edit Policy"
+                      tooltipPosition="top"
+                    ></button>
+                    <button 
+                      pButton 
+                      icon="pi pi-trash" 
+                      class="p-button-rounded p-button-text p-button-danger p-button-sm"
+                      type="button"
+                      (click)="deletePolicy(policy, $event)"
+                      pTooltip="Delete Policy"
+                      tooltipPosition="top"
+                    ></button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="7">No policy assignments found</td>
+              </tr>
+            </ng-template>
+            
+            <ng-template pTemplate="loadingbody">
+              <tr>
+                <td colspan="7">Loading policies...</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+        
+        <!-- Message for new employees -->
+        <div *ngIf="!isEditMode" class="bg-gray-50 rounded-lg p-6">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="pi pi-shield text-2xl text-blue-600"></i>
+            </div>
+            <h4 class="text-lg font-medium text-gray-900 mb-2">Policy Assignment Management</h4>
+            <p class="text-gray-600 mb-4">
+              Save the employee first to manage policy assignments.
+            </p>
+            <button 
+              pButton 
+              label="Save Employee First" 
+              icon="pi pi-save" 
+              class="p-button-outlined p-button-sm"
+              disabled
+            ></button>
+          </div>
+        </div>
       </div>
     </div>
 

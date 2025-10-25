@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CreateEmployee, EditEmployee, Employee } from '@/interfaces/employee.interface';
+import { EmployeeEmployment } from '@/interfaces/employee-employment.interface';
 import { ApiResponse } from '@/core/models/api-response.model';
 import { AppConfigService } from '@/pages/service/app-config.service';
 import { AuthService } from '@/auth/auth.service';
@@ -37,5 +38,9 @@ export class EmployeeService {
 
   deleteEmployee(id: number): Observable<ApiResponse<boolean>> {
     return this.http.delete<ApiResponse<boolean>>(`${this.apiUrl}/Employee/${id}`,this.headers);
+  }
+
+  getAllEmployeeEmployments(): Observable<ApiResponse<EmployeeEmployment[]>> {
+    return this.http.get<ApiResponse<EmployeeEmployment[]>>(`${this.apiUrl}/EmployeeEmployment`, this.headers);
   }
 }

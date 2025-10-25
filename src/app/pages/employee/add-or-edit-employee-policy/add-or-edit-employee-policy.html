@@ -1,0 +1,190 @@
+<div class="card">
+    <p-toast />
+    
+    <div class="mb-4">
+        <h5 class="m-0">
+            {{ isEditMode 
+                ? ('employeePolicies.formPage.editTitle' | translate) 
+                : ('employeePolicies.formPage.addTitle' | translate) 
+            }}
+        </h5>
+    </div>
+
+    <form [formGroup]="policyForm" (ngSubmit)="onSubmit()">
+        <p-card>
+            <div class="grid">
+                <!-- Employee Employment (Read-only) -->
+                <div class="col-12 md:col-6">
+                    <div class="field">
+                        <label for="employeeEmploymentId" class="font-semibold">
+                            {{ 'employeePolicies.formPage.fields.employeeEmployment' | translate }}
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <div class="p-3 bg-gray-50 border border-gray-300 rounded-md">
+                            <div class="flex items-center gap-2">
+                                <i class="pi pi-building text-gray-500"></i>
+                                <span class="text-gray-700 font-medium">{{ getSelectedEmploymentLabel() }}</span>
+                                <span class="text-xs text-gray-500 bg-green-100 px-2 py-1 rounded">Current Employment</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Policy Type -->
+                <div class="col-12 md:col-6">
+                    <div class="field">
+                        <label for="policyType" class="font-semibold">
+                            {{ 'employeePolicies.formPage.fields.policyType' | translate }}
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <p-select
+                            id="policyType"
+                            formControlName="policyType"
+                            [options]="policyTypes"
+                            optionLabel="label"
+                            optionValue="value"
+                            [placeholder]="'employeePolicies.formPage.placeholders.selectPolicyType' | translate"
+                            (onChange)="onPolicyTypeChange()"
+                            class="w-full"
+                        />
+                        <small 
+                            *ngIf="policyForm.get('policyType')?.invalid && policyForm.get('policyType')?.touched" 
+                            class="p-error"
+                        >
+                            {{ 'employeePolicies.formPage.validations.policyTypeRequired' | translate }}
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Policy -->
+                <div class="col-12 md:col-6">
+                    <div class="field">
+                        <label for="policyId" class="font-semibold">
+                            {{ 'employeePolicies.formPage.fields.policy' | translate }}
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <p-select
+                            id="policyId"
+                            formControlName="policyId"
+                            [options]="filteredPolicies"
+                            optionLabel="label"
+                            optionValue="value"
+                            [placeholder]="'employeePolicies.formPage.placeholders.selectPolicy' | translate"
+                            [filter]="true"
+                            filterBy="label"
+                            [showClear]="true"
+                            class="w-full"
+                        />
+                        <small 
+                            *ngIf="policyForm.get('policyId')?.invalid && policyForm.get('policyId')?.touched" 
+                            class="p-error"
+                        >
+                            {{ 'employeePolicies.formPage.validations.policyRequired' | translate }}
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Start Date Time -->
+                <div class="col-12 md:col-6">
+                    <div class="field">
+                        <label for="startDateTime" class="font-semibold">
+                            {{ 'employeePolicies.formPage.fields.startDateTime' | translate }}
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <p-datePicker
+                            id="startDateTime"
+                            formControlName="startDateTime"
+                            [showTime]="true"
+                            [showIcon]="true"
+                            dateFormat="yy-mm-dd"
+                            [placeholder]="'employeePolicies.formPage.placeholders.selectStartDateTime' | translate"
+                            class="w-full"
+                        />
+                        <small 
+                            *ngIf="policyForm.get('startDateTime')?.invalid && policyForm.get('startDateTime')?.touched" 
+                            class="p-error"
+                        >
+                            {{ 'employeePolicies.formPage.validations.startDateTimeRequired' | translate }}
+                        </small>
+                    </div>
+                </div>
+
+                <!-- End Date Time -->
+                <div class="col-12 md:col-6" *ngIf="!policyForm.get('isPermanentPolicy')?.value">
+                    <div class="field">
+                        <label for="endDateTime" class="font-semibold">
+                            {{ 'employeePolicies.formPage.fields.endDateTime' | translate }}
+                        </label>
+                        <p-datePicker
+                            id="endDateTime"
+                            formControlName="endDateTime"
+                            [showTime]="true"
+                            [showIcon]="true"
+                            dateFormat="yy-mm-dd"
+                            [placeholder]="'employeePolicies.formPage.placeholders.selectEndDateTime' | translate"
+                            class="w-full"
+                        />
+                        <small class="text-gray-500 mt-1 block">
+                            Leave empty for permanent policy
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Permanent Policy Checkbox -->
+                <div class="col-12 md:col-6">
+                    <div class="field-checkbox">
+                        <input 
+                            type="checkbox" 
+                            id="isPermanentPolicy"
+                            formControlName="isPermanentPolicy"
+                            class="mr-2"
+                        />
+                        <label for="isPermanentPolicy" class="ml-2">Permanent Policy</label>
+                    </div>
+                </div>
+
+                <!-- Attachment URL -->
+                <div class="col-12 md:col-6">
+                    <div class="field">
+                        <label for="attachmentURL" class="font-semibold">
+                            {{ 'employeePolicies.formPage.fields.attachmentURL' | translate }}
+                        </label>
+                        <input
+                            id="attachmentURL"
+                            type="text"
+                            pInputText
+                            formControlName="attachmentURL"
+                            [placeholder]="'employeePolicies.formPage.placeholders.attachmentURL' | translate"
+                            class="w-full"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex justify-end gap-2 mt-4">
+                <button
+                    pButton
+                    pRipple
+                    type="button"
+                    [label]="'common.cancel' | translate"
+                    icon="pi pi-times"
+                    class="p-button-text"
+                    (click)="onCancel()"
+                    [disabled]="loading"
+                ></button>
+                <button
+                    pButton
+                    pRipple
+                    type="submit"
+                    [label]="isEditMode ? ('common.update' | translate) : ('common.save' | translate)"
+                    icon="pi pi-check"
+                    class="p-button-success"
+                    [disabled]="loading"
+                    [loading]="loading"
+                ></button>
+            </div>
+        </p-card>
+    </form>
+</div>
+

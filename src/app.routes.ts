@@ -179,6 +179,13 @@ export const appRoutes: Routes = [
           )
       },
       {
+        path: 'leave-requests',
+        loadChildren: () =>
+          import('./app/pages/leave-request/leave-request.routes').then(
+            (m) => m.LEAVE_REQUEST_ROUTES
+          )
+      },
+      {
         path: 'ramadan-periods',
         loadChildren: () =>
           import('./app/pages/ramadan-period/ramadan-period.routes').then(
@@ -239,6 +246,20 @@ export const appRoutes: Routes = [
         loadChildren: () =>
           import('./app/pages/shift/shift.routes').then(
             (m) => m.SHIFT_ROUTES
+          )
+      },
+      {
+        path: 'workflow',
+        loadChildren: () =>
+          import('./app/pages/workflow/workflow.routes').then(
+            (m) => m.WORKFLOW_ROUTES
+          )
+      },
+       {
+        path: 'overTime',
+        loadChildren: () =>
+          import('./app/pages/OverTime/overTime.routes').then(
+            (m) => m.OVER_TIME_ROUTES
           )
       },
       { path: 'test', component: Layout },
