@@ -200,6 +200,13 @@ export const appRoutes: Routes = [
           )
       },
       {
+        path: 'general-policy',
+        loadChildren: () =>
+          import('./app/pages/general-policy/general-policy.routes').then(
+            (m) => m.GENERAL_POLICY_ROUTES
+          )
+      },
+      {
         path: 'timetables',
         loadChildren: () =>
           import('./app/pages/timetable/timetable.routes').then(
